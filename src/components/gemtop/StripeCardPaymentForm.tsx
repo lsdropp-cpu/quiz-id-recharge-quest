@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Shield, Lock, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { WalletPreviewStrip } from '@/components/gemtop/WalletPreviewStrip';
 // Payment backend calls go to this project's own server routes
 // (/api/public/process-card-payment and /api/public/register-utmify-sale).
 
@@ -255,11 +256,23 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
   const [pagamentoTracked, setPagamentoTracked] = useState(false);
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [canMakePayment, setCanMakePayment] = useState(false);
+  const [showWalletPreview, setShowWalletPreview] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
+  // Show static Apple Pay / Google Pay mockups only inside the Lovable preview
+  // (or with ?vercarteiras=1). Never for real customers.
+  useEffect(() => {
+    const host = window.location.hostname;
+    const isPreviewHost =
+      host === 'localhost' || host === '127.0.0.1' || host.startsWith('id-preview--');
+    const forced = new URLSearchParams(window.location.search).has('vercarteiras');
+    setShowWalletPreview(isPreviewHost || forced);
+  }, []);
+
   const isFormComplete = cardholderName && cardNumberComplete && cardExpiryComplete && cardCvcComplete;
+
   const isOnCooldown = cooldownRemaining > 0;
 
   // Check if user is blocked or on cooldown on mount and update timer
@@ -888,6 +901,19 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
           </div>
         </>
       )}
+
+      {/* Visual-only wallet preview (Lovable preview / ?vercarteiras=1) */}
+      {!canMakePayment && showWalletPreview && (
+        <>
+          <WalletPreviewStrip lang={lang} />
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-muted-foreground text-sm">{t.orPayWithCard}</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+        </>
+      )}
+
 
       {/* Card Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
