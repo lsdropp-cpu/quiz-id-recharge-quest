@@ -4,7 +4,8 @@ import { CheckCircle, Diamond, Gift, Clock, AlertTriangle, Sparkles, BookOpen } 
 import { useUtmifyHotmartPixel } from "@/hooks/useUtmifyHotmartPixel";
 import { trackFunnel } from "@/lib/gemtop-tracking";
 
-const freefireLogo = "https://recargasdiamante.site/assets/freefire-logo-khkzMQoZ.png";
+import freefireLogoNew from "@/assets/freefire-logo-new.png.asset.json";
+const freefireLogo = freefireLogoNew.url;
 
 export const Route = createFileRoute("/obrigado")({
   head: () => ({

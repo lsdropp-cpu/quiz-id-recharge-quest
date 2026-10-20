@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Check, TriangleAlert } from "lucide-react";
-import freefireLogoAsset from "@/assets/freefire-logo-transparent.png.asset.json";
+import freefireLogoAsset from "@/assets/freefire-logo-new.png.asset.json";
 
 interface QuizLandingProps {
   onStart: () => void;
