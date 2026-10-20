@@ -1,16 +1,15 @@
-import { Check } from "lucide-react";
-import freefireLogo from "@/assets/freefire-logo-white.png.asset.json";
+import freefireIcon from "@/assets/freefire-selection-white.png";
 
 /** Presentation-only selected game mark, shared across localized headers. */
 export default function FreeFireGameMark() {
   return (
-    <div className="inline-flex h-12 sm:h-14 items-center gap-5 border-b-2 border-primary pb-2">
+    <div className="inline-flex h-12 sm:h-14 items-center gap-3">
       <img
-        src={freefireLogo.url}
-        alt="Free Fire"
-        className="h-7 sm:h-8 w-auto object-contain"
+        src={freefireIcon}
+        alt=""
+        className="size-10 sm:size-11 shrink-0 rounded-lg object-contain"
       />
-      <Check aria-hidden="true" className="size-4 shrink-0 text-primary" strokeWidth={3} />
+      <span className="font-sans text-xl sm:text-2xl font-medium leading-none text-foreground">Free Fire</span>
     </div>
   );
 }
