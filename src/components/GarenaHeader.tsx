@@ -1,6 +1,6 @@
 import garenaLogo from "@/assets/garena-logo.png";
 import membershipsBanner from "@/assets/memberships-banner.webp";
-import freefirePill from "@/assets/freefire-pill.png.asset.json";
+import freefirePill from "@/assets/freefire-pill-transparent.png.asset.json";
 import freefireBanner from "@/assets/freefire-game-banner.png.asset.json";
 
 const GarenaHeader = () => (
