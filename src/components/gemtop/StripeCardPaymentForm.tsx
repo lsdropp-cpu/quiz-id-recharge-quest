@@ -261,14 +261,11 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
   const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
-  // Show static Apple Pay / Google Pay mockups only inside the Lovable preview
-  // (or with ?vercarteiras=1). Never for real customers.
+  // Show static Apple Pay / Google Pay mockups only in the Lovable preview
+  // (dev server) or with ?vercarteiras=1. Never on the published site.
   useEffect(() => {
-    const host = window.location.hostname;
-    const isPreviewHost =
-      host === 'localhost' || host === '127.0.0.1' || host.startsWith('id-preview--');
     const forced = new URLSearchParams(window.location.search).has('vercarteiras');
-    setShowWalletPreview(isPreviewHost || forced);
+    setShowWalletPreview(Boolean(import.meta.env.DEV) || forced);
   }, []);
 
   const isFormComplete = cardholderName && cardNumberComplete && cardExpiryComplete && cardCvcComplete;
@@ -869,12 +866,6 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Order Summary */}
-      <div className="flex items-center justify-between rounded-lg border border-border bg-muted px-4 py-3">
-        <span className="text-sm font-medium text-foreground">{productName}</span>
-        <span className="text-base font-bold text-foreground">$ {amount.toFixed(2)} USD</span>
-      </div>
-
       {/* Apple Pay / Google Pay Button */}
       {canMakePayment && paymentRequest && (
         <>
