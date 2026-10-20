@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import freefireLogoAsset from "@/assets/freefire-logo-transparent.png.asset.json";
+import freefireLogoAsset from "@/assets/freefire-logo-new.png.asset.json";
 
 export const Route = createFileRoute("/roleta")({
   head: () => ({
