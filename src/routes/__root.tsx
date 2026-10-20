@@ -117,6 +117,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "icon",
+        type: "image/png",
+        href: "/favicon.png",
+      },
     ],
     // Brazilian funnel has its own Utmify account; Spanish pages keep theirs.
     scripts: isBr ? BR_SCRIPTS : [
