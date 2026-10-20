@@ -321,3 +321,26 @@
 @media (prefers-reduced-motion: reduce) {
   .es-halloween *, .es-halloween *::before, .es-halloween *::after { animation: none !important; transition: none !important; }
 }
+
+/* Gemtop checkout pages (ported styles) */
+@theme inline {
+  --color-discount: hsl(var(--discount-green));
+}
+
+:root {
+  --discount-green: 145 70% 40%;
+}
+
+.discount-text {
+  color: hsl(var(--discount-green));
+}
+
+.info-box {
+  background-color: hsl(var(--secondary) / 0.5);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
