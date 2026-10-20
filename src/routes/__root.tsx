@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import HalloweenTheme from "@/components/br/HalloweenTheme";
 import SpanishHalloweenTheme from "@/components/HalloweenTheme";
@@ -180,6 +181,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       {isBr ? <HalloweenTheme><Outlet /></HalloweenTheme> : isSpanishFunnel ? <SpanishHalloweenTheme><Outlet /></SpanishHalloweenTheme> : <Outlet />}
+      <Toaster />
     </QueryClientProvider>
   );
 }
