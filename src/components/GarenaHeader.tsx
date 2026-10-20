@@ -1,6 +1,6 @@
 import garenaLogo from "@/assets/garena-logo.png";
 import membershipsBanner from "@/assets/memberships-banner.webp";
-import freefirePill from "@/assets/freefire-pill-transparent.png.asset.json";
+import FreeFireGameMark from "@/components/FreeFireGameMark";
 import freefireBanner from "@/assets/freefire-game-banner.png.asset.json";
 
 const GarenaHeader = () => (
@@ -15,7 +15,7 @@ const GarenaHeader = () => (
     <img src={membershipsBanner} alt="Membresías Free Fire" className="w-full rounded-xl shadow-md" />
     <div>
       <p className="text-sm sm:text-base font-bold text-foreground mb-2">Selección de Juego</p>
-      <img src={freefirePill.url} alt="Free Fire" className="h-11 sm:h-[52px] w-auto" />
+      <FreeFireGameMark />
     </div>
     <img src={freefireBanner.url} alt="Free Fire" className="w-full rounded-xl shadow-md" loading="lazy" />
   </div>
