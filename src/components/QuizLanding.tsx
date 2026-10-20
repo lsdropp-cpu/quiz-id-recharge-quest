@@ -1,5 +1,5 @@
 import { Check, TriangleAlert } from "lucide-react";
-import freefireLogoAsset from "@/assets/freefire-logo-new.png.asset.json";
+import freefireLogoAsset from "@/assets/freefire-logo-white.png.asset.json";
 
 interface QuizLandingProps {
   onStart: () => void;
