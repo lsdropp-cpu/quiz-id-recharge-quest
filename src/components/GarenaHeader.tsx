@@ -1,7 +1,7 @@
 import garenaLogo from "@/assets/garena-logo.png";
 import membershipsBanner from "@/assets/memberships-banner.webp";
 import freefireCharacter from "@/assets/freefire-character.png";
-import freefireBanner from "@/assets/freefire-banner.webp.asset.json";
+import freefireBanner from "@/assets/freefire-game-banner.png.asset.json";
 
 const GarenaHeader = () => (
   <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
