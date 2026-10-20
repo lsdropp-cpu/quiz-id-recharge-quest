@@ -856,6 +856,12 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Order Summary */}
+      <div className="flex items-center justify-between rounded-lg border border-border bg-muted px-4 py-3">
+        <span className="text-sm font-medium text-foreground">{productName}</span>
+        <span className="text-base font-bold text-foreground">$ {amount.toFixed(2)} USD</span>
+      </div>
+
       {/* Apple Pay / Google Pay Button */}
       {canMakePayment && paymentRequest && (
         <>
@@ -996,11 +1002,6 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
         </div>
 
 
-        {/* Security Notice */}
-        <div className="flex items-center gap-2 text-muted-foreground text-sm">
-          <Shield className="w-4 h-4" />
-          <span>{t.securePayment}</span>
-        </div>
 
         {/* Accepted Cards Notice */}
         <div className="text-center text-muted-foreground text-sm">
