@@ -16,7 +16,7 @@ export const Route = createFileRoute("/checkout9-en")({
   component: () => (
     <GemtopCheckoutPage
       priceKey="9"
-      priceUsd={9.0}
+      priceUsd={9.90}
       diamonds={5600}
       lang="en"
       banner={freefireBannerEn}
