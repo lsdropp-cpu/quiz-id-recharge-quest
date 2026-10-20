@@ -10,33 +10,362 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout-success'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as IdplayerRouteImport } from './routes/idplayer'
+import { Route as Idplayer2RouteImport } from './routes/idplayer2'
+import { Route as PresellRouteImport } from './routes/presell'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as Quiz2RouteImport } from './routes/quiz2'
+import { Route as RechargeRouteImport } from './routes/recharge'
+import { Route as Recharge2RouteImport } from './routes/recharge2'
+import { Route as RoletaRouteImport } from './routes/roleta'
+import { Route as BrIndexRouteImport } from './routes/br.index'
+import { Route as BrIdplayerRouteImport } from './routes/br.idplayer'
+import { Route as BrQuizRouteImport } from './routes/br.quiz'
+import { Route as BrRechargeRouteImport } from './routes/br.recharge'
+import { Route as CheckoutPlanIdRouteImport } from './routes/checkout.$planId'
+import { Route as EsIndexRouteImport } from './routes/es.index'
+import { Route as EsIdplayerRouteImport } from './routes/es.idplayer'
+import { Route as EsQuizRouteImport } from './routes/es.quiz'
+import { Route as EsRechargeRouteImport } from './routes/es.recharge'
+import { Route as FrIndexRouteImport } from './routes/fr.index'
+import { Route as FrIdplayerRouteImport } from './routes/fr.idplayer'
+import { Route as FrQuizRouteImport } from './routes/fr.quiz'
+import { Route as FrRechargeRouteImport } from './routes/fr.recharge'
+import { Route as ApiPublicFreepayWebhookRouteImport } from './routes/api/public/freepay-webhook'
+import { Route as BrCheckoutPlanRouteImport } from './routes/br.checkout.$plan'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout-success',
+  path: '/checkout-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdplayerRoute = IdplayerRouteImport.update({
+  id: '/idplayer',
+  path: '/idplayer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Idplayer2Route = Idplayer2RouteImport.update({
+  id: '/idplayer2',
+  path: '/idplayer2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PresellRoute = PresellRouteImport.update({
+  id: '/presell',
+  path: '/presell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Quiz2Route = Quiz2RouteImport.update({
+  id: '/quiz2',
+  path: '/quiz2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RechargeRoute = RechargeRouteImport.update({
+  id: '/recharge',
+  path: '/recharge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Recharge2Route = Recharge2RouteImport.update({
+  id: '/recharge2',
+  path: '/recharge2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoletaRoute = RoletaRouteImport.update({
+  id: '/roleta',
+  path: '/roleta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrIndexRoute = BrIndexRouteImport.update({
+  id: '/br/',
+  path: '/br/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrIdplayerRoute = BrIdplayerRouteImport.update({
+  id: '/br/idplayer',
+  path: '/br/idplayer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrQuizRoute = BrQuizRouteImport.update({
+  id: '/br/quiz',
+  path: '/br/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrRechargeRoute = BrRechargeRouteImport.update({
+  id: '/br/recharge',
+  path: '/br/recharge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutPlanIdRoute = CheckoutPlanIdRouteImport.update({
+  id: '/checkout/$planId',
+  path: '/checkout/$planId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsIndexRoute = EsIndexRouteImport.update({
+  id: '/es/',
+  path: '/es/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsIdplayerRoute = EsIdplayerRouteImport.update({
+  id: '/es/idplayer',
+  path: '/es/idplayer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsQuizRoute = EsQuizRouteImport.update({
+  id: '/es/quiz',
+  path: '/es/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsRechargeRoute = EsRechargeRouteImport.update({
+  id: '/es/recharge',
+  path: '/es/recharge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrIndexRoute = FrIndexRouteImport.update({
+  id: '/fr/',
+  path: '/fr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrIdplayerRoute = FrIdplayerRouteImport.update({
+  id: '/fr/idplayer',
+  path: '/fr/idplayer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrQuizRoute = FrQuizRouteImport.update({
+  id: '/fr/quiz',
+  path: '/fr/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrRechargeRoute = FrRechargeRouteImport.update({
+  id: '/fr/recharge',
+  path: '/fr/recharge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicFreepayWebhookRoute = ApiPublicFreepayWebhookRouteImport.update({
+  id: '/api/public/freepay-webhook',
+  path: '/api/public/freepay-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrCheckoutPlanRoute = BrCheckoutPlanRouteImport.update({
+  id: '/br/checkout/$plan',
+  path: '/br/checkout/$plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout-success': typeof CheckoutSuccessRoute
+  '/dashboard': typeof DashboardRoute
+  '/idplayer': typeof IdplayerRoute
+  '/idplayer2': typeof Idplayer2Route
+  '/presell': typeof PresellRoute
+  '/quiz': typeof QuizRoute
+  '/quiz2': typeof Quiz2Route
+  '/recharge': typeof RechargeRoute
+  '/recharge2': typeof Recharge2Route
+  '/roleta': typeof RoletaRoute
+  '/br/idplayer': typeof BrIdplayerRoute
+  '/br/quiz': typeof BrQuizRoute
+  '/br/recharge': typeof BrRechargeRoute
+  '/checkout/$planId': typeof CheckoutPlanIdRoute
+  '/es/idplayer': typeof EsIdplayerRoute
+  '/es/quiz': typeof EsQuizRoute
+  '/es/recharge': typeof EsRechargeRoute
+  '/fr/idplayer': typeof FrIdplayerRoute
+  '/fr/quiz': typeof FrQuizRoute
+  '/fr/recharge': typeof FrRechargeRoute
+  '/br/': typeof BrIndexRoute
+  '/es/': typeof EsIndexRoute
+  '/fr/': typeof FrIndexRoute
+  '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
+  '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout-success': typeof CheckoutSuccessRoute
+  '/dashboard': typeof DashboardRoute
+  '/idplayer': typeof IdplayerRoute
+  '/idplayer2': typeof Idplayer2Route
+  '/presell': typeof PresellRoute
+  '/quiz': typeof QuizRoute
+  '/quiz2': typeof Quiz2Route
+  '/recharge': typeof RechargeRoute
+  '/recharge2': typeof Recharge2Route
+  '/roleta': typeof RoletaRoute
+  '/br/idplayer': typeof BrIdplayerRoute
+  '/br/quiz': typeof BrQuizRoute
+  '/br/recharge': typeof BrRechargeRoute
+  '/checkout/$planId': typeof CheckoutPlanIdRoute
+  '/es/idplayer': typeof EsIdplayerRoute
+  '/es/quiz': typeof EsQuizRoute
+  '/es/recharge': typeof EsRechargeRoute
+  '/fr/idplayer': typeof FrIdplayerRoute
+  '/fr/quiz': typeof FrQuizRoute
+  '/fr/recharge': typeof FrRechargeRoute
+  '/br': typeof BrIndexRoute
+  '/es': typeof EsIndexRoute
+  '/fr': typeof FrIndexRoute
+  '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
+  '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checkout-success': typeof CheckoutSuccessRoute
+  '/dashboard': typeof DashboardRoute
+  '/idplayer': typeof IdplayerRoute
+  '/idplayer2': typeof Idplayer2Route
+  '/presell': typeof PresellRoute
+  '/quiz': typeof QuizRoute
+  '/quiz2': typeof Quiz2Route
+  '/recharge': typeof RechargeRoute
+  '/recharge2': typeof Recharge2Route
+  '/roleta': typeof RoletaRoute
+  '/br/idplayer': typeof BrIdplayerRoute
+  '/br/quiz': typeof BrQuizRoute
+  '/br/recharge': typeof BrRechargeRoute
+  '/checkout/$planId': typeof CheckoutPlanIdRoute
+  '/es/idplayer': typeof EsIdplayerRoute
+  '/es/quiz': typeof EsQuizRoute
+  '/es/recharge': typeof EsRechargeRoute
+  '/fr/idplayer': typeof FrIdplayerRoute
+  '/fr/quiz': typeof FrQuizRoute
+  '/fr/recharge': typeof FrRechargeRoute
+  '/br/': typeof BrIndexRoute
+  '/es/': typeof EsIndexRoute
+  '/fr/': typeof FrIndexRoute
+  '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
+  '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/checkout-success'
+    | '/dashboard'
+    | '/idplayer'
+    | '/idplayer2'
+    | '/presell'
+    | '/quiz'
+    | '/quiz2'
+    | '/recharge'
+    | '/recharge2'
+    | '/roleta'
+    | '/br/idplayer'
+    | '/br/quiz'
+    | '/br/recharge'
+    | '/checkout/$planId'
+    | '/es/idplayer'
+    | '/es/quiz'
+    | '/es/recharge'
+    | '/fr/idplayer'
+    | '/fr/quiz'
+    | '/fr/recharge'
+    | '/br/'
+    | '/es/'
+    | '/fr/'
+    | '/api/public/freepay-webhook'
+    | '/br/checkout/$plan'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/checkout-success'
+    | '/dashboard'
+    | '/idplayer'
+    | '/idplayer2'
+    | '/presell'
+    | '/quiz'
+    | '/quiz2'
+    | '/recharge'
+    | '/recharge2'
+    | '/roleta'
+    | '/br/idplayer'
+    | '/br/quiz'
+    | '/br/recharge'
+    | '/checkout/$planId'
+    | '/es/idplayer'
+    | '/es/quiz'
+    | '/es/recharge'
+    | '/fr/idplayer'
+    | '/fr/quiz'
+    | '/fr/recharge'
+    | '/br'
+    | '/es'
+    | '/fr'
+    | '/api/public/freepay-webhook'
+    | '/br/checkout/$plan'
+  id:
+    | '__root__'
+    | '/'
+    | '/checkout-success'
+    | '/dashboard'
+    | '/idplayer'
+    | '/idplayer2'
+    | '/presell'
+    | '/quiz'
+    | '/quiz2'
+    | '/recharge'
+    | '/recharge2'
+    | '/roleta'
+    | '/br/idplayer'
+    | '/br/quiz'
+    | '/br/recharge'
+    | '/checkout/$planId'
+    | '/es/idplayer'
+    | '/es/quiz'
+    | '/es/recharge'
+    | '/fr/idplayer'
+    | '/fr/quiz'
+    | '/fr/recharge'
+    | '/br/'
+    | '/es/'
+    | '/fr/'
+    | '/api/public/freepay-webhook'
+    | '/br/checkout/$plan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  DashboardRoute: typeof DashboardRoute
+  IdplayerRoute: typeof IdplayerRoute
+  Idplayer2Route: typeof Idplayer2Route
+  PresellRoute: typeof PresellRoute
+  QuizRoute: typeof QuizRoute
+  Quiz2Route: typeof Quiz2Route
+  RechargeRoute: typeof RechargeRoute
+  Recharge2Route: typeof Recharge2Route
+  RoletaRoute: typeof RoletaRoute
+  BrIdplayerRoute: typeof BrIdplayerRoute
+  BrQuizRoute: typeof BrQuizRoute
+  BrRechargeRoute: typeof BrRechargeRoute
+  CheckoutPlanIdRoute: typeof CheckoutPlanIdRoute
+  EsIdplayerRoute: typeof EsIdplayerRoute
+  EsQuizRoute: typeof EsQuizRoute
+  EsRechargeRoute: typeof EsRechargeRoute
+  FrIdplayerRoute: typeof FrIdplayerRoute
+  FrQuizRoute: typeof FrQuizRoute
+  FrRechargeRoute: typeof FrRechargeRoute
+  BrIndexRoute: typeof BrIndexRoute
+  EsIndexRoute: typeof EsIndexRoute
+  FrIndexRoute: typeof FrIndexRoute
+  ApiPublicFreepayWebhookRoute: typeof ApiPublicFreepayWebhookRoute
+  BrCheckoutPlanRoute: typeof BrCheckoutPlanRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +377,211 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout-success': {
+      id: '/checkout-success'
+      path: '/checkout-success'
+      fullPath: '/checkout-success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/idplayer': {
+      id: '/idplayer'
+      path: '/idplayer'
+      fullPath: '/idplayer'
+      preLoaderRoute: typeof IdplayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/idplayer2': {
+      id: '/idplayer2'
+      path: '/idplayer2'
+      fullPath: '/idplayer2'
+      preLoaderRoute: typeof Idplayer2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/presell': {
+      id: '/presell'
+      path: '/presell'
+      fullPath: '/presell'
+      preLoaderRoute: typeof PresellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz2': {
+      id: '/quiz2'
+      path: '/quiz2'
+      fullPath: '/quiz2'
+      preLoaderRoute: typeof Quiz2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recharge': {
+      id: '/recharge'
+      path: '/recharge'
+      fullPath: '/recharge'
+      preLoaderRoute: typeof RechargeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recharge2': {
+      id: '/recharge2'
+      path: '/recharge2'
+      fullPath: '/recharge2'
+      preLoaderRoute: typeof Recharge2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roleta': {
+      id: '/roleta'
+      path: '/roleta'
+      fullPath: '/roleta'
+      preLoaderRoute: typeof RoletaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/br/': {
+      id: '/br/'
+      path: '/br'
+      fullPath: '/br/'
+      preLoaderRoute: typeof BrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/br/idplayer': {
+      id: '/br/idplayer'
+      path: '/br/idplayer'
+      fullPath: '/br/idplayer'
+      preLoaderRoute: typeof BrIdplayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/br/quiz': {
+      id: '/br/quiz'
+      path: '/br/quiz'
+      fullPath: '/br/quiz'
+      preLoaderRoute: typeof BrQuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/br/recharge': {
+      id: '/br/recharge'
+      path: '/br/recharge'
+      fullPath: '/br/recharge'
+      preLoaderRoute: typeof BrRechargeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/$planId': {
+      id: '/checkout/$planId'
+      path: '/checkout/$planId'
+      fullPath: '/checkout/$planId'
+      preLoaderRoute: typeof CheckoutPlanIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/': {
+      id: '/es/'
+      path: '/es'
+      fullPath: '/es/'
+      preLoaderRoute: typeof EsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/idplayer': {
+      id: '/es/idplayer'
+      path: '/es/idplayer'
+      fullPath: '/es/idplayer'
+      preLoaderRoute: typeof EsIdplayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/quiz': {
+      id: '/es/quiz'
+      path: '/es/quiz'
+      fullPath: '/es/quiz'
+      preLoaderRoute: typeof EsQuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/recharge': {
+      id: '/es/recharge'
+      path: '/es/recharge'
+      fullPath: '/es/recharge'
+      preLoaderRoute: typeof EsRechargeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/': {
+      id: '/fr/'
+      path: '/fr'
+      fullPath: '/fr/'
+      preLoaderRoute: typeof FrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/idplayer': {
+      id: '/fr/idplayer'
+      path: '/fr/idplayer'
+      fullPath: '/fr/idplayer'
+      preLoaderRoute: typeof FrIdplayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/quiz': {
+      id: '/fr/quiz'
+      path: '/fr/quiz'
+      fullPath: '/fr/quiz'
+      preLoaderRoute: typeof FrQuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/recharge': {
+      id: '/fr/recharge'
+      path: '/fr/recharge'
+      fullPath: '/fr/recharge'
+      preLoaderRoute: typeof FrRechargeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/freepay-webhook': {
+      id: '/api/public/freepay-webhook'
+      path: '/api/public/freepay-webhook'
+      fullPath: '/api/public/freepay-webhook'
+      preLoaderRoute: typeof ApiPublicFreepayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/br/checkout/$plan': {
+      id: '/br/checkout/$plan'
+      path: '/br/checkout/$plan'
+      fullPath: '/br/checkout/$plan'
+      preLoaderRoute: typeof BrCheckoutPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
+  DashboardRoute: DashboardRoute,
+  IdplayerRoute: IdplayerRoute,
+  Idplayer2Route: Idplayer2Route,
+  PresellRoute: PresellRoute,
+  QuizRoute: QuizRoute,
+  Quiz2Route: Quiz2Route,
+  RechargeRoute: RechargeRoute,
+  Recharge2Route: Recharge2Route,
+  RoletaRoute: RoletaRoute,
+  BrIdplayerRoute: BrIdplayerRoute,
+  BrQuizRoute: BrQuizRoute,
+  BrRechargeRoute: BrRechargeRoute,
+  CheckoutPlanIdRoute: CheckoutPlanIdRoute,
+  EsIdplayerRoute: EsIdplayerRoute,
+  EsQuizRoute: EsQuizRoute,
+  EsRechargeRoute: EsRechargeRoute,
+  FrIdplayerRoute: FrIdplayerRoute,
+  FrQuizRoute: FrQuizRoute,
+  FrRechargeRoute: FrRechargeRoute,
+  BrIndexRoute: BrIndexRoute,
+  EsIndexRoute: EsIndexRoute,
+  FrIndexRoute: FrIndexRoute,
+  ApiPublicFreepayWebhookRoute: ApiPublicFreepayWebhookRoute,
+  BrCheckoutPlanRoute: BrCheckoutPlanRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
