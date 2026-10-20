@@ -8,12 +8,12 @@ import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import { resolveTracking } from "@/lib/tracking";
 
 const packages = [
-  { diamonds: "5.600", price: "$9.90", bonus: "1.200", badge: "MEJOR VALOR", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831049552:1?channel=buy_button" },
-  { diamonds: "11.200", price: "$15.90", bonus: "2.240", badge: "MÁS POPULAR", badgeGradient: "from-orange-500 to-pink-500", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831082320:1?channel=buy_button" },
-  { diamonds: "22.400", price: "$19.90", bonus: "4.480", badge: "MEJOR OFERTA", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831115088:1?channel=buy_button" },
-  { diamonds: "29.500", price: "$25.90", bonus: "5.900", badge: "MÁXIMO BENEFICIO", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831147856:1?channel=buy_button" },
-  { diamonds: "39.200", price: "$29.90", bonus: "7.840", badge: "SUPER PACK", badgeGradient: "from-orange-500 to-pink-500", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831180624:1?channel=buy_button" },
-  { diamonds: "56.000", price: "$35.90", bonus: "11.200", badge: "MEGA PACK", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831213392:1?channel=buy_button" },
+  { diamonds: "5.600", price: "$9.90", bonus: "1.200", badge: "MEJOR VALOR", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout9" },
+  { diamonds: "11.200", price: "$15.90", bonus: "2.240", badge: "MÁS POPULAR", badgeGradient: "from-orange-500 to-pink-500", checkoutUrl: "/checkout15" },
+  { diamonds: "22.400", price: "$19.90", bonus: "4.480", badge: "MEJOR OFERTA", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout19" },
+  { diamonds: "29.500", price: "$25.90", bonus: "5.900", badge: "MÁXIMO BENEFICIO", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout25" },
+  { diamonds: "39.200", price: "$29.90", bonus: "7.840", badge: "SUPER PACK", badgeGradient: "from-orange-500 to-pink-500", checkoutUrl: "/checkout29" },
+  { diamonds: "56.000", price: "$35.90", bonus: "11.200", badge: "MEGA PACK", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout35" },
 ];
 
 export const Route = createFileRoute("/recharge")({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/recharge")({
 
 function buildCheckoutUrl(baseUrl: string) {
   if (typeof window === "undefined") return baseUrl;
-  const url = new URL(baseUrl);
+  const url = new URL(baseUrl, window.location.origin);
   const search = new URLSearchParams(window.location.search);
   search.forEach((value, key) => {
     if (!url.searchParams.has(key)) url.searchParams.append(key, value);
@@ -49,7 +49,7 @@ function buildCheckoutUrl(baseUrl: string) {
   const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "src", "sck"];
   for (const key of trackingKeys) {
     const value = url.searchParams.get(key);
-    if (value) url.searchParams.set(`attributes[${key}]`, value);
+    void value;
   }
   return url.toString();
 }
