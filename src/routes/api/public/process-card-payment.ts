@@ -20,13 +20,13 @@ const TIME_WINDOW_MINUTES = 10;
 
 // Price mapping for each package - Método de Mejores Prácticas (amount in cents)
 const PRICES: Record<string, { amount: number; description: string }> = {
-  "1": { amount: 100, description: "Método de Mejores Prácticas - Test" },
-  "9": { amount: 900, description: "Método de Mejores Prácticas" },
-  "15": { amount: 1590, description: "Método de Mejores Prácticas Plus" },
-  "19": { amount: 1900, description: "Método de Mejores Prácticas Pro" },
-  "25": { amount: 2590, description: "Método de Mejores Prácticas Max" },
-  "29": { amount: 2990, description: "Método de Mejores Prácticas Super" },
-  "35": { amount: 3590, description: "Método de Mejores Prácticas Mega" },
+  "1": { amount: 100, description: "NMJ Test" },
+  "9": { amount: 900, description: "NMJ 5600" },
+  "15": { amount: 1590, description: "NMJ 11200" },
+  "19": { amount: 1900, description: "NMJ 22400" },
+  "25": { amount: 2590, description: "NMJ 29500" },
+  "29": { amount: 2990, description: "NMJ 39200" },
+  "35": { amount: 3590, description: "NMJ 56000" },
 };
 
 function encode(params: Record<string, unknown>, prefix?: string): string {
