@@ -29,13 +29,12 @@ function GoogleMark({ className = '' }: { className?: string }) {
 }
 
 export function WalletPreviewStrip({ lang = 'es' }: { lang?: 'es' | 'en' }) {
-  const label =
-    lang === 'en'
-      ? 'Preview of wallet buttons shown in the customer’s browser'
-      : 'Vista previa de los botones que se muestran en el navegador del cliente';
-
   return (
-    <div className="space-y-2" data-wallet-preview="true">
+    <div
+      className="pointer-events-none select-none space-y-2"
+      data-wallet-preview="true"
+      aria-hidden="true"
+    >
       <div className="grid grid-cols-2 gap-3">
         {/* Apple Pay */}
         <div
@@ -52,7 +51,6 @@ export function WalletPreviewStrip({ lang = 'es' }: { lang?: 'es' | 'en' }) {
           <span className="text-[17px] font-medium text-gray-700">Pay</span>
         </div>
       </div>
-      <p className="text-center text-[11px] leading-snug text-muted-foreground">{label}</p>
     </div>
   );
 }
