@@ -11,9 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout-success'
+import { Route as Checkout15RouteImport } from './routes/checkout15'
+import { Route as Checkout15EnRouteImport } from './routes/checkout15-en'
+import { Route as Checkout19RouteImport } from './routes/checkout19'
+import { Route as Checkout19EnRouteImport } from './routes/checkout19-en'
+import { Route as Checkout9RouteImport } from './routes/checkout9'
+import { Route as Checkout9EnRouteImport } from './routes/checkout9-en'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IdplayerRouteImport } from './routes/idplayer'
 import { Route as Idplayer2RouteImport } from './routes/idplayer2'
+import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PresellRouteImport } from './routes/presell'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as Quiz2RouteImport } from './routes/quiz2'
@@ -34,6 +41,8 @@ import { Route as FrIdplayerRouteImport } from './routes/fr.idplayer'
 import { Route as FrQuizRouteImport } from './routes/fr.quiz'
 import { Route as FrRechargeRouteImport } from './routes/fr.recharge'
 import { Route as ApiPublicFreepayWebhookRouteImport } from './routes/api/public/freepay-webhook'
+import { Route as ApiPublicProcessCardPaymentRouteImport } from './routes/api/public/process-card-payment'
+import { Route as ApiPublicRegisterUtmifySaleRouteImport } from './routes/api/public/register-utmify-sale'
 import { Route as BrCheckoutPlanRouteImport } from './routes/br.checkout.$plan'
 
 const IndexRoute = IndexRouteImport.update({
@@ -44,6 +53,36 @@ const IndexRoute = IndexRouteImport.update({
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/checkout-success',
   path: '/checkout-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout15Route = Checkout15RouteImport.update({
+  id: '/checkout15',
+  path: '/checkout15',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout15EnRoute = Checkout15EnRouteImport.update({
+  id: '/checkout15-en',
+  path: '/checkout15-en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout19Route = Checkout19RouteImport.update({
+  id: '/checkout19',
+  path: '/checkout19',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout19EnRoute = Checkout19EnRouteImport.update({
+  id: '/checkout19-en',
+  path: '/checkout19-en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout9Route = Checkout9RouteImport.update({
+  id: '/checkout9',
+  path: '/checkout9',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout9EnRoute = Checkout9EnRouteImport.update({
+  id: '/checkout9-en',
+  path: '/checkout9-en',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -59,6 +98,11 @@ const IdplayerRoute = IdplayerRouteImport.update({
 const Idplayer2Route = Idplayer2RouteImport.update({
   id: '/idplayer2',
   path: '/idplayer2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObrigadoRoute = ObrigadoRouteImport.update({
+  id: '/obrigado',
+  path: '/obrigado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PresellRoute = PresellRouteImport.update({
@@ -161,6 +205,18 @@ const ApiPublicFreepayWebhookRoute = ApiPublicFreepayWebhookRouteImport.update({
   path: '/api/public/freepay-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicProcessCardPaymentRoute =
+  ApiPublicProcessCardPaymentRouteImport.update({
+    id: '/api/public/process-card-payment',
+    path: '/api/public/process-card-payment',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicRegisterUtmifySaleRoute =
+  ApiPublicRegisterUtmifySaleRouteImport.update({
+    id: '/api/public/register-utmify-sale',
+    path: '/api/public/register-utmify-sale',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BrCheckoutPlanRoute = BrCheckoutPlanRouteImport.update({
   id: '/br/checkout/$plan',
   path: '/br/checkout/$plan',
@@ -170,9 +226,16 @@ const BrCheckoutPlanRoute = BrCheckoutPlanRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/checkout-success': typeof CheckoutSuccessRoute
+  '/checkout15': typeof Checkout15Route
+  '/checkout15-en': typeof Checkout15EnRoute
+  '/checkout19': typeof Checkout19Route
+  '/checkout19-en': typeof Checkout19EnRoute
+  '/checkout9': typeof Checkout9Route
+  '/checkout9-en': typeof Checkout9EnRoute
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
+  '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
   '/quiz': typeof QuizRoute
   '/quiz2': typeof Quiz2Route
@@ -193,14 +256,23 @@ export interface FileRoutesByFullPath {
   '/es/': typeof EsIndexRoute
   '/fr/': typeof FrIndexRoute
   '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
+  '/api/public/process-card-payment': typeof ApiPublicProcessCardPaymentRoute
+  '/api/public/register-utmify-sale': typeof ApiPublicRegisterUtmifySaleRoute
   '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout-success': typeof CheckoutSuccessRoute
+  '/checkout15': typeof Checkout15Route
+  '/checkout15-en': typeof Checkout15EnRoute
+  '/checkout19': typeof Checkout19Route
+  '/checkout19-en': typeof Checkout19EnRoute
+  '/checkout9': typeof Checkout9Route
+  '/checkout9-en': typeof Checkout9EnRoute
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
+  '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
   '/quiz': typeof QuizRoute
   '/quiz2': typeof Quiz2Route
@@ -221,15 +293,24 @@ export interface FileRoutesByTo {
   '/es': typeof EsIndexRoute
   '/fr': typeof FrIndexRoute
   '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
+  '/api/public/process-card-payment': typeof ApiPublicProcessCardPaymentRoute
+  '/api/public/register-utmify-sale': typeof ApiPublicRegisterUtmifySaleRoute
   '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/checkout-success': typeof CheckoutSuccessRoute
+  '/checkout15': typeof Checkout15Route
+  '/checkout15-en': typeof Checkout15EnRoute
+  '/checkout19': typeof Checkout19Route
+  '/checkout19-en': typeof Checkout19EnRoute
+  '/checkout9': typeof Checkout9Route
+  '/checkout9-en': typeof Checkout9EnRoute
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
+  '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
   '/quiz': typeof QuizRoute
   '/quiz2': typeof Quiz2Route
@@ -250,6 +331,8 @@ export interface FileRoutesById {
   '/es/': typeof EsIndexRoute
   '/fr/': typeof FrIndexRoute
   '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
+  '/api/public/process-card-payment': typeof ApiPublicProcessCardPaymentRoute
+  '/api/public/register-utmify-sale': typeof ApiPublicRegisterUtmifySaleRoute
   '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRouteTypes {
@@ -257,9 +340,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/checkout-success'
+    | '/checkout15'
+    | '/checkout15-en'
+    | '/checkout19'
+    | '/checkout19-en'
+    | '/checkout9'
+    | '/checkout9-en'
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
+    | '/obrigado'
     | '/presell'
     | '/quiz'
     | '/quiz2'
@@ -280,14 +370,23 @@ export interface FileRouteTypes {
     | '/es/'
     | '/fr/'
     | '/api/public/freepay-webhook'
+    | '/api/public/process-card-payment'
+    | '/api/public/register-utmify-sale'
     | '/br/checkout/$plan'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/checkout-success'
+    | '/checkout15'
+    | '/checkout15-en'
+    | '/checkout19'
+    | '/checkout19-en'
+    | '/checkout9'
+    | '/checkout9-en'
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
+    | '/obrigado'
     | '/presell'
     | '/quiz'
     | '/quiz2'
@@ -308,14 +407,23 @@ export interface FileRouteTypes {
     | '/es'
     | '/fr'
     | '/api/public/freepay-webhook'
+    | '/api/public/process-card-payment'
+    | '/api/public/register-utmify-sale'
     | '/br/checkout/$plan'
   id:
     | '__root__'
     | '/'
     | '/checkout-success'
+    | '/checkout15'
+    | '/checkout15-en'
+    | '/checkout19'
+    | '/checkout19-en'
+    | '/checkout9'
+    | '/checkout9-en'
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
+    | '/obrigado'
     | '/presell'
     | '/quiz'
     | '/quiz2'
@@ -336,15 +444,24 @@ export interface FileRouteTypes {
     | '/es/'
     | '/fr/'
     | '/api/public/freepay-webhook'
+    | '/api/public/process-card-payment'
+    | '/api/public/register-utmify-sale'
     | '/br/checkout/$plan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  Checkout15Route: typeof Checkout15Route
+  Checkout15EnRoute: typeof Checkout15EnRoute
+  Checkout19Route: typeof Checkout19Route
+  Checkout19EnRoute: typeof Checkout19EnRoute
+  Checkout9Route: typeof Checkout9Route
+  Checkout9EnRoute: typeof Checkout9EnRoute
   DashboardRoute: typeof DashboardRoute
   IdplayerRoute: typeof IdplayerRoute
   Idplayer2Route: typeof Idplayer2Route
+  ObrigadoRoute: typeof ObrigadoRoute
   PresellRoute: typeof PresellRoute
   QuizRoute: typeof QuizRoute
   Quiz2Route: typeof Quiz2Route
@@ -365,6 +482,8 @@ export interface RootRouteChildren {
   EsIndexRoute: typeof EsIndexRoute
   FrIndexRoute: typeof FrIndexRoute
   ApiPublicFreepayWebhookRoute: typeof ApiPublicFreepayWebhookRoute
+  ApiPublicProcessCardPaymentRoute: typeof ApiPublicProcessCardPaymentRoute
+  ApiPublicRegisterUtmifySaleRoute: typeof ApiPublicRegisterUtmifySaleRoute
   BrCheckoutPlanRoute: typeof BrCheckoutPlanRoute
 }
 
@@ -382,6 +501,48 @@ declare module '@tanstack/react-router' {
       path: '/checkout-success'
       fullPath: '/checkout-success'
       preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout15': {
+      id: '/checkout15'
+      path: '/checkout15'
+      fullPath: '/checkout15'
+      preLoaderRoute: typeof Checkout15RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout15-en': {
+      id: '/checkout15-en'
+      path: '/checkout15-en'
+      fullPath: '/checkout15-en'
+      preLoaderRoute: typeof Checkout15EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout19': {
+      id: '/checkout19'
+      path: '/checkout19'
+      fullPath: '/checkout19'
+      preLoaderRoute: typeof Checkout19RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout19-en': {
+      id: '/checkout19-en'
+      path: '/checkout19-en'
+      fullPath: '/checkout19-en'
+      preLoaderRoute: typeof Checkout19EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout9': {
+      id: '/checkout9'
+      path: '/checkout9'
+      fullPath: '/checkout9'
+      preLoaderRoute: typeof Checkout9RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout9-en': {
+      id: '/checkout9-en'
+      path: '/checkout9-en'
+      fullPath: '/checkout9-en'
+      preLoaderRoute: typeof Checkout9EnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -403,6 +564,13 @@ declare module '@tanstack/react-router' {
       path: '/idplayer2'
       fullPath: '/idplayer2'
       preLoaderRoute: typeof Idplayer2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/obrigado': {
+      id: '/obrigado'
+      path: '/obrigado'
+      fullPath: '/obrigado'
+      preLoaderRoute: typeof ObrigadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/presell': {
@@ -545,6 +713,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFreepayWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/process-card-payment': {
+      id: '/api/public/process-card-payment'
+      path: '/api/public/process-card-payment'
+      fullPath: '/api/public/process-card-payment'
+      preLoaderRoute: typeof ApiPublicProcessCardPaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/register-utmify-sale': {
+      id: '/api/public/register-utmify-sale'
+      path: '/api/public/register-utmify-sale'
+      fullPath: '/api/public/register-utmify-sale'
+      preLoaderRoute: typeof ApiPublicRegisterUtmifySaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/br/checkout/$plan': {
       id: '/br/checkout/$plan'
       path: '/br/checkout/$plan'
@@ -558,9 +740,16 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
+  Checkout15Route: Checkout15Route,
+  Checkout15EnRoute: Checkout15EnRoute,
+  Checkout19Route: Checkout19Route,
+  Checkout19EnRoute: Checkout19EnRoute,
+  Checkout9Route: Checkout9Route,
+  Checkout9EnRoute: Checkout9EnRoute,
   DashboardRoute: DashboardRoute,
   IdplayerRoute: IdplayerRoute,
   Idplayer2Route: Idplayer2Route,
+  ObrigadoRoute: ObrigadoRoute,
   PresellRoute: PresellRoute,
   QuizRoute: QuizRoute,
   Quiz2Route: Quiz2Route,
@@ -581,6 +770,8 @@ const rootRouteChildren: RootRouteChildren = {
   EsIndexRoute: EsIndexRoute,
   FrIndexRoute: FrIndexRoute,
   ApiPublicFreepayWebhookRoute: ApiPublicFreepayWebhookRoute,
+  ApiPublicProcessCardPaymentRoute: ApiPublicProcessCardPaymentRoute,
+  ApiPublicRegisterUtmifySaleRoute: ApiPublicRegisterUtmifySaleRoute,
   BrCheckoutPlanRoute: BrCheckoutPlanRoute,
 }
 export const routeTree = rootRouteImport
