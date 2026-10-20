@@ -1,6 +1,6 @@
 import garenaLogo from "@/assets/garena-logo.png";
 import membershipsBanner from "@/assets/fr-memberships-banner.jpg";
-import freefireCharacter from "@/assets/freefire-character.png";
+import freefirePill from "@/assets/freefire-pill.png.asset.json";
 import freefireBanner from "@/assets/fr-freefire-banner.jpg";
 
 const GarenaHeader = () => (
@@ -15,10 +15,7 @@ const GarenaHeader = () => (
     <img src={membershipsBanner} alt="Abonnements Free Fire" className="w-full rounded-xl shadow-md" />
     <div>
       <p className="text-sm sm:text-base font-bold text-foreground mb-2">Sélection du jeu</p>
-      <div className="inline-flex items-center gap-2 border-2 border-primary rounded-full px-3 py-1.5 sm:px-4 sm:py-2 bg-card">
-        <img src={freefireCharacter} alt="Free Fire" className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
-        <span className="text-foreground font-medium text-sm sm:text-base">Free Fire</span>
-      </div>
+      <img src={freefirePill.url} alt="Free Fire" className="h-11 sm:h-[52px] w-auto" />
     </div>
     <img src={freefireBanner} alt="Free Fire" className="w-full rounded-xl shadow-md" loading="lazy" />
   </div>
