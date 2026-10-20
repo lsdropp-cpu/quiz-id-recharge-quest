@@ -9,7 +9,7 @@ import diamondBonus from "@/assets/diamond-bonus.png";
 import { track, trackFunnel } from "@/lib/gemtop-tracking";
 
 const stripePromise = loadStripe(
-  "pk_live_51Q0TEVDSZSnaeaRaLi0yvUWr1YsyCtyYZOG0x4KESqZ1DIxv58CkU9FfYAqMaQQzxxZ4UnPSGF9nYVo2an5aEs15006nLskD1m"
+  "pk_live_51USd0fEMALFSqtrSvveUnWRBhIPLfzAO0SkGsntOwIRZjBZO3xJ1EHfBrVf6oZeITfSybbS72YWqJBK5WuqFjRws00VafmEWmH"
 );
 
 // Email validation regex
