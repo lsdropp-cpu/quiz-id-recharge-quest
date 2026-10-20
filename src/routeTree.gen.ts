@@ -15,6 +15,12 @@ import { Route as Checkout15RouteImport } from './routes/checkout15'
 import { Route as Checkout15EnRouteImport } from './routes/checkout15-en'
 import { Route as Checkout19RouteImport } from './routes/checkout19'
 import { Route as Checkout19EnRouteImport } from './routes/checkout19-en'
+import { Route as Checkout25RouteImport } from './routes/checkout25'
+import { Route as Checkout25EnRouteImport } from './routes/checkout25-en'
+import { Route as Checkout29RouteImport } from './routes/checkout29'
+import { Route as Checkout29EnRouteImport } from './routes/checkout29-en'
+import { Route as Checkout35RouteImport } from './routes/checkout35'
+import { Route as Checkout35EnRouteImport } from './routes/checkout35-en'
 import { Route as Checkout9RouteImport } from './routes/checkout9'
 import { Route as Checkout9EnRouteImport } from './routes/checkout9-en'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -73,6 +79,36 @@ const Checkout19Route = Checkout19RouteImport.update({
 const Checkout19EnRoute = Checkout19EnRouteImport.update({
   id: '/checkout19-en',
   path: '/checkout19-en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout25Route = Checkout25RouteImport.update({
+  id: '/checkout25',
+  path: '/checkout25',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout25EnRoute = Checkout25EnRouteImport.update({
+  id: '/checkout25-en',
+  path: '/checkout25-en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout29Route = Checkout29RouteImport.update({
+  id: '/checkout29',
+  path: '/checkout29',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout29EnRoute = Checkout29EnRouteImport.update({
+  id: '/checkout29-en',
+  path: '/checkout29-en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout35Route = Checkout35RouteImport.update({
+  id: '/checkout35',
+  path: '/checkout35',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Checkout35EnRoute = Checkout35EnRouteImport.update({
+  id: '/checkout35-en',
+  path: '/checkout35-en',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Checkout9Route = Checkout9RouteImport.update({
@@ -230,6 +266,12 @@ export interface FileRoutesByFullPath {
   '/checkout15-en': typeof Checkout15EnRoute
   '/checkout19': typeof Checkout19Route
   '/checkout19-en': typeof Checkout19EnRoute
+  '/checkout25': typeof Checkout25Route
+  '/checkout25-en': typeof Checkout25EnRoute
+  '/checkout29': typeof Checkout29Route
+  '/checkout29-en': typeof Checkout29EnRoute
+  '/checkout35': typeof Checkout35Route
+  '/checkout35-en': typeof Checkout35EnRoute
   '/checkout9': typeof Checkout9Route
   '/checkout9-en': typeof Checkout9EnRoute
   '/dashboard': typeof DashboardRoute
@@ -267,6 +309,12 @@ export interface FileRoutesByTo {
   '/checkout15-en': typeof Checkout15EnRoute
   '/checkout19': typeof Checkout19Route
   '/checkout19-en': typeof Checkout19EnRoute
+  '/checkout25': typeof Checkout25Route
+  '/checkout25-en': typeof Checkout25EnRoute
+  '/checkout29': typeof Checkout29Route
+  '/checkout29-en': typeof Checkout29EnRoute
+  '/checkout35': typeof Checkout35Route
+  '/checkout35-en': typeof Checkout35EnRoute
   '/checkout9': typeof Checkout9Route
   '/checkout9-en': typeof Checkout9EnRoute
   '/dashboard': typeof DashboardRoute
@@ -305,6 +353,12 @@ export interface FileRoutesById {
   '/checkout15-en': typeof Checkout15EnRoute
   '/checkout19': typeof Checkout19Route
   '/checkout19-en': typeof Checkout19EnRoute
+  '/checkout25': typeof Checkout25Route
+  '/checkout25-en': typeof Checkout25EnRoute
+  '/checkout29': typeof Checkout29Route
+  '/checkout29-en': typeof Checkout29EnRoute
+  '/checkout35': typeof Checkout35Route
+  '/checkout35-en': typeof Checkout35EnRoute
   '/checkout9': typeof Checkout9Route
   '/checkout9-en': typeof Checkout9EnRoute
   '/dashboard': typeof DashboardRoute
@@ -344,6 +398,12 @@ export interface FileRouteTypes {
     | '/checkout15-en'
     | '/checkout19'
     | '/checkout19-en'
+    | '/checkout25'
+    | '/checkout25-en'
+    | '/checkout29'
+    | '/checkout29-en'
+    | '/checkout35'
+    | '/checkout35-en'
     | '/checkout9'
     | '/checkout9-en'
     | '/dashboard'
@@ -381,6 +441,12 @@ export interface FileRouteTypes {
     | '/checkout15-en'
     | '/checkout19'
     | '/checkout19-en'
+    | '/checkout25'
+    | '/checkout25-en'
+    | '/checkout29'
+    | '/checkout29-en'
+    | '/checkout35'
+    | '/checkout35-en'
     | '/checkout9'
     | '/checkout9-en'
     | '/dashboard'
@@ -418,6 +484,12 @@ export interface FileRouteTypes {
     | '/checkout15-en'
     | '/checkout19'
     | '/checkout19-en'
+    | '/checkout25'
+    | '/checkout25-en'
+    | '/checkout29'
+    | '/checkout29-en'
+    | '/checkout35'
+    | '/checkout35-en'
     | '/checkout9'
     | '/checkout9-en'
     | '/dashboard'
@@ -456,6 +528,12 @@ export interface RootRouteChildren {
   Checkout15EnRoute: typeof Checkout15EnRoute
   Checkout19Route: typeof Checkout19Route
   Checkout19EnRoute: typeof Checkout19EnRoute
+  Checkout25Route: typeof Checkout25Route
+  Checkout25EnRoute: typeof Checkout25EnRoute
+  Checkout29Route: typeof Checkout29Route
+  Checkout29EnRoute: typeof Checkout29EnRoute
+  Checkout35Route: typeof Checkout35Route
+  Checkout35EnRoute: typeof Checkout35EnRoute
   Checkout9Route: typeof Checkout9Route
   Checkout9EnRoute: typeof Checkout9EnRoute
   DashboardRoute: typeof DashboardRoute
@@ -529,6 +607,48 @@ declare module '@tanstack/react-router' {
       path: '/checkout19-en'
       fullPath: '/checkout19-en'
       preLoaderRoute: typeof Checkout19EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout25': {
+      id: '/checkout25'
+      path: '/checkout25'
+      fullPath: '/checkout25'
+      preLoaderRoute: typeof Checkout25RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout25-en': {
+      id: '/checkout25-en'
+      path: '/checkout25-en'
+      fullPath: '/checkout25-en'
+      preLoaderRoute: typeof Checkout25EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout29': {
+      id: '/checkout29'
+      path: '/checkout29'
+      fullPath: '/checkout29'
+      preLoaderRoute: typeof Checkout29RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout29-en': {
+      id: '/checkout29-en'
+      path: '/checkout29-en'
+      fullPath: '/checkout29-en'
+      preLoaderRoute: typeof Checkout29EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout35': {
+      id: '/checkout35'
+      path: '/checkout35'
+      fullPath: '/checkout35'
+      preLoaderRoute: typeof Checkout35RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout35-en': {
+      id: '/checkout35-en'
+      path: '/checkout35-en'
+      fullPath: '/checkout35-en'
+      preLoaderRoute: typeof Checkout35EnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout9': {
@@ -744,6 +864,12 @@ const rootRouteChildren: RootRouteChildren = {
   Checkout15EnRoute: Checkout15EnRoute,
   Checkout19Route: Checkout19Route,
   Checkout19EnRoute: Checkout19EnRoute,
+  Checkout25Route: Checkout25Route,
+  Checkout25EnRoute: Checkout25EnRoute,
+  Checkout29Route: Checkout29Route,
+  Checkout29EnRoute: Checkout29EnRoute,
+  Checkout35Route: Checkout35Route,
+  Checkout35EnRoute: Checkout35EnRoute,
   Checkout9Route: Checkout9Route,
   Checkout9EnRoute: Checkout9EnRoute,
   DashboardRoute: DashboardRoute,
