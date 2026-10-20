@@ -135,7 +135,7 @@ const GemtopCheckoutPage = ({ priceKey, priceUsd, diamonds, lang = "es", banner,
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="checkout-light min-h-screen bg-background text-foreground">
       {/* Urgency Header */}
       <div className="bg-destructive py-3">
         <div className="container mx-auto px-4 flex items-center justify-center gap-3">

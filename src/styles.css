@@ -344,3 +344,17 @@
   font-size: 0.875rem;
   color: hsl(var(--muted-foreground));
 }
+
+/* Light (white) theme scoped to the gemtop checkout pages */
+.checkout-light {
+  --background: 0 0% 97%;
+  --foreground: 240 10% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 10%;
+  --muted: 240 5% 94%;
+  --muted-foreground: 240 4% 40%;
+  --border: 240 6% 86%;
+  --input: 240 6% 86%;
+}
