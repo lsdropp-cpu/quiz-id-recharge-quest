@@ -353,7 +353,8 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
             country: billingAddress?.country || existingBillingDetails?.address?.country || "US",
           };
 
-          const hasAddressData = effectiveBillingAddress.line1 || effectiveBillingAddress.postal_code;
+          // Stripe requires shipping.address.line1, so only attach shipping with a real street.
+          const hasAddressData = Boolean(effectiveBillingAddress.line1);
 
           const paymentIntent = await stripeFetch("/payment_intents", "POST", stripeSecret, {
             amount: priceData.amount,
