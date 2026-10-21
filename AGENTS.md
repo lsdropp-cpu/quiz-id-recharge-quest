@@ -1,4 +1,5 @@
 # Project rules
+- Spanish recharge pack data (diamonds, bonus, price, charge amount) lives in `src/lib/recharge-packages.ts`; recharge pages, checkout pages and the Stripe charge map all read from it so a page can never display a price different from the one charged.
 - Native TikTok tracking is centralized in the advertising-consent module; remove Utmify TikTok loaders to prevent duplicate initialization, preserve unrelated localized Utmify tracking, and attach Purchase only to confirmed Stripe success, never thank-you page visits.
 - Advertising SDK initialization is client-only and consent-gated with fail-closed region lookup; no customer matching or server event uploads are enabled by this browser-only integration.
 - Share only the presentation-only Free Fire game mark across localized headers; keep banners, copy, payment and tracking isolated so visual fixes stay consistent without altering localized funnels.

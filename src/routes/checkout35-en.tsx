@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import GemtopCheckoutPage from "@/components/gemtop/GemtopCheckoutPage";
 import freefireBannerEn from "@/assets/freefire-banner-en.jpg";
+import { rechargePrice } from "@/lib/recharge-packages";
 
 export const Route = createFileRoute("/checkout35-en")({
   head: () => ({
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/checkout35-en")({
   component: () => (
     <GemtopCheckoutPage
       priceKey="35"
-      priceUsd={35.9}
+      priceUsd={rechargePrice("35")}
       diamonds={56000}
       lang="en"
       banner={freefireBannerEn}
