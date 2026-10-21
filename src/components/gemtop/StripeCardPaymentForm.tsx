@@ -189,7 +189,7 @@ const lookupAddressFromPostal = async (postalCode: string, countryHint: string):
           city: cityName,
           region: stateAbbr,
           postal: cleanPostal,
-          line1: cityName || cleanPostal, // Use city as line1 fallback
+          line1: '', // Never fill street with city; AVS validates ZIP only
         };
         console.log('[ADDRESS] Found from postal:', address);
         return address;
@@ -220,7 +220,7 @@ const detectLocationFromIP = async (): Promise<DetectedAddress> => {
         city: data.city || '',
         region: data.region || '',
         postal: data.postal || '',
-        line1: data.city || '',
+        line1: '',
       };
       sessionStorage.setItem('detected_address', JSON.stringify(address));
       console.log('[LOCATION] Detected from IP:', address);
@@ -723,7 +723,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
             city: detectedAddress.city || undefined,
             state: detectedAddress.region || undefined,
             postal_code: postalCode || detectedAddress.postal || undefined,
-            line1: detectedAddress.line1 || detectedAddress.city || undefined,
+            line1: detectedAddress.line1 || undefined,
           }
         },
       });
@@ -758,7 +758,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
           name: cardholderName,
           trackingParams,
           billingAddress: {
-            line1: detectedAddress.line1 || detectedAddress.city || null,
+            line1: detectedAddress.line1 || null,
             line2: null,
             city: detectedAddress.city || null,
             state: detectedAddress.region || null,
@@ -796,7 +796,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
                 city: detectedAddress.city || undefined,
                 state: detectedAddress.region || undefined,
                 postal_code: postalCode || detectedAddress.postal || undefined,
-                line1: detectedAddress.line1 || detectedAddress.city || undefined,
+                line1: detectedAddress.line1 || undefined,
               }
             }
           }
