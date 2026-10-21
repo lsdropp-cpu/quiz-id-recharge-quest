@@ -24,6 +24,7 @@ export function createConsent(previous: ConsentRecord | null, advertising: boole
 
 let region: string | null = null;
 let initialized = false;
+const observedPurchases = new Set<string>();
 type Queue = Array<unknown> & Record<string, any>;
 declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string; } }
 export function readConsent(): ConsentRecord | null {
@@ -116,9 +117,14 @@ export function isApprovedPurchase(purchase: Purchase) {
 }
 export function trackTikTokPurchase(purchase: Purchase) {
   // Evaluate the visitor's current choice at the successful action. Never replay blocked purchases.
-  if (!isApprovedPurchase(purchase) || !mayTrack()) return false;
+  if (!isApprovedPurchase(purchase) || observedPurchases.has(purchase.id)) return false;
+  observedPurchases.add(purchase.id);
   const key = `tiktok-purchase:${TIKTOK_PIXEL_ID}:${purchase.id}`;
   try { if (localStorage.getItem(key)) return false; } catch { return false; }
+  if (!mayTrack()) {
+    try { localStorage.setItem(key, JSON.stringify({ blocked: true, region, choice: readConsent(), recordedAt: new Date().toISOString() })); } catch { /* Remain blocked in this visit. */ }
+    return false;
+  }
   try {
     syncTikTokConsent();
     removeCustomerFieldsFromUrl();
