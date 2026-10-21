@@ -24,6 +24,7 @@ export function createConsent(previous: ConsentRecord | null, advertising: boole
 
 let region: string | null = null;
 let initialized = false;
+let consentEnabled = false;
 const observedPurchases = new Set<string>();
 type Queue = Array<unknown> & Record<string, any>;
 declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string; } }
@@ -67,8 +68,11 @@ function removeCustomerFieldsFromUrl() {
 
 export function syncTikTokConsent() {
   if (!mayTrack()) {
-    window.ttq?.revokeConsent?.();
-    window.ttq?.disableCookie?.();
+    if (consentEnabled) {
+      window.ttq?.revokeConsent?.();
+      window.ttq?.disableCookie?.();
+      consentEnabled = false;
+    }
     return;
   }
   if (!initialized) {
@@ -101,8 +105,11 @@ export function syncTikTokConsent() {
     ttq.load(TIKTOK_PIXEL_ID, { autoConfig: false });
     initialized = true;
   }
-  window.ttq?.grantConsent?.();
-  window.ttq?.enableCookie?.();
+  if (!consentEnabled) {
+    window.ttq?.grantConsent?.();
+    window.ttq?.enableCookie?.();
+    consentEnabled = true;
+  }
 }
 export function trackTikTokPage() {
   if (!mayTrack()) return;
