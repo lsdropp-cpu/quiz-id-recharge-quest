@@ -1,4 +1,10 @@
 # French funnel
+# TikTok purchase measurement
+- [ ] Install the requested pixel once across pages with regional consent, withdrawal and linked disclosure.
+- [ ] Attach Purchase to verified Stripe success branches and test consent, duplication and purchase reporting.
+- [ ] Verify a live Stripe test purchase and TikTok receipt (requires test payment path and account access).
+
+# French funnel
 - [x] Create isolated /fr quiz → ID → recharge in French with translated images, euro offers, provided Shopify links and unchanged Spanish tracking scripts.
 - [x] Verify complete French flow, all checkout links and UTM cart attributes; confirm existing funnels remain unchanged.
 
