@@ -284,6 +284,15 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
 
           if (!paymentMethodId) throw new Error("PaymentMethod ID is required");
 
+          // Never send a city (or ZIP) disguised as the street line: it causes AVS street
+          // mismatches. Without a real street, Stripe/issuers validate the ZIP only.
+          if (billingAddress) {
+            const l1 = String(billingAddress.line1 || "").trim().toLowerCase();
+            const city = String(billingAddress.city || "").trim().toLowerCase();
+            const zip = String(billingAddress.postal_code || "").trim().toLowerCase();
+            if (!l1 || l1 === city || l1 === zip) billingAddress.line1 = undefined;
+          }
+
           const priceData = PRICES[String(priceKey)];
           if (!priceData) throw new Error(`Invalid price key: ${priceKey}`);
 
@@ -310,7 +319,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
                   name: name || existingBillingDetails?.name || "Customer",
                   email: email || existingBillingDetails?.email || undefined,
                   address: {
-                    line1: billingAddress.line1 || existingBillingDetails?.address?.line1 || undefined,
+                    line1: billingAddress.line1 || undefined,
                     line2: billingAddress.line2 || existingBillingDetails?.address?.line2 || undefined,
                     city: billingAddress.city || existingBillingDetails?.address?.city || undefined,
                     state: billingAddress.state || existingBillingDetails?.address?.state || undefined,
@@ -335,7 +344,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
           await recordPaymentAttempt(supabaseAdmin, clientIP, email, cardLast4, "payment");
 
           const effectiveBillingAddress = {
-            line1: billingAddress?.line1 || existingBillingDetails?.address?.line1 || undefined,
+            line1: billingAddress?.line1 || undefined,
             line2: billingAddress?.line2 || existingBillingDetails?.address?.line2 || undefined,
             city: billingAddress?.city || existingBillingDetails?.address?.city || undefined,
             state: billingAddress?.state || existingBillingDetails?.address?.state || undefined,
@@ -344,7 +353,8 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
             country: billingAddress?.country || existingBillingDetails?.address?.country || "US",
           };
 
-          const hasAddressData = effectiveBillingAddress.line1 || effectiveBillingAddress.postal_code;
+          // Stripe requires shipping.address.line1, so only attach shipping with a real street.
+          const hasAddressData = Boolean(effectiveBillingAddress.line1);
 
           const paymentIntent = await stripeFetch("/payment_intents", "POST", stripeSecret, {
             amount: priceData.amount,
