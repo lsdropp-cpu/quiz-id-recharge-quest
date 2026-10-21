@@ -6,15 +6,14 @@ import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import { resolveTracking } from "@/lib/tracking";
+import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
 
-const packages = [
-  { diamonds: "5.600", price: "$9.90", bonus: "1.200", badge: "MEJOR VALOR", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout9" },
-  { diamonds: "11.200", price: "$15.90", bonus: "2.240", badge: "MÁS POPULAR", badgeGradient: "from-orange-500 to-pink-500", checkoutUrl: "/checkout15" },
-  { diamonds: "22.400", price: "$19.90", bonus: "4.480", badge: "MEJOR OFERTA", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout19" },
-  { diamonds: "29.500", price: "$25.90", bonus: "5.900", badge: "MÁXIMO BENEFICIO", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout25" },
-  { diamonds: "39.200", price: "$29.90", bonus: "7.840", badge: "SUPER PACK", badgeGradient: "from-orange-500 to-pink-500", checkoutUrl: "/checkout29" },
-  { diamonds: "56.000", price: "$35.90", bonus: "11.200", badge: "MEGA PACK", badgeGradient: "from-violet-500 to-fuchsia-500", checkoutUrl: "/checkout35" },
-];
+const packages = rechargePackages.map((pkg) => ({
+  ...pkg,
+  price: formatRechargePrice(pkg.priceUsd),
+  checkoutUrl: `/checkout${pkg.key}`,
+}));
+
 
 export const Route = createFileRoute("/recharge")({
   head: () => ({

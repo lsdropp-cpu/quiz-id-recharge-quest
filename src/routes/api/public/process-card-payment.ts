@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { rechargePackages } from "@/lib/recharge-packages";
 
 // Ported from the gemtop process-card-payment edge function. Runs as a
 // TanStack server route and talks to Stripe's REST API directly via fetch
@@ -18,16 +19,16 @@ const MAX_DIFFERENT_CARDS_PER_IP = 3;
 const MAX_DIFFERENT_CARDS_PER_EMAIL = 3;
 const TIME_WINDOW_MINUTES = 10;
 
-// Price mapping for each package - Método de Mejores Prácticas (amount in cents)
+// Price mapping for each package - Método de Mejores Prácticas (amount in
+// cents). Amounts come from the shared recharge pack table so the value
+// charged always matches the value the recharge pages display.
 const PRICES: Record<string, { amount: number; description: string }> = {
   "1": { amount: 100, description: "NMJ Test" },
-  "9": { amount: 990, description: "NMJ 5600" },
-  "15": { amount: 1590, description: "NMJ 11200" },
-  "19": { amount: 1990, description: "NMJ 22400" },
-  "25": { amount: 2590, description: "NMJ 29500" },
-  "29": { amount: 2990, description: "NMJ 39200" },
-  "35": { amount: 3590, description: "NMJ 56000" },
+  ...Object.fromEntries(
+    rechargePackages.map((pkg) => [pkg.key, { amount: pkg.cents, description: pkg.statement }]),
+  ),
 };
+
 
 function encode(params: Record<string, unknown>, prefix?: string): string {
   const parts: string[] = [];
