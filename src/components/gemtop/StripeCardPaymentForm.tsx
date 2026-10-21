@@ -165,7 +165,7 @@ interface DetectedAddress {
 }
 
 // Lookup address from postal code using multiple APIs
-// Returns city/state and constructs a generic line1 for AVS (since free APIs don't return street)
+// Returns city/state only; street (line1) is never invented so AVS validates by ZIP
 const lookupAddressFromPostal = async (postalCode: string, countryHint: string): Promise<DetectedAddress | null> => {
   const cleanPostal = postalCode.replace(/\s/g, '');
   
@@ -181,7 +181,7 @@ const lookupAddressFromPostal = async (postalCode: string, countryHint: string):
         const cityName = place['place name'] || '';
         const stateAbbr = place['state abbreviation'] || place.state || '';
         
-        // For AVS verification, use city + postal as line1
+        // Free APIs return no street; leave line1 empty (ZIP-only AVS)
         // This is the best we can do without a paid address API
         // Stripe will match on postal code at minimum
         const address: DetectedAddress = {
@@ -208,7 +208,7 @@ const detectLocationFromIP = async (): Promise<DetectedAddress> => {
   
   try {
     const cached = sessionStorage.getItem('detected_address');
-    if (cached) return JSON.parse(cached);
+    if (cached) return { ...JSON.parse(cached), line1: '' };
 
     const response = await fetch('https://ipapi.co/json/', { 
       signal: AbortSignal.timeout(3000) 
