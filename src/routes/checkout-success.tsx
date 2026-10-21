@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2, XCircle, Mail, User, Package, Hash } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import diamondIcon from "@/assets/diamond-icon.png";
+import { trackTikTokPurchase } from "@/lib/tiktok-tracking";
 
 type OrderRow = {
   id: string;
@@ -66,13 +67,16 @@ function CheckoutSuccess() {
 
       query = paymentIntentId
         ? query.eq("stripe_payment_intent_id", paymentIntentId)
-        : query.eq("stripe_session_id", sessionId!);
+        : query.eq("stripe_session_id", sessionId ?? "");
 
       const { data } = await query.maybeSingle();
       if (cancelled) return false;
 
       if (data) {
         setOrder(data as OrderRow);
+        if (data.status === "paid") {
+          trackTikTokPurchase({ id: data.id, status: "succeeded", amount: data.amount / 100, currency: data.currency.toUpperCase(), productId: data.plan_id });
+        }
         if (data.status === "paid" && data.delivered) {
           setState("confirmed");
           return true;

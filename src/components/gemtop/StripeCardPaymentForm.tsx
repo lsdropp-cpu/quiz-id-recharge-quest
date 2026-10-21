@@ -17,6 +17,7 @@ import { WalletPreviewStrip } from '@/components/gemtop/WalletPreviewStrip';
 
 import type { PaymentRequest } from '@stripe/stripe-js';
 import { track, trackFunnel } from '@/lib/gemtop-tracking';
+import { trackTikTokPurchase } from '@/lib/tiktok-tracking';
 
 interface StripeCardPaymentFormProps {
   priceKey: string;
@@ -503,6 +504,10 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
     console.log('[UTMIFY] Payment succeeded, registration handled by edge function', { paymentIntentId });
   };
 
+  const reportApprovedPurchase = (id: string, value = amount, currency = 'USD') => {
+    trackTikTokPurchase({ id, status: 'succeeded', amount: value, currency: currency.toUpperCase(), productId: `diamantes-${priceKey}` });
+  };
+
   // Initialize Payment Request (Apple Pay / Google Pay) - Run ASAP when stripe loads
   useEffect(() => {
     if (!stripe || paymentRequest) return;
@@ -618,6 +623,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
           }
 
           if (paymentIntent?.status === 'succeeded') {
+            reportApprovedPurchase(paymentIntent.id, paymentIntent.amount / 100, paymentIntent.currency);
             ev.complete('success');
             clearPaymentAttempts();
             await registerUtmifySaleFor3DS(paymentIntent.id);
@@ -626,6 +632,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
             onSuccess();
           }
         } else if (data.success) {
+          reportApprovedPurchase(data.paymentIntentId);
           ev.complete('success');
           clearPaymentAttempts();
           logPaymentSuccess(data.paymentIntentId);
@@ -802,6 +809,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
         }
 
         if (paymentIntent?.status === 'succeeded') {
+          reportApprovedPurchase(paymentIntent.id, paymentIntent.amount / 100, paymentIntent.currency);
           clearPaymentAttempts();
           await registerUtmifySaleFor3DS(paymentIntent.id);
           trackFunnel('comprou', { productId: productName, source: new URLSearchParams(window.location.search).get('utm_source') || localStorage.getItem('utm_source') || null });
@@ -812,6 +820,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
       }
 
       if (data.success) {
+        reportApprovedPurchase(data.paymentIntentId);
         // Payment succeeded without 3DS - clear attempts
         clearPaymentAttempts();
         logPaymentSuccess(data.paymentIntentId);

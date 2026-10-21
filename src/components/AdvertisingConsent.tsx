@@ -15,11 +15,13 @@ export default function AdvertisingConsent() {
   const t = copy[pathname.startsWith("/br") ? "br" : pathname.startsWith("/fr") ? "fr" : pathname.endsWith("-en") ? "en" : "es"];
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [hasChoice, setHasChoice] = useState(false);
   useEffect(() => {
     let cancelled = false;
     void resolveAdvertisingRegion().then(region => {
       if (cancelled) return;
       setOpen(requiresConsent(region) && !readConsent() && !hasAdvertisingOptOut());
+      setHasChoice(Boolean(readConsent()));
       setReady(true);
       syncTikTokConsent();
     });
@@ -32,6 +34,7 @@ export default function AdvertisingConsent() {
   useEffect(() => { if (ready) trackTikTokPage(); }, [ready, pathname]);
   const choose = (accepted: boolean) => {
     if (!updateAdvertisingChoice(accepted)) return;
+    setHasChoice(true);
     setOpen(false);
     if (accepted) trackTikTokPage();
   };
@@ -47,7 +50,7 @@ export default function AdvertisingConsent() {
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" className="min-w-28" onClick={() => choose(false)}>{t.reject}</Button>
           <Button variant="outline" className="min-w-28" onClick={() => choose(true)}>{t.accept}</Button>
-          {readConsent() && <Button variant="ghost" onClick={() => setOpen(false)}>{t.close}</Button>}
+          {hasChoice && <Button variant="ghost" onClick={() => setOpen(false)}>{t.close}</Button>}
         </div>
       </div>
     </section>}
