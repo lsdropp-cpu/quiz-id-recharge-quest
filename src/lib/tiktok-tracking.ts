@@ -1,4 +1,4 @@
-export const TIKTOK_PIXEL_ID = "DB22PJBC77U9003F8DDG";
+export const TIKTOK_PIXEL_ID = "DBD5O1BC77U29DFSUJ7G";
 export const CONSENT_KEY = "advertising_consent_v1";
 export const NOTICE_VERSION = "tiktok-advertising-2026-10-21";
 export const NOTICE = "TikTok receives page visits, approved purchase amount and currency, browser/device information, IP address and advertising cookie identifiers to measure and optimize ads. No name, email, card data or player ID is shared by this integration. Accept or reject advertising measurement; change your choice in Privacy settings.";

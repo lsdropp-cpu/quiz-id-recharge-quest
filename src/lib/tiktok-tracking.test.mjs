@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
 import { advertisingAllowed, createConsent, isApprovedPurchase, requiresConsent, TIKTOK_PIXEL_ID } from "./tiktok-tracking";
-test("uses the user's TikTok pixel", () => { expect(TIKTOK_PIXEL_ID).toBe("DB22PJBC77U9003F8DDG"); });
+test("uses the user's TikTok pixel", () => { expect(TIKTOK_PIXEL_ID).toBe("DBD5O1BC77U29DFSUJ7G"); });
 test("regional notice blocks France until acceptance and fails closed for unknown regions", () => {
   expect(requiresConsent("FR")).toBe(true);
   expect(advertisingAllowed("FR", null, false)).toBe(false);
