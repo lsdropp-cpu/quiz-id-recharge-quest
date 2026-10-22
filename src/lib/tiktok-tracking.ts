@@ -1,7 +1,9 @@
 export const TIKTOK_PIXEL_ID = "DBD5O1BC77U29DFSUJ7G";
+export const UTMIFY_TIKTOK_PIXEL_ID = "6ada5c894fa7707c1212ffd9";
+const UTMIFY_PIXEL_SRC = "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js";
 export const CONSENT_KEY = "advertising_consent_v1";
-export const NOTICE_VERSION = "tiktok-advertising-2026-10-21";
-export const NOTICE = "TikTok receives page visits, approved purchase amount and currency, browser/device information, IP address and advertising cookie identifiers to measure and optimize ads. No name, email, card data or player ID is shared by this integration. Accept or reject advertising measurement; change your choice in Privacy settings.";
+export const NOTICE_VERSION = "tiktok-advertising-2026-10-22";
+export const NOTICE = "TikTok receives page visits, approved purchase amount and currency, browser/device information, IP address and advertising cookie identifiers to measure and optimize ads. Advertising attribution partners may read name, email or phone typed into site forms for campaign attribution; card data is never shared by this integration. Accept or reject advertising measurement; change your choice in Privacy settings.";
 
 export type ConsentRecord = {
   visitorId: string; advertising: boolean; region: string | null;
@@ -27,7 +29,7 @@ let initialized = false;
 let consentEnabled = false;
 const observedPurchases = new Set<string>();
 type Queue = Array<unknown> & Record<string, any>;
-declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string; } }
+declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string; tikTokPixelId?: string; } }
 export function readConsent(): ConsentRecord | null {
   try {
     const value = JSON.parse(localStorage.getItem(CONSENT_KEY) || "null");
@@ -105,12 +107,26 @@ export function syncTikTokConsent() {
     ttq.load(TIKTOK_PIXEL_ID, { autoConfig: false });
     initialized = true;
   }
+  loadUtmifyPixel();
   if (!consentEnabled) {
     window.ttq?.grantConsent?.();
     window.ttq?.enableCookie?.();
     consentEnabled = true;
   }
 }
+let utmifyLoaded = false;
+function loadUtmifyPixel() {
+  if (utmifyLoaded || !mayTrack()) return;
+  utmifyLoaded = true;
+  window.tikTokPixelId = UTMIFY_TIKTOK_PIXEL_ID;
+  const script = document.createElement("script");
+  script.id = "utmify-tiktok-pixel";
+  script.async = true;
+  script.defer = true;
+  script.src = UTMIFY_PIXEL_SRC;
+  document.head.appendChild(script);
+}
+
 export function trackTikTokPage() {
   if (!mayTrack()) return;
   syncTikTokConsent();
