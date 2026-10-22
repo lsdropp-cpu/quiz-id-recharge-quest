@@ -29,7 +29,7 @@ let initialized = false;
 let consentEnabled = false;
 const observedPurchases = new Set<string>();
 type Queue = Array<unknown> & Record<string, any>;
-declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string; } }
+declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string; tikTokPixelId?: string; } }
 export function readConsent(): ConsentRecord | null {
   try {
     const value = JSON.parse(localStorage.getItem(CONSENT_KEY) || "null");
@@ -107,12 +107,26 @@ export function syncTikTokConsent() {
     ttq.load(TIKTOK_PIXEL_ID, { autoConfig: false });
     initialized = true;
   }
+  loadUtmifyPixel();
   if (!consentEnabled) {
     window.ttq?.grantConsent?.();
     window.ttq?.enableCookie?.();
     consentEnabled = true;
   }
 }
+let utmifyLoaded = false;
+function loadUtmifyPixel() {
+  if (utmifyLoaded || !mayTrack()) return;
+  utmifyLoaded = true;
+  window.tikTokPixelId = UTMIFY_TIKTOK_PIXEL_ID;
+  const script = document.createElement("script");
+  script.id = "utmify-tiktok-pixel";
+  script.async = true;
+  script.defer = true;
+  script.src = UTMIFY_PIXEL_SRC;
+  document.head.appendChild(script);
+}
+
 export function trackTikTokPage() {
   if (!mayTrack()) return;
   syncTikTokConsent();
