@@ -39,9 +39,6 @@ export default function AdvertisingConsent() {
     if (accepted) trackTikTokPage();
   };
   return <>
-    <footer className="flex items-center justify-center gap-4 border-t border-border bg-background px-4 py-3 text-xs text-muted-foreground">
-      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}><Shield className="size-3" />{t.settings}</Button>
-    </footer>
     {open && <section aria-label={t.title} className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background p-5 text-foreground">
       <div className="mx-auto max-w-3xl space-y-3">
         <h2 className="font-semibold">{t.title}</h2>
