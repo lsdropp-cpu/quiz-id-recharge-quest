@@ -5,7 +5,7 @@ import LiveViewersBadge from "@/components/LiveViewersBadge";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { resolveTracking } from "@/lib/tracking";
+import { resolveTracking, shopifyTrackingUrl } from "@/lib/tracking";
 import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
 
 const shopifyVariants: Record<string, string> = {
@@ -40,26 +40,8 @@ export const Route = createFileRoute("/recharge2")({
 
 function buildCheckoutUrl(baseUrl: string) {
   if (typeof window === "undefined") return baseUrl;
-  const url = new URL(baseUrl, window.location.origin);
   const search = new URLSearchParams(window.location.search);
-  search.forEach((value, key) => {
-    if (!url.searchParams.has(key)) url.searchParams.append(key, value);
-  });
-  // Fallback: fill any UTM/src/sck missing from the URL with saved values
-  const saved = resolveTracking(search);
-  Object.entries(saved).forEach(([key, value]) => {
-    if (value && !url.searchParams.has(key)) url.searchParams.set(key, value);
-  });
-  // Also save every tracking value as a Shopify cart attribute. Cart
-  // attributes are stored on the order itself (note_attributes), so the
-  // UTMs survive Shopify's checkout redirects, abandoned-cart returns and
-  // in-app browsers that strip the query string.
-  const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "src", "sck"];
-  for (const key of trackingKeys) {
-    const value = url.searchParams.get(key);
-    if (value && url.hostname.endsWith("myshopify.com")) url.searchParams.set(`attributes[${key}]`, value);
-  }
-  return url.toString();
+  return shopifyTrackingUrl(baseUrl, resolveTracking(search));
 }
 
 function RechargeTwoPage() {
