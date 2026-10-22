@@ -1,6 +1,7 @@
 import { test, expect } from "bun:test";
-import { advertisingAllowed, createConsent, isApprovedPurchase, requiresConsent, TIKTOK_PIXEL_ID } from "./tiktok-tracking";
+import { advertisingAllowed, createConsent, isApprovedPurchase, requiresConsent, TIKTOK_PIXEL_ID, UTMIFY_TIKTOK_PIXEL_ID } from "./tiktok-tracking";
 test("uses the user's TikTok pixel", () => { expect(TIKTOK_PIXEL_ID).toBe("DBD5O1BC77U29DFSUJ7G"); });
+test("uses the Utmify TikTok pixel id", () => { expect(UTMIFY_TIKTOK_PIXEL_ID).toBe("6ada5c894fa7707c1212ffd9"); });
 test("regional notice blocks France until acceptance and fails closed for unknown regions", () => {
   expect(requiresConsent("FR")).toBe(true);
   expect(advertisingAllowed("FR", null, false)).toBe(false);
