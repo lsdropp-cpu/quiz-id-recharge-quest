@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { hasAdvertisingOptOut, readConsent, requiresConsent, resolveAdvertisingRegion, syncTikTokConsent, trackTikTokPage, updateAdvertisingChoice } from "@/lib/tiktok-tracking";
@@ -41,12 +41,11 @@ export default function AdvertisingConsent() {
   return <>
     <footer className="flex items-center justify-center gap-4 border-t border-border bg-background px-4 py-3 text-xs text-muted-foreground">
       <Button variant="ghost" size="sm" onClick={() => setOpen(true)}><Shield className="size-3" />{t.settings}</Button>
-      <Link to="/privacy" className="underline underline-offset-4">{t.policy}</Link>
     </footer>
     {open && <section aria-label={t.title} className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background p-5 text-foreground">
       <div className="mx-auto max-w-3xl space-y-3">
         <h2 className="font-semibold">{t.title}</h2>
-        <p className="text-sm text-muted-foreground">{t.body} <Link to="/privacy" className="underline">{t.policy}</Link></p>
+        <p className="text-sm text-muted-foreground">{t.body}</p>
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" className="min-w-28" onClick={() => choose(false)}>{t.reject}</Button>
           <Button variant="outline" className="min-w-28" onClick={() => choose(true)}>{t.accept}</Button>
