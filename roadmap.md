@@ -1,5 +1,6 @@
 # TikTok purchase measurement
-- [ ] Resolve requested Utmify TikTok replacement (6ada1d2cc0cb62e3ac782a39) across pages. Blocker: confirm replacement versus existing native pixel; supplied loader automatically captures form identities and sends them to Utmify, so safe consent and collection controls must be verified before installation. Requested UTMs loader already exists globally; campaign URL parameters belong on the ad destination.
+- [ ] Install requested Utmify TikTok loader for the Shopify funnel only. Blocker: supplied loader automatically captures name/email and sends customer data to Utmify without verified collection/withdrawal controls; leave existing Stripe pixel intact. Shopify-to-Utmify paid-order connection must be checked in those services; site scripts alone do not confirm a paid order.
+- [x] Preserve all six supplied TikTok campaign fields, including utm_id, in Shopify checkout URLs and order attributes; global Utmify UTMs loader already exists.
 - [x] Install the requested pixel once across pages with regional consent, withdrawal and linked disclosure.
 - [x] Attach Purchase to verified Stripe success branches; isolated browser tests verify amount, currency, rejection and duplicate prevention without submitting a payment.
 - [ ] Verify published tracking and an end-to-end Stripe test purchase with TikTok receipt. Blockers: publishing not requested, checkout currently uses live Stripe, no TikTok account access; sandbox SDK transmissions had aborted requests, so receipt remains unverified.

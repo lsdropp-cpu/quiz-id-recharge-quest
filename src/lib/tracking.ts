@@ -8,16 +8,18 @@ export type TrackingParams = {
   utm_campaign?: string | null;
   utm_content?: string | null;
   utm_term?: string | null;
+  utm_id?: string | null;
   src?: string | null;
   sck?: string | null;
 };
 
-const KEYS: (keyof TrackingParams)[] = [
+export const TRACKING_KEYS: (keyof TrackingParams)[] = [
   "utm_source",
   "utm_medium",
   "utm_campaign",
   "utm_content",
   "utm_term",
+  "utm_id",
   "src",
   "sck",
 ];
@@ -46,7 +48,7 @@ export const captureTracking = (search: URLSearchParams | string): TrackingParam
 
   const merged: TrackingParams = { ...stored };
   let changed = false;
-  for (const key of KEYS) {
+  for (const key of TRACKING_KEYS) {
     const v = params.get(key);
     if (v && v.trim()) {
       if (merged[key] !== v) {
@@ -105,7 +107,7 @@ export const resolveTracking = (search: URLSearchParams | string): TrackingParam
   const params = typeof search === "string" ? new URLSearchParams(search) : search;
   const stored = captureTracking(params);
   const out: TrackingParams = {};
-  for (const key of KEYS) {
+  for (const key of TRACKING_KEYS) {
     const fromUrl = params.get(key);
     const fromLs = readFromLocalStorage(key);
     const v =
@@ -157,3 +159,15 @@ export const resolveTracking = (search: URLSearchParams | string): TrackingParam
 
   return out;
 };
+
+// Keep campaign values on the Shopify order as well as its checkout URL.
+export function shopifyTrackingUrl(baseUrl: string, tracking: TrackingParams): string {
+  const url = new URL(baseUrl);
+  for (const key of TRACKING_KEYS) {
+    const value = tracking[key];
+    if (!value) continue;
+    url.searchParams.set(key, value);
+    if (url.hostname.endsWith(".myshopify.com")) url.searchParams.set(`attributes[${key}]`, value);
+  }
+  return url.toString();
+}
