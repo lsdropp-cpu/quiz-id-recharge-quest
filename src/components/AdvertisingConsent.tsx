@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { hasAdvertisingOptOut, readConsent, requiresConsent, resolveAdvertisingRegion, syncTikTokConsent, trackTikTokPage, updateAdvertisingChoice } from "@/lib/tiktok-tracking";
 
