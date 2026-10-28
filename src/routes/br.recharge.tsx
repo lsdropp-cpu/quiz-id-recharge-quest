@@ -6,7 +6,7 @@ import LiveViewersBadge from "@/components/br/LiveViewersBadge";
 import SocialProofToasts from "@/components/br/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { resolveTracking } from "@/lib/tracking";
+import { brShopifyCheckoutUrl } from "@/lib/shopify-checkout";
 
 const packages = [
   { diamonds: "5.600", price: "R$19,90", bonus: "1.200", badge: "MELHOR VALOR", badgeGradient: "from-secondary to-secondary", checkoutUrl: "https://1ievzb-tk.myshopify.com/cart/53605831049552:1?channel=buy_button" },
@@ -21,41 +21,15 @@ export const Route = createFileRoute("/br/recharge")({
   head: () => ({
     meta: [
       { title: "Recarga de diamantes — Free Fire Brasil" },
-      { name: "description", content: "Escolha sua recarga de diamantes com bônus e pague na hora via PIX." },
+      { name: "description", content: "Escolha sua recarga de diamantes com bônus e finalize seu pagamento na Shopify." },
       { property: "og:title", content: "Recarga de diamantes — Free Fire Brasil" },
-      { property: "og:description", content: "Escolha sua recarga de diamantes com bônus e pague na hora via PIX." },
+      { property: "og:description", content: "Escolha sua recarga de diamantes com bônus e finalize seu pagamento na Shopify." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
   component: RechargePage,
 });
-
-function buildCheckoutUrl(baseUrl: string) {
-  if (typeof window === "undefined") return baseUrl;
-  const url = new URL(baseUrl);
-  // Ask Shopify for Portuguese; the shop must have this language enabled.
-  url.searchParams.set("locale", "pt-BR");
-  const search = new URLSearchParams(window.location.search);
-  search.forEach((value, key) => {
-    if (!url.searchParams.has(key)) url.searchParams.append(key, value);
-  });
-  // Fallback: fill any UTM/src/sck missing from the URL with saved values
-  const saved = resolveTracking(search);
-  Object.entries(saved).forEach(([key, value]) => {
-    if (value && !url.searchParams.has(key)) url.searchParams.set(key, value);
-  });
-  // Also save every tracking value as a Shopify cart attribute. Cart
-  // attributes are stored on the order itself (note_attributes), so the
-  // UTMs survive Shopify's checkout redirects, abandoned-cart returns and
-  // in-app browsers that strip the query string.
-  const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "src", "sck"];
-  for (const key of trackingKeys) {
-    const value = url.searchParams.get(key);
-    if (value) url.searchParams.set(`attributes[${key}]`, value);
-  }
-  return url.toString();
-}
 
 function RechargePage() {
   useFunnelTracking("recharge");
@@ -98,7 +72,8 @@ function RechargePage() {
                 <Button
                   key={i}
                   onClick={() => {
-                    window.location.href = `/br/checkout/${i}${window.location.search}`;
+                    const url = brShopifyCheckoutUrl(i, window.location.search);
+                    if (url) window.location.href = url;
                   }}
                   className="go-to-checkout h-auto whitespace-normal block p-0 relative rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                 >

@@ -5,13 +5,12 @@ import LiveViewersBadge from "@/components/LiveViewersBadge";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { resolveTracking } from "@/lib/tracking";
+import { usdShopifyCheckoutUrl } from "@/lib/shopify-checkout";
 import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
 
 const packages = rechargePackages.map((pkg) => ({
   ...pkg,
   price: formatRechargePrice(pkg.priceUsd),
-  checkoutUrl: `/checkout${pkg.key}`,
 }));
 
 
@@ -28,30 +27,6 @@ export const Route = createFileRoute("/recharge")({
   }),
   component: RechargePage,
 });
-
-function buildCheckoutUrl(baseUrl: string) {
-  if (typeof window === "undefined") return baseUrl;
-  const url = new URL(baseUrl, window.location.origin);
-  const search = new URLSearchParams(window.location.search);
-  search.forEach((value, key) => {
-    if (!url.searchParams.has(key)) url.searchParams.append(key, value);
-  });
-  // Fallback: fill any UTM/src/sck missing from the URL with saved values
-  const saved = resolveTracking(search);
-  Object.entries(saved).forEach(([key, value]) => {
-    if (value && !url.searchParams.has(key)) url.searchParams.set(key, value);
-  });
-  // Also save every tracking value as a Shopify cart attribute. Cart
-  // attributes are stored on the order itself (note_attributes), so the
-  // UTMs survive Shopify's checkout redirects, abandoned-cart returns and
-  // in-app browsers that strip the query string.
-  const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "src", "sck"];
-  for (const key of trackingKeys) {
-    const value = url.searchParams.get(key);
-    void value;
-  }
-  return url.toString();
-}
 
 function RechargePage() {
   useFunnelTracking("recharge");
@@ -94,7 +69,8 @@ function RechargePage() {
                 <button
                   key={i}
                   onClick={() => {
-                    window.location.href = buildCheckoutUrl(pkg.checkoutUrl);
+                    const url = usdShopifyCheckoutUrl(pkg.key, window.location.search);
+                    if (url) window.location.href = url;
                   }}
                   className="go-to-checkout relative rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-[0_0_24px_rgba(255,122,20,0.25)] hover:scale-[1.02] active:scale-[0.98]"
                 >
