@@ -1,3 +1,7 @@
+# Shopify checkout destinations
+- [ ] Direct every funnel to the matching Shopify package, preserving prices and campaign attributes.
+- [ ] Verify the changed checkout handoffs without submitting payments.
+
 # TikTok purchase measurement
 - [ ] Install requested Utmify TikTok loader for the Shopify funnel only. Blocker: supplied loader automatically captures name/email and sends customer data to Utmify without verified collection/withdrawal controls; leave existing Stripe pixel intact. Shopify-to-Utmify paid-order connection must be checked in those services; site scripts alone do not confirm a paid order.
 - [x] Preserve all six supplied TikTok campaign fields, including utm_id, in Shopify checkout URLs and order attributes; global Utmify UTMs loader already exists.
