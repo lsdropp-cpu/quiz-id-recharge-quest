@@ -5,22 +5,12 @@ import LiveViewersBadge from "@/components/LiveViewersBadge";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { resolveTracking, shopifyTrackingUrl } from "@/lib/tracking";
+import { usdShopifyCheckoutUrl } from "@/lib/shopify-checkout";
 import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
-
-const shopifyVariants: Record<string, string> = {
-  "9": "49462223175777",
-  "15": "49462223208545",
-  "19": "49462223241313",
-  "25": "49462223274081",
-  "29": "49462223306849",
-  "35": "49462223339617",
-};
 
 const packages = rechargePackages.map((pkg) => ({
   ...pkg,
   price: formatRechargePrice(pkg.priceUsd),
-  checkoutUrl: `https://qqs5hg-h4.myshopify.com/cart/${shopifyVariants[pkg.key]}:1?channel=buy_button`,
 }));
 
 
@@ -37,12 +27,6 @@ export const Route = createFileRoute("/recharge2")({
   }),
   component: RechargeTwoPage,
 });
-
-function buildCheckoutUrl(baseUrl: string) {
-  if (typeof window === "undefined") return baseUrl;
-  const search = new URLSearchParams(window.location.search);
-  return shopifyTrackingUrl(baseUrl, resolveTracking(search));
-}
 
 function RechargeTwoPage() {
   useFunnelTracking("recharge");
@@ -85,7 +69,8 @@ function RechargeTwoPage() {
                 <button
                   key={i}
                   onClick={() => {
-                    window.location.href = buildCheckoutUrl(pkg.checkoutUrl);
+                    const url = usdShopifyCheckoutUrl(pkg.key, window.location.search);
+                    if (url) window.location.href = url;
                   }}
                   className="go-to-checkout relative rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-[0_0_24px_rgba(255,122,20,0.25)] hover:scale-[1.02] active:scale-[0.98]"
                 >
