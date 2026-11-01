@@ -151,7 +151,7 @@
   width: 100%;
   height: 100%;
 }
-.quiz-entry-scenery img { object-fit: cover; object-position: center; }
+.quiz-entry-scenery img { object-fit: contain; object-position: center top; }
 .quiz-entry-veil {
   position: absolute;
   inset: 0;
@@ -170,7 +170,7 @@
 .quiz-entry-content .bg-warning\/10 { background: hsl(var(--background) / 0.76); }
 .quiz-entry-content button { border-radius: 8px; }
 @media (max-width: 767px) {
-  .quiz-entry-scenery img { object-position: center top; }
+  .quiz-entry-scenery img { object-fit: cover; object-position: center top; }
   .quiz-entry-content > .bg-card { padding-inline: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
