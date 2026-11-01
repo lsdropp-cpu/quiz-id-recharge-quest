@@ -1,5 +1,7 @@
 import { Check, TriangleAlert } from "lucide-react";
 import freefireLogoAsset from "@/assets/freefire-logo-white.png.asset.json";
+import QuizLandingScenery from "@/components/QuizLandingScenery";
+import { Button } from "@/components/ui/button";
 
 interface QuizLandingProps {
   onStart: () => void;
@@ -7,7 +9,9 @@ interface QuizLandingProps {
 
 const QuizLanding = ({ onStart }: QuizLandingProps) => {
   return (
-    <div className="animate-fade-in">
+    <>
+    <QuizLandingScenery />
+    <div className="quiz-entry-content animate-fade-in">
       <div className="flex justify-center mb-6 -mx-4">
         <img
           src={freefireLogoAsset.url}
@@ -46,15 +50,16 @@ const QuizLanding = ({ onStart }: QuizLandingProps) => {
           <span className="font-medium">No todas las cuentas califican</span>
         </div>
 
-        <button
+        <Button
           onClick={onStart}
-          className="w-full text-lg font-semibold py-4 px-6 rounded-xl bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 transition-all duration-200 flex items-center justify-center gap-2 animate-pulse-glow"
+          className="h-auto whitespace-normal w-full text-lg font-semibold py-4 px-6 rounded-xl bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 transition-all duration-200 flex items-center justify-center gap-2 animate-pulse-glow"
         >
           <span>Comenzar Calificación</span>
           <span>🔥</span>
-        </button>
+        </Button>
       </div>
     </div>
+    </>
   );
 };
 

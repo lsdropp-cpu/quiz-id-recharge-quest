@@ -138,6 +138,45 @@
 @media (min-width: 1024px) { .container { max-width: 1024px; } }
 @media (min-width: 1280px) { .container { max-width: 1280px; } }
 
+/* Hangar art is mounted only on the quiz introduction. */
+.quiz-entry-scenery {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: hsl(var(--background));
+}
+.quiz-entry-scenery picture, .quiz-entry-scenery img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.quiz-entry-scenery img { object-fit: cover; object-position: center; }
+.quiz-entry-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, hsl(var(--background) / 0.12), hsl(var(--background) / 0.25) 65%, hsl(var(--background) / 0.65));
+}
+.quiz-entry-content { position: relative; z-index: 1; }
+.quiz-entry-content > .bg-card {
+  background: transparent;
+  box-shadow: none;
+  padding-inline: 0.75rem;
+}
+.quiz-entry-content h1 { letter-spacing: 0; }
+.quiz-entry-content .text-muted-foreground { color: hsl(var(--foreground) / 0.88); }
+.quiz-entry-content .bg-secondary\/50 { background: hsl(var(--background) / 0.76); border-radius: 8px; }
+.quiz-entry-content > .bg-gradient-to-r { background: hsl(var(--background) / 0.8); border-radius: 8px; }
+.quiz-entry-content .bg-warning\/10 { background: hsl(var(--background) / 0.76); }
+.quiz-entry-content button { border-radius: 8px; }
+@media (max-width: 767px) {
+  .quiz-entry-scenery img { object-position: center top; }
+  .quiz-entry-content > .bg-card { padding-inline: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quiz-entry-content, .quiz-entry-content button { animation: none; }
+}
+
 /* Alternate quiz presentation never affects the original funnel. */
 .quiz-ninja {
   --background: 240 10% 4%;
