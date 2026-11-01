@@ -182,6 +182,15 @@
 .quiz-entry-side svg { position: absolute; top: 340px; width: 28px; height: 28px; }
 .quiz-entry-side-left svg { right: 0; }
 :root { --scenery-diamond: 190 100% 55%; }
+@media (min-width: 768px) {
+  .quiz-entry-content { max-width: 368px; margin-inline: auto; padding-top: 1rem; font-size: 14px; }
+  .quiz-entry-content > div:first-child { margin-bottom: 1.5rem; }
+  .quiz-entry-content > div:first-child img { max-width: 320px; }
+  .quiz-entry-content > .bg-card { padding: 26px; }
+  .quiz-entry-content h1 { font-size: 20px; }
+  .quiz-entry-content .bg-secondary\/50 { padding: 10px 12px; }
+  .quiz-entry-content button { font-size: 16px; padding-block: 12px; }
+}
 @media (max-width: 767px) {
   .quiz-entry-scenery img { object-fit: cover; object-position: center top; }
   .quiz-entry-content > .bg-card { padding: 1.25rem; }
