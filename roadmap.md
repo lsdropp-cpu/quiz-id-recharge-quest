@@ -1,6 +1,6 @@
 # Quiz introduction scenery
-- [ ] Apply the supplied desktop/mobile hangar artwork only to quiz introductions; preserve the default theme on subsequent steps.
-- [ ] Verify artwork, starting the quiz, and unchanged ID/recharge presentation on desktop/mobile.
+- [x] Apply the supplied desktop/mobile hangar artwork only to quiz introductions; preserve the default theme on subsequent steps.
+- [x] Verify artwork and starting all five quizzes on desktop/mobile; ID/recharge remain unchanged and both screenshots show readable content.
 
 # Shopify checkout destinations
 - [x] Direct every funnel to the matching existing Shopify package, preserving displayed prices and campaign attributes.
