@@ -1,3 +1,7 @@
+# Quiz introduction scenery
+- [x] Apply the supplied desktop/mobile hangar artwork only to quiz introductions; preserve the default theme on subsequent steps.
+- [x] Verify artwork and starting all five quizzes on desktop/mobile; ID/recharge remain unchanged and both screenshots show readable content.
+
 # Shopify checkout destinations
 - [x] Direct every funnel to the matching existing Shopify package, preserving displayed prices and campaign attributes.
 - [x] Verify all 30 recharge buttons and 16 legacy checkout handoffs without submitting payments; real USD and Brazilian Shopify checkouts open. Shopify catalog pricing remains controlled by each store.

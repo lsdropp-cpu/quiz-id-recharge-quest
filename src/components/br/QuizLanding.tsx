@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Check, TriangleAlert } from "lucide-react";
 import freefireLogoAsset from "@/assets/freefire-logo-white.png.asset.json";
+import QuizLandingScenery from "@/components/QuizLandingScenery";
 
 interface QuizLandingProps {
   onStart: () => void;
@@ -8,7 +9,9 @@ interface QuizLandingProps {
 
 const QuizLanding = ({ onStart }: QuizLandingProps) => {
   return (
-    <div className="animate-fade-in">
+    <>
+    <QuizLandingScenery />
+    <div className="quiz-entry-content animate-fade-in">
       <div className="flex justify-center mb-6 -mx-4">
         <img
           src={freefireLogoAsset.url}
@@ -56,6 +59,7 @@ const QuizLanding = ({ onStart }: QuizLandingProps) => {
         </Button>
       </div>
     </div>
+    </>
   );
 };
 
