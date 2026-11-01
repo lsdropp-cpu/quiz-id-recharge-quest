@@ -7,10 +7,10 @@ import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 export const Route = createFileRoute("/idplayer2")({
   head: () => ({
     meta: [
-      { title: "Identificar cuenta — Free Fire (Edición Halloween)" },
-      { name: "description", content: "Ingresa tu ID de jugador de Free Fire para validar tu cuenta en la edición especial de Halloween." },
-      { property: "og:title", content: "Identificar cuenta — Free Fire (Edición Halloween)" },
-      { property: "og:description", content: "Ingresa tu ID de jugador de Free Fire para validar tu cuenta en la edición especial de Halloween." },
+      { title: "Identificar cuenta — Free Fire" },
+      { name: "description", content: "Ingresa tu ID de jugador de Free Fire para validar tu cuenta." },
+      { property: "og:title", content: "Identificar cuenta — Free Fire" },
+      { property: "og:description", content: "Ingresa tu ID de jugador de Free Fire para validar tu cuenta." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

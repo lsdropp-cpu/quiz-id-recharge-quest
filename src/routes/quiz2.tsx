@@ -11,10 +11,10 @@ type QuizStep = "landing" | "questions" | "result";
 export const Route = createFileRoute("/quiz2")({
   head: () => ({
     meta: [
-      { title: "Quiz Free Fire — Califica tu cuenta (Edición Halloween)" },
-      { name: "description", content: "Descubre si tu cuenta Free Fire califica para descuentos en diamantes en la edición especial de Halloween." },
-      { property: "og:title", content: "Quiz Free Fire — Califica tu cuenta (Edición Halloween)" },
-      { property: "og:description", content: "Descubre si tu cuenta Free Fire califica para descuentos en diamantes en la edición especial de Halloween." },
+      { title: "Quiz Free Fire — Califica tu cuenta" },
+      { name: "description", content: "Descubre si tu cuenta Free Fire califica para descuentos en diamantes." },
+      { property: "og:title", content: "Quiz Free Fire — Califica tu cuenta" },
+      { property: "og:description", content: "Descubre si tu cuenta Free Fire califica para descuentos en diamantes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

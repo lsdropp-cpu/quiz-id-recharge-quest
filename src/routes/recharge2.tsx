@@ -17,10 +17,10 @@ const packages = rechargePackages.map((pkg) => ({
 export const Route = createFileRoute("/recharge2")({
   head: () => ({
     meta: [
-      { title: "Recarga de Diamantes — Free Fire (Edición Halloween)" },
-      { name: "description", content: "Selecciona tu paquete de diamantes con bono especial desbloqueado en la edición especial de Halloween." },
-      { property: "og:title", content: "Recarga de Diamantes — Free Fire (Edición Halloween)" },
-      { property: "og:description", content: "Selecciona tu paquete de diamantes con bono especial desbloqueado en la edición especial de Halloween." },
+      { title: "Recarga de Diamantes — Free Fire" },
+      { name: "description", content: "Selecciona tu paquete de diamantes con bono especial desbloqueado." },
+      { property: "og:title", content: "Recarga de Diamantes — Free Fire" },
+      { property: "og:description", content: "Selecciona tu paquete de diamantes con bono especial desbloqueado." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
