@@ -7,7 +7,7 @@
 - Keep French funnel routes under `/fr` and French presentation/data in separate modules so existing offers and navigation stay unchanged; reuse Spanish root scripts and shared tracking helpers, with localized Shopify URLs and cart attributes.
 - Keep Brazilian funnel pages under `/br` and their presentation components isolated from the Spanish funnel so localization does not alter existing offers or navigation.
 - Brazilian pages reuse the existing tracking helpers and Shopify cart-attribute handoff so tracking behavior remains consistent between languages.
-- All funnels use Shopify checkout; USD and Brazilian package destinations live in `src/lib/shopify-checkout.ts`, and legacy checkout pages redirect without initializing Stripe or PIX so old links cannot reopen the previous payment flow.
+- The main /quiz → /idplayer → /recharge funnel uses the Stripe card checkout pages (/checkoutXX); all other funnels use Shopify checkout; USD and Brazilian package destinations live in `src/lib/shopify-checkout.ts`, and legacy checkout pages redirect without initializing Stripe or PIX so old links cannot reopen the previous payment flow.
 - Funnels use the default dark theme; seasonal wrappers (e.g. Halloween) were removed, so any future seasonal theme must be a presentation-only wrapper that never touches checkout handoff or tracking.
 - Quiz introductions share the presentation-only QuizLandingScenery; mount it only inside landing views so questions, results, ID and recharge retain their normal dark theme and independent funnel logic.
 - The alternate /quiz2 → /idplayer2 → /recharge2 funnel must look identical to the main Spanish funnel; keep its own routes, Shopify handoff, tracking and QuizResult destination so the variant stays independent.
