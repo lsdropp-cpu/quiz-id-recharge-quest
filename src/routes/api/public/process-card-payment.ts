@@ -60,7 +60,11 @@ async function stripeFetch(
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(json?.error?.message || `Stripe error ${res.status}`);
+    const err: any = new Error(json?.error?.message || `Stripe error ${res.status}`);
+    err.stripeCode = json?.error?.code;
+    err.declineCode = json?.error?.decline_code;
+    err.isCardError = json?.error?.type === "card_error";
+    throw err;
   }
   return json;
 }
@@ -415,13 +419,20 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
             return json({ success: true, paymentIntentId: paymentIntent.id });
           }
 
+          const lpe = paymentIntent.last_payment_error;
           return json({
-            error: `Payment failed with status: ${paymentIntent.status}`,
+            error: lpe?.message || `Payment failed with status: ${paymentIntent.status}`,
+            code: lpe?.code,
+            decline_code: lpe?.decline_code,
             paymentIntentId: paymentIntent.id,
           });
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           console.error("[PROCESS-CARD-PAYMENT] Error:", errorMessage);
+          const e: any = error;
+          if (e?.isCardError || e?.declineCode || e?.stripeCode) {
+            return json({ error: errorMessage, code: e.stripeCode, decline_code: e.declineCode });
+          }
           return json({ error: errorMessage }, 500);
         }
       },

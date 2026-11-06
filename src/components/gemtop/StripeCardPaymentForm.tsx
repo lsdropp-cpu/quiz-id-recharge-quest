@@ -99,6 +99,39 @@ const translations = {
   }
 };
 
+const DECLINE_MESSAGES: Record<string, { es: string; en: string }> = {
+  insufficient_funds: { es: 'Fondos insuficientes en la tarjeta. Verifica tu saldo o intenta con otra tarjeta.', en: 'Insufficient funds on the card. Check your balance or try another card.' },
+  incorrect_cvc: { es: 'El código de seguridad (CVV) es incorrecto. Revisa los dígitos al reverso de la tarjeta.', en: 'The security code (CVV) is incorrect. Check the digits on the back of your card.' },
+  invalid_cvc: { es: 'El código de seguridad (CVV) es inválido. Revisa los dígitos al reverso de la tarjeta.', en: 'The security code (CVV) is invalid. Check the digits on the back of your card.' },
+  expired_card: { es: 'Tarjeta vencida. Revisa la fecha de vencimiento o usa otra tarjeta.', en: 'Card expired. Check the expiry date or use another card.' },
+  incorrect_number: { es: 'Número de tarjeta incorrecto. Revisa los datos ingresados.', en: 'Incorrect card number. Check the details you entered.' },
+  invalid_number: { es: 'Número de tarjeta inválido. Revisa los datos ingresados.', en: 'Invalid card number. Check the details you entered.' },
+  invalid_expiry_month: { es: 'Mes de vencimiento inválido.', en: 'Invalid expiry month.' },
+  invalid_expiry_year: { es: 'Año de vencimiento inválido.', en: 'Invalid expiry year.' },
+  incorrect_zip: { es: 'El código postal no coincide con el de tu tarjeta. Revísalo e intenta de nuevo.', en: 'The postal code does not match your card. Check it and try again.' },
+  lost_card: { es: 'Tarjeta rechazada por el banco (reportada como perdida). Usa otra tarjeta.', en: 'Card declined by the bank (reported lost). Use another card.' },
+  stolen_card: { es: 'Tarjeta rechazada por el banco. Usa otra tarjeta.', en: 'Card declined by the bank. Use another card.' },
+  do_not_honor: { es: 'Tu banco no autorizó la compra. Contacta a tu banco para autorizar compras en línea o usa otra tarjeta.', en: 'Your bank did not authorize the purchase. Contact your bank to allow online purchases or use another card.' },
+  transaction_not_allowed: { es: 'Tu tarjeta no permite este tipo de compra. Contacta a tu banco o usa otra tarjeta.', en: 'Your card does not allow this type of purchase. Contact your bank or use another card.' },
+  card_not_supported: { es: 'Esta tarjeta no acepta este tipo de compra. Usa otra tarjeta.', en: 'This card does not support this purchase. Use another card.' },
+  currency_not_supported: { es: 'Tu tarjeta no acepta pagos en dólares (USD). Usa otra tarjeta.', en: 'Your card does not support USD payments. Use another card.' },
+  card_velocity_exceeded: { es: 'Superaste el límite de tu tarjeta. Contacta a tu banco o usa otra tarjeta.', en: 'You exceeded your card limit. Contact your bank or use another card.' },
+  withdrawal_count_limit_exceeded: { es: 'Superaste el límite de tu tarjeta. Contacta a tu banco o usa otra tarjeta.', en: 'You exceeded your card limit. Contact your bank or use another card.' },
+  fraudulent: { es: 'El pago fue rechazado por seguridad. Usa otra tarjeta.', en: 'The payment was declined for security reasons. Use another card.' },
+  merchant_blacklist: { es: 'El pago fue rechazado por seguridad. Usa otra tarjeta.', en: 'The payment was declined for security reasons. Use another card.' },
+  processing_error: { es: 'Ocurrió un error al procesar la tarjeta. Intenta de nuevo.', en: 'An error occurred while processing the card. Try again.' },
+  authentication_required: { es: 'Tu banco requiere verificación adicional. Intenta de nuevo y completa la verificación.', en: 'Your bank requires extra verification. Try again and complete it.' },
+  payment_intent_authentication_failure: { es: 'No se completó la verificación de tu banco. Intenta de nuevo.', en: 'Bank verification was not completed. Try again.' },
+  generic_decline: { es: 'Tarjeta rechazada por el banco. Contacta a tu banco o usa otra tarjeta.', en: 'Card declined by the bank. Contact your bank or use another card.' },
+  card_declined: { es: 'Tarjeta rechazada por el banco. Contacta a tu banco o usa otra tarjeta.', en: 'Card declined by the bank. Contact your bank or use another card.' },
+};
+
+export function declineMessage(lang: 'es' | 'en', code?: string | null, declineCode?: string | null, fallback?: string | null): string | null {
+  const hit = (declineCode && DECLINE_MESSAGES[declineCode]) || (code && DECLINE_MESSAGES[code]);
+  if (hit) return hit[lang];
+  return fallback || null;
+}
+
 const elementStyle = {
   base: {
     fontSize: '16px',
@@ -803,7 +836,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
         });
         
         if (confirmError) {
-          toast.error(t.bankRejected);
+          toast.error(declineMessage(lang === 'en' ? 'en' : 'es', confirmError.code, (confirmError as any).decline_code, confirmError.message) || t.bankRejected);
           setIsProcessing(false);
           return;
         }
@@ -830,7 +863,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
       } else if (data.error) {
         // Payment failed (card declined, etc.) - friendly message to reduce insistence
         const isDeclined = data.error.includes('declined') || data.error.includes('failed');
-        toast.error(isDeclined ? t.bankRejected : t.bankCantProcess);
+        toast.error(declineMessage(lang === 'en' ? 'en' : 'es', data.code, data.decline_code, data.code || data.decline_code ? data.error : null) || (isDeclined ? t.bankRejected : t.bankCantProcess));
         setIsProcessing(false);
       }
     } catch (err) {
