@@ -294,4 +294,6 @@
   --muted-foreground: 240 4% 40%;
   --border: 240 6% 86%;
   --input: 240 6% 86%;
+  --success: 103 50% 38%;
+  --success-foreground: 0 0% 100%;
 }
