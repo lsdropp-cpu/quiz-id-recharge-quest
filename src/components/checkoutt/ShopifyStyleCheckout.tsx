@@ -13,6 +13,7 @@ import {
 import { loadStripe, type PaymentRequest } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { declineMessage } from "@/components/gemtop/StripeCardPaymentForm";
+import { WalletPreviewStrip } from "@/components/gemtop/WalletPreviewStrip";
 import diamondBonus from "@/assets/diamond-bonus.png";
 import { track, trackFunnel } from "@/lib/gemtop-tracking";
 import { trackTikTokPurchase } from "@/lib/tiktok-tracking";
