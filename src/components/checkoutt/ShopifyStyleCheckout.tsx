@@ -34,8 +34,8 @@ const COUNTRIES: [string, string][] = [
 ];
 // Countries whose banks validate the postal code (AVS); elsewhere it is optional.
 const ZIP_REQUIRED = new Set(["US", "CA", "PR"]);
-// Countries where Shopify hides the postal code field entirely.
-const ZIP_HIDDEN = new Set(["BO"]);
+// Latin American countries: banks do not check postal codes, so the field is hidden.
+const ZIP_HIDDEN = new Set(["MX","CO","AR","CL","PE","EC","GT","HN","SV","DO","VE","BO","PY","UY","PA","CR","NI","BR"]);
 // Countries where Shopify shows no state/province field.
 const STATE_HIDDEN = new Set(["GT", "BO", "PY", "DO", "CR", "SV", "HN", "NI", "PA", "UY"]);
 const TZ_COUNTRY: Record<string, string> = {
