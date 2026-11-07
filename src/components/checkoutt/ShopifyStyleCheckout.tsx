@@ -210,10 +210,14 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   return (
     <div className="space-y-8">
       {/* Express checkout */}
-      {paymentRequest && (
+      {(paymentRequest || showWalletPreview) && (
         <section>
           <p className="mb-2 text-center text-xs text-muted-foreground">Pago exprés</p>
-          <PaymentRequestButtonElement options={{ paymentRequest, style: { paymentRequestButton: { type: "buy", theme: "dark", height: "44px" } } }} />
+          {paymentRequest ? (
+            <PaymentRequestButtonElement options={{ paymentRequest, style: { paymentRequestButton: { type: "buy", theme: "dark", height: "44px" } } }} />
+          ) : (
+            <WalletPreviewStrip lang="es" />
+          )}
           <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />O<span className="h-px flex-1 bg-border" /></div>
         </section>
       )}
