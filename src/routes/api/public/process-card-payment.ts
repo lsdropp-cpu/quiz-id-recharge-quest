@@ -12,11 +12,11 @@ const corsHeaders = {
 };
 
 // Rate limiting constants
-const MAX_ATTEMPTS_PER_IP = 5;
-const MAX_ATTEMPTS_PER_EMAIL = 5;
-const MAX_ATTEMPTS_PER_CARD = 2;
-const MAX_DIFFERENT_CARDS_PER_IP = 3;
-const MAX_DIFFERENT_CARDS_PER_EMAIL = 3;
+const MAX_ATTEMPTS_PER_IP = 8;
+const MAX_ATTEMPTS_PER_EMAIL = 8;
+const MAX_ATTEMPTS_PER_CARD = 4;
+const MAX_DIFFERENT_CARDS_PER_IP = 4;
+const MAX_DIFFERENT_CARDS_PER_EMAIL = 4;
 const TIME_WINDOW_MINUTES = 10;
 
 // Price mapping for each package - Método de Mejores Prácticas (amount in
@@ -370,6 +370,9 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
               enabled: "true",
               allow_redirects: "never",
             },
+            // Ask the issuer for 3D Secure when available so risky-looking
+            // payments get a bank confirmation instead of a straight decline.
+            payment_method_options: { card: { request_three_d_secure: "any" } },
             ...(hasAddressData
               ? {
                   shipping: {
