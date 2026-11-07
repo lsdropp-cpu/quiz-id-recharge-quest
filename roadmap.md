@@ -1,3 +1,7 @@
+# Main Shopify-style Stripe checkout
+- [x] Create fixed-package versions of /checkoutt and connect all six /recharge buttons, preserving prices, tracking and payment rules.
+- [x] Verify all six destinations, prices, campaign parameters and address form on desktop/mobile without making a live payment; 18 focused tests pass. Existing live-viewer hydration warnings and external tracking fetch failures remain outside this checkout change.
+
 # Quiz introduction scenery
 - [x] Apply the supplied desktop/mobile hangar artwork only to quiz introductions; preserve the default theme on subsequent steps.
 - [x] Verify artwork and starting all five quizzes on desktop/mobile; ID/recharge remain unchanged and both screenshots show readable content.
