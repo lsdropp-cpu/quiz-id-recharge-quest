@@ -284,7 +284,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const clientIP = getClientIP(request);
 
-          const { paymentMethodId, priceKey, email, name, trackingParams, billingAddress } =
+          const { paymentMethodId, priceKey, email, name, phone, trackingParams, billingAddress } =
             (await request.json()) as any;
 
           if (!paymentMethodId) throw new Error("PaymentMethod ID is required");
@@ -361,7 +361,34 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
           // Stripe requires shipping.address.line1, so only attach shipping with a real street.
           const hasAddressData = Boolean(effectiveBillingAddress.line1);
 
+          // Official Stripe Customer (reuse by email) so Radar sees a named buyer.
+          // Created only at payment time; failure never blocks the payment.
+          let customerId: string | undefined;
+          const cleanEmail = String(email || "").trim().toLowerCase();
+          if (cleanEmail) {
+            try {
+              const found = await stripeFetch(`/customers?email=${encodeURIComponent(cleanEmail)}&limit=1`, "GET", stripeSecret);
+              const customerData = {
+                name: name || existingBillingDetails?.name || undefined,
+                phone: phone || undefined,
+                address: effectiveBillingAddress.postal_code ? effectiveBillingAddress : undefined,
+              };
+              if (found?.data?.[0]?.id) {
+                customerId = found.data[0].id;
+                await stripeFetch(`/customers/${customerId}`, "POST", stripeSecret, customerData);
+              } else {
+                const created = await stripeFetch("/customers", "POST", stripeSecret, { email: cleanEmail, ...customerData });
+                customerId = created.id;
+              }
+              await stripeFetch(`/payment_methods/${paymentMethodId}/attach`, "POST", stripeSecret, { customer: customerId });
+            } catch (e) {
+              console.log("[PROCESS-CARD-PAYMENT] Customer setup skipped:", e instanceof Error ? e.message : e);
+              customerId = undefined;
+            }
+          }
+
           const paymentIntent = await stripeFetch("/payment_intents", "POST", stripeSecret, {
+            customer: customerId,
             amount: priceData.amount,
             currency: "usd",
             payment_method: paymentMethodId,
