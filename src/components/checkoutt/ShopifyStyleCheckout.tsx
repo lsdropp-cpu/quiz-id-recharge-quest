@@ -32,7 +32,9 @@ const COUNTRIES: [string, string][] = [
   ["VE", "Venezuela"], ["BO", "Bolivia"], ["PY", "Paraguay"], ["UY", "Uruguay"], ["PA", "Panamá"],
   ["CR", "Costa Rica"], ["NI", "Nicaragua"], ["BR", "Brasil"],
 ];
-const US_STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+const US_STATES: [string, string][] = [
+  ["AL","Alabama"],["AK","Alaska"],["AS","Samoa Americana"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","Distrito de Columbia"],["FM","Micronesia"],["FL","Florida"],["GA","Georgia"],["GU","Guam"],["HI","Hawái"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Luisiana"],["ME","Maine"],["MH","Islas Marshall"],["MD","Maryland"],["MA","Massachusetts"],["MI","Míchigan"],["MN","Minnesota"],["MS","Misisipi"],["MO","Misuri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","Nuevo Hampshire"],["NJ","Nueva Jersey"],["NM","Nuevo México"],["NY","Nueva York"],["NC","Carolina del Norte"],["ND","Dakota del Norte"],["MP","Islas Marianas del Norte"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregón"],["PW","Palaos"],["PA","Pensilvania"],["PR","Puerto Rico"],["RI","Rhode Island"],["SC","Carolina del Sur"],["SD","Dakota del Sur"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VI","Islas Vírgenes de EE. UU."],["VA","Virginia"],["WA","Washington"],["WV","Virginia Occidental"],["WI","Wisconsin"],["WY","Wyoming"],
+];
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 const COOLDOWN_MS = 10_000;
@@ -290,7 +292,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
               <>
                 <select value={state} onChange={(e) => setState(e.target.value)} autoComplete="address-level1" className={`${cls("state")} appearance-none ${state ? "" : "text-muted-foreground"}`}>
                   <option value="">Estado</option>
-                  {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  {US_STATES.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
               </>
