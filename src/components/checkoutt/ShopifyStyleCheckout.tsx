@@ -192,12 +192,6 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     const e: Record<string, string> = {};
     if (!isValidEmail(email)) e.email = "Ingresa un correo electrónico válido";
     if (!holder.trim()) e.holder = "Ingresa el nombre del titular";
-    if (!lastName.trim()) e.lastName = "Ingresa tus apellidos";
-    if (!address1.trim()) e.address1 = "Ingresa una dirección";
-    if (!city.trim()) e.city = "Ingresa una ciudad";
-    if (country === "US" && !state) e.state = "Selecciona un estado";
-    if (country === "GT" && !state) e.state = "Selecciona una región";
-    if (zipRequired && !zip.trim()) e.zip = "Ingresa un código postal";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -212,7 +206,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     if (!card) return;
     setProcessing(true);
     setLastAttempt(Date.now());
-    const billing = { line1: address1.trim(), line2: address2.trim() || null, city: city.trim(), state: state || null, postal_code: zipHidden ? null : (zip.trim() || null), country };
+    const billing = { line1: null, line2: null, city: null, state: null, postal_code: zip.trim() || null, country };
     const fullName = `${firstName} ${lastName}`.trim() || holder;
     try {
       const { error, paymentMethod } = await stripe.createPaymentMethod({
@@ -300,49 +294,9 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
         </div>
       </section>
 
-      {/* Billing address */}
+      {/* Optional postal code only */}
       <section className="space-y-3">
-        <h3 className="text-sm font-bold">Dirección de facturación</h3>
-        <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1.5 text-[10px] text-muted-foreground">País / Región</span>
-          <select value={country} onChange={(e) => { setCountry(e.target.value); setState(""); setErrors({}); }} autoComplete="country" className={`${field} appearance-none pt-4`}>
-            {COUNTRIES.map(([c, n]) => <option key={c} value={c}>{n}</option>)}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <input placeholder="Nombre" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} className={field} />
-          <div><input placeholder="Apellidos" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} className={cls("lastName")} />{err("lastName")}</div>
-        </div>
-        <div className="relative"><input placeholder="Dirección" autoComplete="address-line1" value={address1} onChange={(e) => setAddress1(e.target.value)} className={cls("address1")} /><Search className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />{err("address1")}</div>
-        <input placeholder="Casa, apartamento, etc. (opcional)" autoComplete="address-line2" value={address2} onChange={(e) => setAddress2(e.target.value)} className={field} />
-        <div className={`grid gap-3 ${[!stateHidden, !zipHidden].filter(Boolean).length === 2 ? "grid-cols-3" : [!stateHidden, !zipHidden].some(Boolean) ? "grid-cols-2" : "grid-cols-1"}`}>
-          <div><input placeholder="Ciudad" autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} className={cls("city")} />{err("city")}</div>
-          {!stateHidden && <div className="relative">
-            {country === "US" ? (
-              <>
-                <select value={state} onChange={(e) => setState(e.target.value)} autoComplete="address-level1" className={`${cls("state")} appearance-none ${state ? "" : "text-muted-foreground"}`}>
-                  <option value="">Estado</option>
-                  {US_STATES.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
-              </>
-            ) : country === "GT" ? (
-              <>
-                <select value={state} onChange={(e) => setState(e.target.value)} autoComplete="address-level1" className={`${cls("state")} appearance-none ${state ? "" : "text-muted-foreground"}`}>
-                  <option value="">Región</option>
-                  {GT_REGIONS.map((name) => <option key={name} value={name}>{name}</option>)}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
-              </>
-            ) : (
-              <input placeholder="Estado / Provincia" autoComplete="address-level1" value={state} onChange={(e) => setState(e.target.value)} className={field} />
-            )}
-            {err("state")}
-          </div>}
-          {!zipHidden && <div><input placeholder={zipRequired ? "Código postal" : "Código postal (opcional)"} autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)} className={cls("zip")} />{err("zip")}</div>}
-        </div>
-        <div className="relative"><input type="tel" placeholder="Teléfono (opcional)" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={field} /><CircleHelp className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" /></div>
+        <input placeholder="Código postal (opcional)" autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)} className={field} />
       </section>
 
       <button
