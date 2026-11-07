@@ -247,7 +247,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
           <div className="space-y-3 bg-muted p-4">
             <div className={`${stripeBox} justify-between`}><div className="flex-1"><CardNumberElement options={{ style: stripeStyle, placeholder: "Número de tarjeta", showIcon: false }} /></div><Lock className="h-4 w-4 text-muted-foreground" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className={stripeBox}><div className="flex-1"><CardExpiryElement options={{ style: stripeStyle, placeholder: "Fecha de vencimiento (MM / AA)" }} /></div></div>
+              <div className={stripeBox}><div className="flex-1"><CardExpiryElement options={{ style: stripeStyle, placeholder: "Vencimiento (MM / AA)" }} /></div></div>
               <div className={`${stripeBox} justify-between`}><div className="flex-1"><CardCvcElement options={{ style: stripeStyle, placeholder: "Código de seguridad" }} /></div><CircleHelp className="h-4 w-4 text-muted-foreground" /></div>
             </div>
             <div><input placeholder="Nombre del titular" autoComplete="cc-name" value={holder} onChange={(e) => setHolder(e.target.value)} className={cls("holder")} />{err("holder")}</div>
