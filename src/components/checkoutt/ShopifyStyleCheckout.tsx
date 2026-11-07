@@ -172,6 +172,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     return Object.keys(e).length === 0;
   };
 
+  const [cardBrand, setCardBrand] = useState<string>("unknown");
   const pay = async () => {
     if (!stripe || !elements || processing) return;
     if (!validate()) { toast.error("Revisa los campos marcados."); return; }
@@ -255,11 +256,11 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
               Tarjeta de crédito
             </span>
             <span className="flex gap-1 text-[9px] font-bold">
-              {["VISA", "MC", "AMEX", "+5"].map((b) => <span key={b} className="rounded border border-border bg-card px-1.5 py-0.5">{b}</span>)}
+              {([["visa","VISA"],["mastercard","MC"],["amex","AMEX"],["other","+5"]] as const).map(([k, b]) => { const on = cardBrand !== "unknown" && (k === cardBrand || (k === "other" && !["visa","mastercard","amex"].includes(cardBrand))); return <span key={b} className={`rounded border px-1.5 py-0.5 transition-opacity ${on ? "border-primary bg-card" : "border-border bg-card"} ${cardBrand !== "unknown" && !on ? "opacity-30" : ""}`}>{b}</span>; })}
             </span>
           </div>
           <div className="space-y-3 bg-muted p-4">
-            <div className={`${stripeBox} justify-between`}><div className="flex-1"><CardNumberElement options={{ style: stripeStyle, placeholder: "Número de tarjeta", showIcon: false }} /></div><Lock className="h-4 w-4 text-muted-foreground" /></div>
+            <div className={`${stripeBox} justify-between`}><div className="flex-1"><CardNumberElement options={{ style: stripeStyle, placeholder: "Número de tarjeta", showIcon: true }} onChange={(e) => setCardBrand(e.brand || "unknown")} /></div><Lock className="h-4 w-4 text-muted-foreground" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div className={stripeBox}><div className="flex-1"><CardExpiryElement options={{ style: stripeStyle, placeholder: "Vencimiento (MM / AA)" }} /></div></div>
               <div className={`${stripeBox} justify-between`}><div className="flex-1"><CardCvcElement options={{ style: stripeStyle, placeholder: "Código de seguridad" }} /></div><CircleHelp className="h-4 w-4 text-muted-foreground" /></div>
