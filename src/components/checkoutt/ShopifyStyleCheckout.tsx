@@ -73,7 +73,7 @@ function getUtmifyLeadId(): string {
 function getUtmParams() {
   const url = new URLSearchParams(window.location.search);
   const g = (k: string) => url.get(k) || localStorage.getItem(`utm_${k}`) || localStorage.getItem(k) || "";
-  return { src: g("src") || getUtmifyLeadId(), sck: g("sck"), utm_source: g("utm_source"), utm_medium: g("utm_medium"), utm_campaign: g("utm_campaign"), utm_content: g("utm_content"), utm_term: g("utm_term") };
+  return { src: g("src") || getUtmifyLeadId(), sck: g("sck"), utm_source: g("utm_source"), utm_medium: g("utm_medium"), utm_campaign: g("utm_campaign"), utm_content: g("utm_content"), utm_term: g("utm_term"), utm_id: g("utm_id") };
 }
 const sourceParam = () => new URLSearchParams(window.location.search).get("utm_source") || localStorage.getItem("utm_source") || null;
 
@@ -112,14 +112,15 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const productName = `${pkg.diamonds} Diamantes Free Fire`;
   const productId = `diamantes-${pkg.key}`;
 
-  const approved = async (id: string, viaServer: boolean, payer?: { email?: string; name?: string }) => {
+  const approved = async (id: string, viaServer: boolean, payer?: { email?: string; name?: string }, clientSecret?: string) => {
     trackTikTokPurchase({ id, status: "succeeded", amount: pkg.priceUsd, currency: "USD", productId });
-    if (!viaServer) {
+    if (!viaServer && clientSecret) {
       // 3D Secure confirmations finish in the browser, so register the sale here.
       fetch("/api/public/register-utmify-sale", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: id, email: payer?.email || email, name: payer?.name || holder, value: pkg.priceUsd, currency: "USD", productName, leadId: getUtmifyLeadId(), sourceUrl: window.location.href, trackingParams: getUtmParams() }),
+        keepalive: true,
+        body: JSON.stringify({ orderId: id, clientSecret, email: payer?.email || email, name: payer?.name || holder, value: pkg.priceUsd, currency: "USD", productName, leadId: getUtmifyLeadId(), sourceUrl: window.location.href, trackingParams: getUtmParams() }),
       }).catch(() => {});
     }
     trackFunnel("comprou", { productId, source: sourceParam() });
@@ -162,7 +163,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
           ev.complete("success");
           let pi = paymentIntent;
           if (pi?.status === "requires_action") { const r = await stripe.confirmCardPayment(data.client_secret); if (r.error) { toast.error(declineMessage("es", r.error.code, r.error.decline_code, r.error.message) || "No se completó la verificación de tu banco."); return; } pi = r.paymentIntent; }
-          if (pi?.status === "succeeded") return approved(pi.id, false, { email: payerEmail, name: payerName });
+          if (pi?.status === "succeeded") return approved(pi.id, false, { email: payerEmail, name: payerName }, data.client_secret);
           return;
         }
         ev.complete("fail");
@@ -225,7 +226,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
       if (data?.requires_action && data.client_secret) {
         const r = await stripe.confirmCardPayment(data.client_secret);
         if (r.error) { toast.error(declineMessage("es", r.error.code, r.error.decline_code, r.error.message) || "No se completó la verificación de tu banco."); return; }
-        if (r.paymentIntent?.status === "succeeded") return approved(r.paymentIntent.id, false);
+        if (r.paymentIntent?.status === "succeeded") return approved(r.paymentIntent.id, false, undefined, data.client_secret);
         return;
       }
       toast.error(data?.rate_limited ? "Demasiados intentos. Espera unos minutos e intenta de nuevo." : declineMessage("es", data?.code, data?.decline_code, data?.error) || "Tu banco no pudo procesar el pago.");

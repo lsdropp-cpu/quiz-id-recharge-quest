@@ -1,3 +1,7 @@
+# Stripe sales to Utmify
+- [x] Configure secure Utmify credentials and verified paid-sale reporting for cards, wallets and 3DS without changing payment rules.
+- [x] Run 22 focused tests and mobile checkout/security checks; recover the $19.90 sale from 2026-11-07 03:22 UTC, confirm Utmify API acceptance and persisted duplicate prevention without a new charge. Utmify dashboard display was not independently inspected; deployment requires publishing. Provider outages still require resending; no autonomous retry/webhook was configured.
+
 # Main Shopify-style Stripe checkout
 - [x] Create fixed-package versions of /checkoutt and connect all six /recharge buttons, preserving prices, tracking and payment rules.
 - [x] Verify all six destinations, prices, campaign parameters and address form on desktop/mobile without making a live payment; 18 focused tests pass. Existing live-viewer hydration warnings and external tracking fetch failures remain outside this checkout change.

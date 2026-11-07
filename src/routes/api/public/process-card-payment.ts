@@ -189,83 +189,6 @@ async function recordPaymentAttempt(
   }
 }
 
-async function registerUtmifySale(data: {
-  orderId: string;
-  email: string;
-  name: string;
-  value: number;
-  productName: string;
-  trackingParams?: any;
-}) {
-  const apiToken = process.env["UTMIFY_API_TOKEN"];
-  if (!apiToken) {
-    console.log("[UTMIFY] No API token configured, skipping registration");
-    return;
-  }
-
-  try {
-    const now = new Date();
-    const formattedDate = now.toISOString().replace("T", " ").substring(0, 19);
-
-    const utmifyPayload = {
-      orderId: data.orderId,
-      platform: "Stripe",
-      paymentMethod: "credit_card",
-      status: "paid",
-      createdAt: formattedDate,
-      approvedDate: formattedDate,
-      refundedAt: null,
-      customer: {
-        name: data.name || "Cliente",
-        email: data.email || "",
-        phone: null,
-        document: null,
-        country: "US",
-      },
-      products: [
-        {
-          id: data.orderId,
-          name: "Produto 01",
-          planId: null,
-          planName: null,
-          quantity: 1,
-          priceInCents: Math.round(data.value * 100),
-        },
-      ],
-      trackingParameters: {
-        src: data.trackingParams?.src || null,
-        sck: data.trackingParams?.sck || null,
-        utm_source: data.trackingParams?.utm_source || null,
-        utm_medium: data.trackingParams?.utm_medium || null,
-        utm_campaign: data.trackingParams?.utm_campaign || null,
-        utm_content: data.trackingParams?.utm_content || null,
-        utm_term: data.trackingParams?.utm_term || null,
-      },
-      commission: {
-        totalPriceInCents: Math.round(data.value * 100),
-        gatewayFeeInCents: 0,
-        userCommissionInCents: Math.round(data.value * 100),
-        currency: "USD",
-      },
-      isTest: false,
-    };
-
-    const response = await fetch("https://api.utmify.com.br/api-credentials/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-token": apiToken,
-      },
-      body: JSON.stringify(utmifyPayload),
-    });
-
-    const responseText = await response.text();
-    console.log("[UTMIFY] API response", { status: response.status, response: responseText });
-  } catch (error) {
-    console.error("[UTMIFY] Error registering sale:", error);
-  }
-}
-
 export const Route = createFileRoute("/api/public/process-card-payment")({
   server: {
     handlers: {
@@ -421,6 +344,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
               billing_city: effectiveBillingAddress.city || "",
               billing_postal_code: effectiveBillingAddress.postal_code || "",
               billing_country: effectiveBillingAddress.country || "",
+              ...Object.fromEntries(["src", "sck", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"].map((key) => [`tracking_${key}`, String(trackingParams?.[key] || "").slice(0, 500)])),
             },
             description: priceData.description,
             receipt_email: email || undefined,
@@ -438,14 +362,13 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
           }
 
           if (paymentIntent.status === "succeeded") {
-            await registerUtmifySale({
-              orderId: paymentIntent.id,
-              email: email || "",
-              name: name || "",
-              value: priceData.amount / 100,
-              productName: priceData.description,
-              trackingParams,
-            });
+            try {
+              const token = process.env["UTMIFY_API_TOKEN"];
+              if (token) {
+                const { deliverPaidSale } = await import("@/lib/utmify-sales.server");
+                await deliverPaidSale(paymentIntent.id, stripeSecret, token);
+              }
+            } catch { console.error("[UTMIFY] Delivery pending; payment remains approved"); }
             return json({ success: true, paymentIntentId: paymentIntent.id });
           }
 
