@@ -111,11 +111,11 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     navigate({ to: "/obrigado" });
   };
 
-  const callServer = (paymentMethodId: string, payerEmail: string, payerName: string, billing: Record<string, string | null>) =>
+  const callServer = (paymentMethodId: string, payerEmail: string, payerName: string, billing: Record<string, string | null>, payerPhone?: string) =>
     fetch("/api/public/process-card-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentMethodId, priceKey: pkg.key, email: payerEmail, name: payerName, trackingParams: getUtmParams(), billingAddress: billing }),
+      body: JSON.stringify({ paymentMethodId, priceKey: pkg.key, email: payerEmail, name: payerName, phone: payerPhone || undefined, trackingParams: getUtmParams(), billingAddress: billing }),
     }).then(async (r) => ({ ok: r.ok, data: await r.json().catch(() => null) }));
 
   // Apple Pay / Google Pay: no address sheet, one tap with Face ID / fingerprint.
@@ -138,7 +138,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
         const { data } = await callServer(ev.paymentMethod.id, payerEmail, payerName, {
           line1: b.address?.line1 || null, line2: b.address?.line2 || null, city: b.address?.city || null,
           state: b.address?.state || null, postal_code: b.address?.postal_code || null, country: b.address?.country || null,
-        });
+        }, ev.payerPhone || b.phone || undefined);
         if (data?.success) { ev.complete("success"); return approved(data.paymentIntentId, true, { email: payerEmail, name: payerName }); }
         if (data?.requires_action && data.client_secret) {
           const { error, paymentIntent } = await stripe.confirmCardPayment(data.client_secret, { payment_method: ev.paymentMethod.id }, { handleActions: false });
@@ -190,7 +190,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
         billing_details: { name: holder.trim(), email: email.trim(), phone: phone.trim() || undefined, address: { ...billing, line2: billing.line2 ?? undefined, state: billing.state ?? undefined } },
       });
       if (error || !paymentMethod) { toast.error(declineMessage("es", error?.code, error?.decline_code, error?.message) || "Revisa los datos de tu tarjeta."); return; }
-      const { data } = await callServer(paymentMethod.id, email.trim(), fullName, billing);
+      const { data } = await callServer(paymentMethod.id, email.trim(), fullName, billing, phone.trim());
       if (data?.success) return approved(data.paymentIntentId, true);
       if (data?.requires_action && data.client_secret) {
         const r = await stripe.confirmCardPayment(data.client_secret);
