@@ -32,6 +32,20 @@ const COUNTRIES: [string, string][] = [
   ["VE", "Venezuela"], ["BO", "Bolivia"], ["PY", "Paraguay"], ["UY", "Uruguay"], ["PA", "Panamá"],
   ["CR", "Costa Rica"], ["NI", "Nicaragua"], ["BR", "Brasil"],
 ];
+// Countries whose banks validate the postal code (AVS); elsewhere it is optional.
+const ZIP_REQUIRED = new Set(["US", "CA", "PR"]);
+// Countries where Shopify hides the postal code field entirely.
+const ZIP_HIDDEN = new Set(["BO"]);
+// Countries where Shopify shows no state/province field.
+const STATE_HIDDEN = new Set(["GT", "BO", "PY", "DO", "CR", "SV", "HN", "NI", "PA", "UY"]);
+const TZ_COUNTRY: Record<string, string> = {
+  "America/Guatemala": "GT", "America/La_Paz": "BO", "America/Costa_Rica": "CR", "America/Santo_Domingo": "DO",
+  "America/Asuncion": "PY", "America/Mexico_City": "MX", "America/Monterrey": "MX", "America/Tijuana": "MX", "America/Cancun": "MX",
+  "America/Merida": "MX", "America/Chihuahua": "MX", "America/Hermosillo": "MX", "America/Bogota": "CO", "America/Lima": "PE",
+  "America/Guayaquil": "EC", "America/Tegucigalpa": "HN", "America/El_Salvador": "SV", "America/Managua": "NI",
+  "America/Panama": "PA", "America/Caracas": "VE", "America/Montevideo": "UY", "America/Santiago": "CL",
+  "America/Argentina/Buenos_Aires": "AR", "America/Puerto_Rico": "PR", "Europe/Madrid": "ES", "America/Sao_Paulo": "BR",
+};
 const US_STATES: [string, string][] = [
   ["AL","Alabama"],["AK","Alaska"],["AS","Samoa Americana"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["FM","Micronesia"],["FL","Florida"],["GA","Georgia"],["GU","Guam"],["HI","Hawái"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Luisiana"],["ME","Maine"],["MH","Islas Marshall"],["MD","Maryland"],["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Misisipi"],["MO","Misuri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","Nuevo Hampshire"],["NJ","Nueva Jersey"],["NM","Nuevo México"],["NY","Nueva York"],["NC","Carolina del Norte"],["ND","Dakota del Norte"],["MP","Islas Marianas del Norte"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregón"],["PW","Palaos"],["PA","Pensilvania"],["PR","Puerto Rico"],["RI","Rhode Island"],["SC","Carolina del Sur"],["SD","Dakota del Sur"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["DC","Washington D. C."],["WV","Virginia Occidental"],["WI","Wisconsin"],["WY","Wyoming"],["VI","Islas Vírgenes de EE. UU."],["AA","Fuerzas Armadas de las Américas"],["AE","Fuerzas Armadas de Europa"],["AP","Fuerzas Armadas del Pacífico"],
 ];
@@ -159,6 +173,18 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stripe, pkg.key]);
 
+  // Pre-select the visitor's country from the device time zone (falls back to US).
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const c = TZ_COUNTRY[tz];
+      if (c) setCountry(c);
+    } catch { /* keep default */ }
+  }, []);
+  const zipHidden = ZIP_HIDDEN.has(country);
+  const zipRequired = ZIP_REQUIRED.has(country);
+  const stateHidden = STATE_HIDDEN.has(country);
+
   const validate = () => {
     const e: Record<string, string> = {};
     if (!isValidEmail(email)) e.email = "Ingresa un correo electrónico válido";
@@ -167,7 +193,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     if (!address1.trim()) e.address1 = "Ingresa una dirección";
     if (!city.trim()) e.city = "Ingresa una ciudad";
     if (country === "US" && !state) e.state = "Selecciona un estado";
-    if (!zip.trim()) e.zip = "Ingresa un código postal";
+    if (zipRequired && !zip.trim()) e.zip = "Ingresa un código postal";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -182,13 +208,13 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     if (!card) return;
     setProcessing(true);
     setLastAttempt(Date.now());
-    const billing = { line1: address1.trim(), line2: address2.trim() || null, city: city.trim(), state: state || null, postal_code: zip.trim(), country };
+    const billing = { line1: address1.trim(), line2: address2.trim() || null, city: city.trim(), state: state || null, postal_code: zipHidden ? null : (zip.trim() || null), country };
     const fullName = `${firstName} ${lastName}`.trim() || holder;
     try {
       const { error, paymentMethod } = await stripe.createPaymentMethod({
         type: "card",
         card,
-        billing_details: { name: holder.trim(), email: email.trim(), phone: phone.trim() || undefined, address: { ...billing, line2: billing.line2 ?? undefined, state: billing.state ?? undefined } },
+        billing_details: { name: holder.trim(), email: email.trim(), phone: phone.trim() || undefined, address: { ...billing, line2: billing.line2 ?? undefined, state: billing.state ?? undefined, postal_code: billing.postal_code ?? undefined } },
       });
       if (error || !paymentMethod) { toast.error(declineMessage("es", error?.code, error?.decline_code, error?.message) || "Revisa los datos de tu tarjeta."); return; }
       const { data } = await callServer(paymentMethod.id, email.trim(), fullName, billing, phone.trim());
@@ -275,7 +301,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
         <h3 className="text-sm font-bold">Dirección de facturación</h3>
         <div className="relative">
           <span className="pointer-events-none absolute left-3 top-1.5 text-[10px] text-muted-foreground">País / Región</span>
-          <select value={country} onChange={(e) => { setCountry(e.target.value); setState(""); }} autoComplete="country" className={`${field} appearance-none pt-4`}>
+          <select value={country} onChange={(e) => { setCountry(e.target.value); setState(""); setErrors({}); }} autoComplete="country" className={`${field} appearance-none pt-4`}>
             {COUNTRIES.map(([c, n]) => <option key={c} value={c}>{n}</option>)}
           </select>
           <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
@@ -286,9 +312,9 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
         </div>
         <div className="relative"><input placeholder="Dirección" autoComplete="address-line1" value={address1} onChange={(e) => setAddress1(e.target.value)} className={cls("address1")} /><Search className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" />{err("address1")}</div>
         <input placeholder="Casa, apartamento, etc. (opcional)" autoComplete="address-line2" value={address2} onChange={(e) => setAddress2(e.target.value)} className={field} />
-        <div className="grid grid-cols-3 gap-3">
+        <div className={`grid gap-3 ${[!stateHidden, !zipHidden].filter(Boolean).length === 2 ? "grid-cols-3" : [!stateHidden, !zipHidden].some(Boolean) ? "grid-cols-2" : "grid-cols-1"}`}>
           <div><input placeholder="Ciudad" autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} className={cls("city")} />{err("city")}</div>
-          <div className="relative">
+          {!stateHidden && <div className="relative">
             {country === "US" ? (
               <>
                 <select value={state} onChange={(e) => setState(e.target.value)} autoComplete="address-level1" className={`${cls("state")} appearance-none ${state ? "" : "text-muted-foreground"}`}>
@@ -301,8 +327,8 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
               <input placeholder="Estado / Provincia" autoComplete="address-level1" value={state} onChange={(e) => setState(e.target.value)} className={field} />
             )}
             {err("state")}
-          </div>
-          <div><input placeholder="Código postal" autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)} className={cls("zip")} />{err("zip")}</div>
+          </div>}
+          {!zipHidden && <div><input placeholder={zipRequired ? "Código postal" : "Código postal (opcional)"} autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)} className={cls("zip")} />{err("zip")}</div>}
         </div>
         <div className="relative"><input type="tel" placeholder="Teléfono (opcional)" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={field} /><CircleHelp className="absolute right-3 top-3.5 h-4 w-4 text-muted-foreground" /></div>
       </section>

@@ -371,7 +371,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
               const customerData = {
                 name: name || existingBillingDetails?.name || undefined,
                 phone: phone || undefined,
-                address: effectiveBillingAddress.postal_code ? effectiveBillingAddress : undefined,
+                address: (effectiveBillingAddress.postal_code || effectiveBillingAddress.line1) ? effectiveBillingAddress : undefined,
               };
               if (found?.data?.[0]?.id) {
                 customerId = found.data[0].id;
