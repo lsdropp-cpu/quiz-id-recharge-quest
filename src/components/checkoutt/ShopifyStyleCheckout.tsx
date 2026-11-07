@@ -83,6 +83,13 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const [lastAttempt, setLastAttempt] = useState(0);
   const [dadosTracked, setDadosTracked] = useState(false);
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  // Visual-only wallet mockup for the Lovable preview (or ?vercarteiras=1);
+  // real customers always see the live Stripe buttons or nothing.
+  const [showWalletPreview, setShowWalletPreview] = useState(false);
+  useEffect(() => {
+    const forced = new URLSearchParams(window.location.search).get("vercarteiras") === "1";
+    setShowWalletPreview(Boolean(import.meta.env.DEV) || forced);
+  }, []);
 
   const productName = `${pkg.diamonds} Diamantes Free Fire`;
   const productId = `diamantes-${pkg.key}`;
