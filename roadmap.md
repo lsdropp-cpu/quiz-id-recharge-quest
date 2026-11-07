@@ -1,3 +1,7 @@
+# Stripe sales to Utmify
+- [ ] Configure secure Utmify credentials and verified paid-sale reporting for cards, wallets and 3DS without changing payment rules.
+- [ ] Test reporting and recover the recent confirmed sale; verify Utmify acceptance without a new charge.
+
 # Main Shopify-style Stripe checkout
 - [x] Create fixed-package versions of /checkoutt and connect all six /recharge buttons, preserving prices, tracking and payment rules.
 - [x] Verify all six destinations, prices, campaign parameters and address form on desktop/mobile without making a live payment; 18 focused tests pass. Existing live-viewer hydration warnings and external tracking fetch failures remain outside this checkout change.
