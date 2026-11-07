@@ -13,6 +13,7 @@ import {
 import { loadStripe, type PaymentRequest } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { declineMessage } from "@/components/gemtop/StripeCardPaymentForm";
+import { WalletPreviewStrip } from "@/components/gemtop/WalletPreviewStrip";
 import diamondBonus from "@/assets/diamond-bonus.png";
 import { track, trackFunnel } from "@/lib/gemtop-tracking";
 import { trackTikTokPurchase } from "@/lib/tiktok-tracking";
@@ -82,6 +83,13 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const [lastAttempt, setLastAttempt] = useState(0);
   const [dadosTracked, setDadosTracked] = useState(false);
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  // Visual-only wallet mockup for the Lovable preview (or ?vercarteiras=1);
+  // real customers always see the live Stripe buttons or nothing.
+  const [showWalletPreview, setShowWalletPreview] = useState(false);
+  useEffect(() => {
+    const forced = new URLSearchParams(window.location.search).get("vercarteiras") === "1";
+    setShowWalletPreview(Boolean(import.meta.env.DEV) || forced);
+  }, []);
 
   const productName = `${pkg.diamonds} Diamantes Free Fire`;
   const productId = `diamantes-${pkg.key}`;
@@ -202,10 +210,14 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   return (
     <div className="space-y-8">
       {/* Express checkout */}
-      {paymentRequest && (
+      {(paymentRequest || showWalletPreview) && (
         <section>
           <p className="mb-2 text-center text-xs text-muted-foreground">Pago exprés</p>
-          <PaymentRequestButtonElement options={{ paymentRequest, style: { paymentRequestButton: { type: "buy", theme: "dark", height: "44px" } } }} />
+          {paymentRequest ? (
+            <PaymentRequestButtonElement options={{ paymentRequest, style: { paymentRequestButton: { type: "buy", theme: "dark", height: "44px" } } }} />
+          ) : (
+            <WalletPreviewStrip lang="es" />
+          )}
           <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />O<span className="h-px flex-1 bg-border" /></div>
         </section>
       )}
