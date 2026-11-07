@@ -23,6 +23,7 @@ import { Route as Checkout35RouteImport } from './routes/checkout35'
 import { Route as Checkout35EnRouteImport } from './routes/checkout35-en'
 import { Route as Checkout9RouteImport } from './routes/checkout9'
 import { Route as Checkout9EnRouteImport } from './routes/checkout9-en'
+import { Route as CheckouttRouteImport } from './routes/checkoutt'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IdplayerRouteImport } from './routes/idplayer'
 import { Route as Idplayer2RouteImport } from './routes/idplayer2'
@@ -119,6 +120,11 @@ const Checkout9Route = Checkout9RouteImport.update({
 const Checkout9EnRoute = Checkout9EnRouteImport.update({
   id: '/checkout9-en',
   path: '/checkout9-en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckouttRoute = CheckouttRouteImport.update({
+  id: '/checkoutt',
+  path: '/checkoutt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -274,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/checkout35-en': typeof Checkout35EnRoute
   '/checkout9': typeof Checkout9Route
   '/checkout9-en': typeof Checkout9EnRoute
+  '/checkoutt': typeof CheckouttRoute
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/checkout35-en': typeof Checkout35EnRoute
   '/checkout9': typeof Checkout9Route
   '/checkout9-en': typeof Checkout9EnRoute
+  '/checkoutt': typeof CheckouttRoute
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
@@ -361,6 +369,7 @@ export interface FileRoutesById {
   '/checkout35-en': typeof Checkout35EnRoute
   '/checkout9': typeof Checkout9Route
   '/checkout9-en': typeof Checkout9EnRoute
+  '/checkoutt': typeof CheckouttRoute
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
@@ -406,6 +415,7 @@ export interface FileRouteTypes {
     | '/checkout35-en'
     | '/checkout9'
     | '/checkout9-en'
+    | '/checkoutt'
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/checkout35-en'
     | '/checkout9'
     | '/checkout9-en'
+    | '/checkoutt'
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/checkout35-en'
     | '/checkout9'
     | '/checkout9-en'
+    | '/checkoutt'
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
@@ -536,6 +548,7 @@ export interface RootRouteChildren {
   Checkout35EnRoute: typeof Checkout35EnRoute
   Checkout9Route: typeof Checkout9Route
   Checkout9EnRoute: typeof Checkout9EnRoute
+  CheckouttRoute: typeof CheckouttRoute
   DashboardRoute: typeof DashboardRoute
   IdplayerRoute: typeof IdplayerRoute
   Idplayer2Route: typeof Idplayer2Route
@@ -663,6 +676,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout9-en'
       fullPath: '/checkout9-en'
       preLoaderRoute: typeof Checkout9EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkoutt': {
+      id: '/checkoutt'
+      path: '/checkoutt'
+      fullPath: '/checkoutt'
+      preLoaderRoute: typeof CheckouttRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -872,6 +892,7 @@ const rootRouteChildren: RootRouteChildren = {
   Checkout35EnRoute: Checkout35EnRoute,
   Checkout9Route: Checkout9Route,
   Checkout9EnRoute: Checkout9EnRoute,
+  CheckouttRoute: CheckouttRoute,
   DashboardRoute: DashboardRoute,
   IdplayerRoute: IdplayerRoute,
   Idplayer2Route: Idplayer2Route,
