@@ -37,7 +37,9 @@ const ZIP_REQUIRED = new Set(["US", "CA", "PR"]);
 // Latin American countries: banks do not check postal codes, so the field is hidden.
 const ZIP_HIDDEN = new Set(["MX","CO","AR","CL","PE","EC","GT","HN","SV","DO","VE","BO","PY","UY","PA","CR","NI","BR"]);
 // Countries where Shopify shows no state/province field.
-const STATE_HIDDEN = new Set(["GT", "BO", "PY", "DO", "CR", "SV", "HN", "NI", "PA", "UY"]);
+const STATE_HIDDEN = new Set(["BO", "PY", "DO", "CR", "SV", "HN", "NI", "PA", "UY"]);
+// Guatemala departments, same list and order as Shopify.
+const GT_REGIONS: string[] = ["Alta Verapaz", "Baja Verapaz", "Chimaltenango", "Chiquimula", "El Progreso", "Escuintla", "Guatemala", "Huehuetenango", "Izabal", "Jalapa", "Jutiapa", "Petén", "Quetzaltenango", "Quiché", "Retalhuleu", "Sacatepéquez", "San Marcos", "Santa Rosa", "Sololá", "Suchitepéquez", "Totonicapán", "Zacapa"];
 const TZ_COUNTRY: Record<string, string> = {
   "America/Guatemala": "GT", "America/La_Paz": "BO", "America/Costa_Rica": "CR", "America/Santo_Domingo": "DO",
   "America/Asuncion": "PY", "America/Mexico_City": "MX", "America/Monterrey": "MX", "America/Tijuana": "MX", "America/Cancun": "MX",
@@ -193,6 +195,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     if (!address1.trim()) e.address1 = "Ingresa una dirección";
     if (!city.trim()) e.city = "Ingresa una ciudad";
     if (country === "US" && !state) e.state = "Selecciona un estado";
+    if (country === "GT" && !state) e.state = "Selecciona una región";
     if (zipRequired && !zip.trim()) e.zip = "Ingresa un código postal";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -320,6 +323,14 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
                 <select value={state} onChange={(e) => setState(e.target.value)} autoComplete="address-level1" className={`${cls("state")} appearance-none ${state ? "" : "text-muted-foreground"}`}>
                   <option value="">Estado</option>
                   {US_STATES.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
+              </>
+            ) : country === "GT" ? (
+              <>
+                <select value={state} onChange={(e) => setState(e.target.value)} autoComplete="address-level1" className={`${cls("state")} appearance-none ${state ? "" : "text-muted-foreground"}`}>
+                  <option value="">Región</option>
+                  {GT_REGIONS.map((name) => <option key={name} value={name}>{name}</option>)}
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-muted-foreground" />
               </>
