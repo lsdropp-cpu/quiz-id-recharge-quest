@@ -554,15 +554,8 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
       },
       requestPayerName: true,
       requestPayerEmail: true,
-      requestShipping: true, // Request full shipping address (includes street for AVS)
-      shippingOptions: [
-        {
-          id: 'digital',
-          label: 'Digital Delivery',
-          detail: 'Instant access',
-          amount: 0,
-        },
-      ],
+      // Digital goods: no shipping sheet, so wallets stay one-tap.
+      requestShipping: false,
     });
 
     // Check immediately without waiting
