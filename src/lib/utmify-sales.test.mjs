@@ -3,7 +3,7 @@ import { buildPaidSale, deliverPaidSale } from "./utmify-sales.server";
 
 const intent = { id: "pi_example", status: "succeeded", amount: 3500, amount_received: 3500, currency: "usd", created: 1794000000, livemode: true,
   metadata: { price_key: "35", tracking_utm_source: "tiktok", tracking_utm_campaign: "campaign" },
-  latest_charge: { created: 1794000030, billing_details: { name: "Example", email: "example@example.com", address: { country: "GT" } }, balance_transaction: { fee: 150 } },
+  latest_charge: { created: 1794000030, billing_details: { name: "Example", email: "example@example.com", address: { country: "GT" } }, balance_transaction: { fee: 150, currency: "usd" } },
 };
 
 test("reports the confirmed $35 sale, actual country and campaign", () => {
@@ -22,6 +22,16 @@ test("never reports an unpaid or partially paid intent", () => {
 });
 test("test payments cannot be represented as live sales", () => {
   expect(buildPaidSale({ ...intent, livemode: false }).isTest).toBe(true);
+});
+test("BRL settlement fees are converted to USD before subtraction", () => {
+  const payload = buildPaidSale({ ...intent, amount: 1990, amount_received: 1990,
+    latest_charge: { ...intent.latest_charge, balance_transaction: { fee: 695, currency: "brl", exchange_rate: 5.50513 } } });
+  expect(payload.commission).toEqual({ totalPriceInCents: 1990, gatewayFeeInCents: 126, userCommissionInCents: 1864, currency: "USD" });
+});
+test("a foreign fee without an exchange rate is not subtracted as USD", () => {
+  const payload = buildPaidSale({ ...intent, latest_charge: { ...intent.latest_charge, balance_transaction: { fee: 695, currency: "brl" } } });
+  expect(payload.commission.gatewayFeeInCents).toBe(0);
+  expect(payload.commission.userCommissionInCents).toBe(3500);
 });
 test("a mismatched payment secret cannot register a sale", async () => {
   const original = globalThis.fetch;

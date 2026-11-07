@@ -1,4 +1,5 @@
 # Stripe sales to Utmify
+- [ ] Correct settlement-currency fees before subtracting from USD revenue, test the real BRL/USD example, and update the existing Utmify sale without a new charge.
 - [x] Configure secure Utmify credentials and verified paid-sale reporting for cards, wallets and 3DS without changing payment rules.
 - [x] Run 22 focused tests and mobile checkout/security checks; recover the $19.90 sale from 2026-11-07 03:22 UTC, confirm Utmify API acceptance and persisted duplicate prevention without a new charge. Utmify dashboard display was not independently inspected; deployment requires publishing. Provider outages still require resending; no autonomous retry/webhook was configured.
 
