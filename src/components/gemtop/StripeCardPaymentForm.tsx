@@ -147,11 +147,11 @@ const elementStyle = {
 };
 
 // Rate limiting constants
-const MAX_ATTEMPTS_PER_CARD = 2;
-const MAX_TOTAL_ATTEMPTS = 3;
-const MAX_DIFFERENT_CARDS = 3; // Max different cards per session
+const MAX_ATTEMPTS_PER_CARD = 4;
+const MAX_TOTAL_ATTEMPTS = 6;
+const MAX_DIFFERENT_CARDS = 4; // Max different cards per session
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-const COOLDOWN_BETWEEN_ATTEMPTS_MS = 35 * 1000; // 35 seconds between attempts
+const COOLDOWN_BETWEEN_ATTEMPTS_MS = 10 * 1000; // 10 seconds between attempts
 
 // Get or initialize session payment attempts from sessionStorage
 const getPaymentAttempts = () => {
