@@ -504,7 +504,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
 
   // UTMify registration for 3D Secure payments (edge function can't register these)
   // Non-3DS payments are registered by the edge function directly
-  const registerUtmifySaleFor3DS = async (paymentIntentId: string) => {
+  const registerUtmifySaleFor3DS = async (paymentIntentId: string, clientSecret: string) => {
     try {
       const leadId = getUtmifyLeadId();
       const trackingParams = getUtmParams();
@@ -515,6 +515,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId: paymentIntentId,
+          clientSecret,
           email: customerEmail,
           name: customerName,
           value: amount,
@@ -652,7 +653,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
             reportApprovedPurchase(paymentIntent.id, paymentIntent.amount / 100, paymentIntent.currency);
             ev.complete('success');
             clearPaymentAttempts();
-            await registerUtmifySaleFor3DS(paymentIntent.id);
+            if (paymentIntent.client_secret) await registerUtmifySaleFor3DS(paymentIntent.id, paymentIntent.client_secret);
             trackFunnel('comprou', { productId: productName, source: new URLSearchParams(window.location.search).get('utm_source') || localStorage.getItem('utm_source') || null });
             toast.success('¡Pago realizado con éxito!');
             onSuccess();
@@ -837,7 +838,7 @@ const StripeCardPaymentForm: React.FC<StripeCardPaymentFormProps> = ({
         if (paymentIntent?.status === 'succeeded') {
           reportApprovedPurchase(paymentIntent.id, paymentIntent.amount / 100, paymentIntent.currency);
           clearPaymentAttempts();
-          await registerUtmifySaleFor3DS(paymentIntent.id);
+          if (paymentIntent.client_secret) await registerUtmifySaleFor3DS(paymentIntent.id, paymentIntent.client_secret);
           trackFunnel('comprou', { productId: productName, source: new URLSearchParams(window.location.search).get('utm_source') || localStorage.getItem('utm_source') || null });
           toast.success(t.paymentSuccess);
           onSuccess();
