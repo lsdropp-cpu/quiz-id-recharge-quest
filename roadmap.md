@@ -1,4 +1,5 @@
 # Stripe sales to Utmify
+- [x] Correct settlement-currency fees before subtracting from USD revenue; reproduced two failing cases then passed 11 tests. Updated the existing sale successfully through Utmify API: gross USD19.90, fee USD1.26, net USD18.64. The reported USD11.47 dashboard notification is not independently reproduced; dashboard refresh/notification behavior remains unverified.
 - [x] Configure secure Utmify credentials and verified paid-sale reporting for cards, wallets and 3DS without changing payment rules.
 - [x] Run 22 focused tests and mobile checkout/security checks; recover the $19.90 sale from 2026-11-07 03:22 UTC, confirm Utmify API acceptance and persisted duplicate prevention without a new charge. Utmify dashboard display was not independently inspected; deployment requires publishing. Provider outages still require resending; no autonomous retry/webhook was configured.
 

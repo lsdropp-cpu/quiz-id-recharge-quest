@@ -6,7 +6,7 @@ type Intent = {
   id: string; status: string; amount: number; amount_received: number;
   currency: string; created: number; livemode: boolean;
   metadata: Record<string, string>; receipt_email?: string;
-  latest_charge?: { created?: number; billing_details?: { name?: string; email?: string; phone?: string; address?: { country?: string } }; balance_transaction?: { fee?: number } };
+  latest_charge?: { created?: number; billing_details?: { name?: string; email?: string; phone?: string; address?: { country?: string } }; balance_transaction?: { fee?: number; currency?: string; exchange_rate?: number | null } };
 };
 
 export async function stripeRequest(path: string, secret: string, body?: URLSearchParams) {
@@ -28,7 +28,14 @@ export function buildPaidSale(intent: Intent) {
   const pack = rechargePackages.find((p) => p.key === metadata.price_key);
   const date = (seconds: number) => new Date(seconds * 1000).toISOString().replace("T", " ").slice(0, 19);
   // Keep the provider's original order ID and creation date for safe resubmission.
-  const fee = intent.latest_charge?.balance_transaction?.fee || 0;
+  const settlement = intent.latest_charge?.balance_transaction;
+  // Stripe fees are in settlement currency, not necessarily the charge currency.
+  // exchange_rate converts charge -> settlement; divide to convert the fee back.
+  const sameCurrency = settlement?.currency?.toLowerCase() === intent.currency.toLowerCase();
+  const rate = settlement?.exchange_rate;
+  const convertedFee = sameCurrency ? (settlement?.fee || 0)
+    : rate && rate > 0 ? Math.round((settlement?.fee || 0) / rate) : 0;
+  const fee = Math.max(0, Math.min(intent.amount_received, convertedFee));
   return {
     orderId: intent.id, platform: "Stripe", paymentMethod: "credit_card", status: "paid",
     createdAt: date(intent.created), approvedDate: date(intent.latest_charge?.created || intent.created), refundedAt: null,
