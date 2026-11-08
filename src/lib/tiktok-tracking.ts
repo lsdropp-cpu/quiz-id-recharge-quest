@@ -1,5 +1,5 @@
 export const TIKTOK_PIXEL_ID = "DBD5O1BC77U29DFSUJ7G";
-export const UTMIFY_TIKTOK_PIXEL_ID = "6ae14f524b11c251216449c9";
+export const UTMIFY_TIKTOK_PIXEL_ID = "6a6bd4f5b9b8fc887e72d81a";
 const UTMIFY_PIXEL_SRC = "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js";
 export const CONSENT_KEY = "advertising_consent_v1";
 export const NOTICE_VERSION = "tiktok-advertising-2026-10-22";

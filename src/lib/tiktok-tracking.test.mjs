@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
 import { advertisingAllowed, createConsent, isApprovedPurchase, requiresConsent, TIKTOK_PIXEL_ID, UTMIFY_TIKTOK_PIXEL_ID } from "./tiktok-tracking";
 test("uses the user's TikTok pixel", () => { expect(TIKTOK_PIXEL_ID).toBe("DBD5O1BC77U29DFSUJ7G"); });
-test("uses the Utmify TikTok pixel id", () => { expect(UTMIFY_TIKTOK_PIXEL_ID).toBe("6ae14f524b11c251216449c9"); });
+test("uses the Utmify TikTok pixel id", () => { expect(UTMIFY_TIKTOK_PIXEL_ID).toBe("6a6bd4f5b9b8fc887e72d81a"); });
 test("regional notice blocks France until acceptance and fails closed for unknown regions", () => {
   expect(requiresConsent("FR")).toBe(true);
   expect(advertisingAllowed("FR", null, false)).toBe(false);
