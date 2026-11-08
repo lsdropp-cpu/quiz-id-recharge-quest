@@ -118,15 +118,18 @@ let utmifyLoaded = false;
 function loadUtmifyPixel() {
   if (utmifyLoaded || !mayTrack()) return;
   utmifyLoaded = true;
-  // The Utmify loader reads the global tikTokPixelId at execution time; load one script per pixel.
-  for (const pixelId of UTMIFY_TIKTOK_PIXEL_IDS) {
-    window.tikTokPixelId = pixelId;
+  // The Utmify loader reads the global tikTokPixelId at execution time, so chain the loads:
+  // each pixel id is set right before its own script runs, never overwritten by the next one.
+  const loadNext = (index: number) => {
+    if (index >= UTMIFY_TIKTOK_PIXEL_IDS.length) return;
+    window.tikTokPixelId = UTMIFY_TIKTOK_PIXEL_IDS[index];
     const script = document.createElement("script");
-    script.async = true;
-    script.defer = true;
     script.src = UTMIFY_PIXEL_SRC;
+    script.onload = () => loadNext(index + 1);
+    script.onerror = () => loadNext(index + 1);
     document.head.appendChild(script);
-  }
+  };
+  loadNext(0);
 }
 
 export function trackTikTokPage() {
