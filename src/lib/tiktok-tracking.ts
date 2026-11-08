@@ -1,5 +1,5 @@
 export const TIKTOK_PIXEL_ID = "DBD5O1BC77U29DFSUJ7G";
-export const UTMIFY_TIKTOK_PIXEL_ID = "6a6bd4f5b9b8fc887e72d81a";
+export const UTMIFY_TIKTOK_PIXEL_IDS = ["6a6bd4f5b9b8fc887e72d81a", "6ac00ee5dffe50be16245e3c"];
 const UTMIFY_PIXEL_SRC = "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js";
 export const CONSENT_KEY = "advertising_consent_v1";
 export const NOTICE_VERSION = "tiktok-advertising-2026-10-22";
@@ -118,13 +118,18 @@ let utmifyLoaded = false;
 function loadUtmifyPixel() {
   if (utmifyLoaded || !mayTrack()) return;
   utmifyLoaded = true;
-  window.tikTokPixelId = UTMIFY_TIKTOK_PIXEL_ID;
-  const script = document.createElement("script");
-  script.id = "utmify-tiktok-pixel";
-  script.async = true;
-  script.defer = true;
-  script.src = UTMIFY_PIXEL_SRC;
-  document.head.appendChild(script);
+  // The Utmify loader reads the global tikTokPixelId at execution time, so chain the loads:
+  // each pixel id is set right before its own script runs, never overwritten by the next one.
+  const loadNext = (index: number) => {
+    if (index >= UTMIFY_TIKTOK_PIXEL_IDS.length) return;
+    window.tikTokPixelId = UTMIFY_TIKTOK_PIXEL_IDS[index];
+    const script = document.createElement("script");
+    script.src = UTMIFY_PIXEL_SRC;
+    script.onload = () => loadNext(index + 1);
+    script.onerror = () => loadNext(index + 1);
+    document.head.appendChild(script);
+  };
+  loadNext(0);
 }
 
 export function trackTikTokPage() {
