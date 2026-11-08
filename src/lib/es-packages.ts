@@ -10,10 +10,12 @@ const esBadges = [
   "MEGA PACK",
 ] as const;
 
+const esCents = [990, 1590, 1990, 2500, 2990, 3500] as const;
+
 export const esPackages = frPackages.map((pkg, i) => ({
   diamonds: pkg.diamonds,
   bonus: pkg.bonus,
-  cents: pkg.cents,
+  cents: esCents[i],
   badge: esBadges[i],
   variant: pkg.variant,
 }));
