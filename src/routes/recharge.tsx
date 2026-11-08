@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 import GarenaHeader from "@/components/GarenaHeader";
 import LiveViewersBadge from "@/components/LiveViewersBadge";
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/recharge")({
 
 function RechargePage() {
   useFunnelTracking("recharge");
-  const navigate = useNavigate();
+
 
   return (
     <div className="min-h-screen gamer-bg">
