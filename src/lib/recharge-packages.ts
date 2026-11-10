@@ -39,5 +39,5 @@ export function rechargeCents(key: RechargeKey): number {
 }
 
 export function formatRechargePrice(priceUsd: number): string {
-  return priceUsd % 1 === 0 ? `$${priceUsd}` : `$${priceUsd.toFixed(2)}`;
+  return `$${priceUsd.toFixed(2)}`;
 }
