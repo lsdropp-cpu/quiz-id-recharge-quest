@@ -1,6 +1,6 @@
 # USD and EUR Stripe checkout funnels
-- [ ] Connect /recharge to existing USD checkouts and /es/recharge to duplicated EUR checkouts, preserving each funnel's prices, wallets, tracking and payment protections.
-- [ ] Test server-approved amounts/currencies and all twelve button-to-checkout flows without a live charge.
+- [x] Connect /recharge to existing USD checkouts and /es/recharge to duplicated EUR checkouts, preserving each funnel's prices, wallets, tracking and payment protections.
+- [x] Test server-approved amounts/currencies and all twelve button-to-checkout flows without a live charge; 38 focused tests passed, desktop/mobile layouts checked, latest build OK. Live payment approval and external pixel receipt remain unverified without a real transaction.
 
 # Stripe sales to Utmify
 - [x] Correct settlement-currency fees before subtracting from USD revenue; reproduced two failing cases then passed 11 tests. Updated the existing sale successfully through Utmify API: gross USD19.90, fee USD1.26, net USD18.64. The reported USD11.47 dashboard notification is not independently reproduced; dashboard refresh/notification behavior remains unverified.
