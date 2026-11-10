@@ -18,6 +18,7 @@ import diamondBonus from "@/assets/diamond-bonus.png";
 import { track, trackFunnel } from "@/lib/gemtop-tracking";
 import { trackTikTokPurchase } from "@/lib/tiktok-tracking";
 import { rechargePackages, type RechargeKey } from "@/lib/recharge-packages";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Same live key and same payment endpoint as the current checkout, so the
 // server-side price map, retry limits and 3D Secure request still apply.
@@ -296,6 +297,24 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
 
       {/* Optional postal code only */}
       <section className="space-y-3">
+        <label htmlFor="billing-country" className="block text-sm font-medium">País de facturación</label>
+        <Select value={country} onValueChange={setCountry} disabled={processing} autoComplete="country">
+          <SelectTrigger id="billing-country" className={`${field} shadow-none`}>
+            <SelectValue placeholder="Selecciona tu país" />
+          </SelectTrigger>
+          <SelectContent className="checkout-light max-h-72">
+            {COUNTRIES.map(([code, name]) => (
+              <SelectItem key={code} value={code} textValue={name}>
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden="true" className="inline-flex w-6 shrink-0 justify-center text-lg">
+                    {String.fromCodePoint(...Array.from(code, (letter) => 127397 + letter.charCodeAt(0)))}
+                  </span>
+                  <span>{name}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <input placeholder="Código postal (opcional)" autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)} className={field} />
       </section>
 
