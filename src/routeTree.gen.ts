@@ -45,6 +45,12 @@ import { Route as BrQuizRouteImport } from './routes/br.quiz'
 import { Route as BrRechargeRouteImport } from './routes/br.recharge'
 import { Route as CheckoutPlanIdRouteImport } from './routes/checkout.$planId'
 import { Route as EsIndexRouteImport } from './routes/es.index'
+import { Route as EsCheckouttRouteImport } from './routes/es.checkoutt'
+import { Route as EsCheckoutt15RouteImport } from './routes/es.checkoutt15'
+import { Route as EsCheckoutt19RouteImport } from './routes/es.checkoutt19'
+import { Route as EsCheckoutt25RouteImport } from './routes/es.checkoutt25'
+import { Route as EsCheckoutt29RouteImport } from './routes/es.checkoutt29'
+import { Route as EsCheckoutt35RouteImport } from './routes/es.checkoutt35'
 import { Route as EsIdplayerRouteImport } from './routes/es.idplayer'
 import { Route as EsQuizRouteImport } from './routes/es.quiz'
 import { Route as EsRechargeRouteImport } from './routes/es.recharge'
@@ -237,6 +243,36 @@ const EsIndexRoute = EsIndexRouteImport.update({
   path: '/es/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EsCheckouttRoute = EsCheckouttRouteImport.update({
+  id: '/es/checkoutt',
+  path: '/es/checkoutt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsCheckoutt15Route = EsCheckoutt15RouteImport.update({
+  id: '/es/checkoutt15',
+  path: '/es/checkoutt15',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsCheckoutt19Route = EsCheckoutt19RouteImport.update({
+  id: '/es/checkoutt19',
+  path: '/es/checkoutt19',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsCheckoutt25Route = EsCheckoutt25RouteImport.update({
+  id: '/es/checkoutt25',
+  path: '/es/checkoutt25',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsCheckoutt29Route = EsCheckoutt29RouteImport.update({
+  id: '/es/checkoutt29',
+  path: '/es/checkoutt29',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsCheckoutt35Route = EsCheckoutt35RouteImport.update({
+  id: '/es/checkoutt35',
+  path: '/es/checkoutt35',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EsIdplayerRoute = EsIdplayerRouteImport.update({
   id: '/es/idplayer',
   path: '/es/idplayer',
@@ -330,6 +366,12 @@ export interface FileRoutesByFullPath {
   '/br/quiz': typeof BrQuizRoute
   '/br/recharge': typeof BrRechargeRoute
   '/checkout/$planId': typeof CheckoutPlanIdRoute
+  '/es/checkoutt': typeof EsCheckouttRoute
+  '/es/checkoutt15': typeof EsCheckoutt15Route
+  '/es/checkoutt19': typeof EsCheckoutt19Route
+  '/es/checkoutt25': typeof EsCheckoutt25Route
+  '/es/checkoutt29': typeof EsCheckoutt29Route
+  '/es/checkoutt35': typeof EsCheckoutt35Route
   '/es/idplayer': typeof EsIdplayerRoute
   '/es/quiz': typeof EsQuizRoute
   '/es/recharge': typeof EsRechargeRoute
@@ -379,6 +421,12 @@ export interface FileRoutesByTo {
   '/br/quiz': typeof BrQuizRoute
   '/br/recharge': typeof BrRechargeRoute
   '/checkout/$planId': typeof CheckoutPlanIdRoute
+  '/es/checkoutt': typeof EsCheckouttRoute
+  '/es/checkoutt15': typeof EsCheckoutt15Route
+  '/es/checkoutt19': typeof EsCheckoutt19Route
+  '/es/checkoutt25': typeof EsCheckoutt25Route
+  '/es/checkoutt29': typeof EsCheckoutt29Route
+  '/es/checkoutt35': typeof EsCheckoutt35Route
   '/es/idplayer': typeof EsIdplayerRoute
   '/es/quiz': typeof EsQuizRoute
   '/es/recharge': typeof EsRechargeRoute
@@ -429,6 +477,12 @@ export interface FileRoutesById {
   '/br/quiz': typeof BrQuizRoute
   '/br/recharge': typeof BrRechargeRoute
   '/checkout/$planId': typeof CheckoutPlanIdRoute
+  '/es/checkoutt': typeof EsCheckouttRoute
+  '/es/checkoutt15': typeof EsCheckoutt15Route
+  '/es/checkoutt19': typeof EsCheckoutt19Route
+  '/es/checkoutt25': typeof EsCheckoutt25Route
+  '/es/checkoutt29': typeof EsCheckoutt29Route
+  '/es/checkoutt35': typeof EsCheckoutt35Route
   '/es/idplayer': typeof EsIdplayerRoute
   '/es/quiz': typeof EsQuizRoute
   '/es/recharge': typeof EsRechargeRoute
@@ -480,6 +534,12 @@ export interface FileRouteTypes {
     | '/br/quiz'
     | '/br/recharge'
     | '/checkout/$planId'
+    | '/es/checkoutt'
+    | '/es/checkoutt15'
+    | '/es/checkoutt19'
+    | '/es/checkoutt25'
+    | '/es/checkoutt29'
+    | '/es/checkoutt35'
     | '/es/idplayer'
     | '/es/quiz'
     | '/es/recharge'
@@ -529,6 +589,12 @@ export interface FileRouteTypes {
     | '/br/quiz'
     | '/br/recharge'
     | '/checkout/$planId'
+    | '/es/checkoutt'
+    | '/es/checkoutt15'
+    | '/es/checkoutt19'
+    | '/es/checkoutt25'
+    | '/es/checkoutt29'
+    | '/es/checkoutt35'
     | '/es/idplayer'
     | '/es/quiz'
     | '/es/recharge'
@@ -578,6 +644,12 @@ export interface FileRouteTypes {
     | '/br/quiz'
     | '/br/recharge'
     | '/checkout/$planId'
+    | '/es/checkoutt'
+    | '/es/checkoutt15'
+    | '/es/checkoutt19'
+    | '/es/checkoutt25'
+    | '/es/checkoutt29'
+    | '/es/checkoutt35'
     | '/es/idplayer'
     | '/es/quiz'
     | '/es/recharge'
@@ -628,6 +700,12 @@ export interface RootRouteChildren {
   BrQuizRoute: typeof BrQuizRoute
   BrRechargeRoute: typeof BrRechargeRoute
   CheckoutPlanIdRoute: typeof CheckoutPlanIdRoute
+  EsCheckouttRoute: typeof EsCheckouttRoute
+  EsCheckoutt15Route: typeof EsCheckoutt15Route
+  EsCheckoutt19Route: typeof EsCheckoutt19Route
+  EsCheckoutt25Route: typeof EsCheckoutt25Route
+  EsCheckoutt29Route: typeof EsCheckoutt29Route
+  EsCheckoutt35Route: typeof EsCheckoutt35Route
   EsIdplayerRoute: typeof EsIdplayerRoute
   EsQuizRoute: typeof EsQuizRoute
   EsRechargeRoute: typeof EsRechargeRoute
@@ -897,6 +975,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/es/checkoutt': {
+      id: '/es/checkoutt'
+      path: '/es/checkoutt'
+      fullPath: '/es/checkoutt'
+      preLoaderRoute: typeof EsCheckouttRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/checkoutt15': {
+      id: '/es/checkoutt15'
+      path: '/es/checkoutt15'
+      fullPath: '/es/checkoutt15'
+      preLoaderRoute: typeof EsCheckoutt15RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/checkoutt19': {
+      id: '/es/checkoutt19'
+      path: '/es/checkoutt19'
+      fullPath: '/es/checkoutt19'
+      preLoaderRoute: typeof EsCheckoutt19RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/checkoutt25': {
+      id: '/es/checkoutt25'
+      path: '/es/checkoutt25'
+      fullPath: '/es/checkoutt25'
+      preLoaderRoute: typeof EsCheckoutt25RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/checkoutt29': {
+      id: '/es/checkoutt29'
+      path: '/es/checkoutt29'
+      fullPath: '/es/checkoutt29'
+      preLoaderRoute: typeof EsCheckoutt29RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/checkoutt35': {
+      id: '/es/checkoutt35'
+      path: '/es/checkoutt35'
+      fullPath: '/es/checkoutt35'
+      preLoaderRoute: typeof EsCheckoutt35RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/es/idplayer': {
       id: '/es/idplayer'
       path: '/es/idplayer'
@@ -1012,6 +1132,12 @@ const rootRouteChildren: RootRouteChildren = {
   BrQuizRoute: BrQuizRoute,
   BrRechargeRoute: BrRechargeRoute,
   CheckoutPlanIdRoute: CheckoutPlanIdRoute,
+  EsCheckouttRoute: EsCheckouttRoute,
+  EsCheckoutt15Route: EsCheckoutt15Route,
+  EsCheckoutt19Route: EsCheckoutt19Route,
+  EsCheckoutt25Route: EsCheckoutt25Route,
+  EsCheckoutt29Route: EsCheckoutt29Route,
+  EsCheckoutt35Route: EsCheckoutt35Route,
   EsIdplayerRoute: EsIdplayerRoute,
   EsQuizRoute: EsQuizRoute,
   EsRechargeRoute: EsRechargeRoute,
