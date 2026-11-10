@@ -19,6 +19,7 @@ import { track, trackFunnel } from "@/lib/gemtop-tracking";
 import { trackTikTokPurchase } from "@/lib/tiktok-tracking";
 import { rechargePackages, type RechargeKey } from "@/lib/recharge-packages";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { stripeCheckoutPackage, type CheckoutCurrency } from "@/lib/stripe-checkout-packages";
 
 // Same live key and same payment endpoint as the current checkout, so the
 // server-side price map, retry limits and 3D Secure request still apply.
@@ -78,7 +79,7 @@ function getUtmParams() {
 }
 const sourceParam = () => new URLSearchParams(window.location.search).get("utm_source") || localStorage.getItem("utm_source") || null;
 
-type Pkg = (typeof rechargePackages)[number];
+type Pkg = ReturnType<typeof stripeCheckoutPackage>;
 
 function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const stripe = useStripe();
@@ -88,7 +89,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const [email, setEmail] = useState("");
   const [newsletter, setNewsletter] = useState(true);
   const [holder, setHolder] = useState("");
-  const [country, setCountry] = useState("US");
+  const [country, setCountry] = useState(pkg.currency === "EUR" ? "ES" : "US");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address1, setAddress1] = useState("");
@@ -114,14 +115,14 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const productId = `diamantes-${pkg.key}`;
 
   const approved = async (id: string, viaServer: boolean, payer?: { email?: string; name?: string }, clientSecret?: string) => {
-    trackTikTokPurchase({ id, status: "succeeded", amount: pkg.priceUsd, currency: "USD", productId });
+    trackTikTokPurchase({ id, status: "succeeded", amount: pkg.priceAmount, currency: pkg.currency, productId });
     if (!viaServer && clientSecret) {
       // 3D Secure confirmations finish in the browser, so register the sale here.
       fetch("/api/public/register-utmify-sale", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         keepalive: true,
-        body: JSON.stringify({ orderId: id, clientSecret, email: payer?.email || email, name: payer?.name || holder, value: pkg.priceUsd, currency: "USD", productName, leadId: getUtmifyLeadId(), sourceUrl: window.location.href, trackingParams: getUtmParams() }),
+        body: JSON.stringify({ orderId: id, clientSecret, email: payer?.email || email, name: payer?.name || holder, value: pkg.priceAmount, currency: pkg.currency, productName, leadId: getUtmifyLeadId(), sourceUrl: window.location.href, trackingParams: getUtmParams() }),
       }).catch(() => {});
     }
     trackFunnel("comprou", { productId, source: sourceParam() });
@@ -133,7 +134,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     fetch("/api/public/process-card-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentMethodId, priceKey: pkg.key, email: payerEmail, name: payerName, phone: payerPhone || undefined, trackingParams: getUtmParams(), billingAddress: billing }),
+      body: JSON.stringify({ paymentMethodId, priceKey: pkg.paymentKey, email: payerEmail, name: payerName, phone: payerPhone || undefined, trackingParams: getUtmParams(), billingAddress: billing }),
     }).then(async (r) => ({ ok: r.ok, data: await r.json().catch(() => null) }));
 
   // Apple Pay / Google Pay: no address sheet, one tap with Face ID / fingerprint.
@@ -141,7 +142,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     if (!stripe) return;
     const pr = stripe.paymentRequest({
       country: "US",
-      currency: "usd",
+      currency: pkg.currency.toLowerCase(),
       total: { label: productName, amount: pkg.cents },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -175,7 +176,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stripe, pkg.key]);
+  }, [stripe, pkg.paymentKey]);
 
   // Pre-select the visitor's country from the device time zone (falls back to US).
   useEffect(() => {
@@ -328,10 +329,10 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   );
 }
 
-export default function ShopifyStyleCheckout({ priceKey }: { priceKey: RechargeKey }) {
-  const pkg = useMemo(() => rechargePackages.find((p) => p.key === priceKey) ?? rechargePackages[0], [priceKey]);
+export default function ShopifyStyleCheckout({ priceKey, currency = "USD" }: { priceKey: RechargeKey; currency?: CheckoutCurrency }) {
+  const pkg = useMemo(() => stripeCheckoutPackage(priceKey, currency), [priceKey, currency]);
   useEffect(() => { track("checkout", `diamantes-${pkg.key}`, sourceParam()); }, [pkg.key]);
-  const price = `$${pkg.priceUsd.toFixed(2)}`;
+  const price = `${pkg.currency === "EUR" ? "€" : "$"}${pkg.priceAmount.toFixed(2)}`;
 
   return (
     <div className="checkout-light min-h-screen bg-card text-foreground">
@@ -353,7 +354,7 @@ export default function ShopifyStyleCheckout({ priceKey }: { priceKey: RechargeK
             <Summary pkg={pkg} price={price} />
           </aside>
           <main className="w-full max-w-[560px] px-4 py-8 md:px-10">
-            <Elements stripe={stripePromise}><CheckoutForm pkg={pkg} /></Elements>
+            <Elements stripe={stripePromise}><CheckoutForm key={pkg.paymentKey} pkg={pkg} /></Elements>
           </main>
         </div>
         <div className="hidden bg-muted md:block md:flex-1">
@@ -377,7 +378,7 @@ function Summary({ pkg, price }: { pkg: Pkg; price: string }) {
       </div>
       <div className="mt-6 flex items-center justify-between">
         <span className="font-semibold">Total</span>
-        <span><span className="mr-2 text-xs text-muted-foreground">USD</span><span className="text-lg font-bold">{price}</span></span>
+        <span><span className="mr-2 text-xs text-muted-foreground">{pkg.currency}</span><span className="text-lg font-bold">{price}</span></span>
       </div>
     </>
   );

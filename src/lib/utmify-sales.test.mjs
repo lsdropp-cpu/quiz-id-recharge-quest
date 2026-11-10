@@ -14,6 +14,13 @@ test("reports the confirmed $35 sale, actual country and campaign", () => {
   expect(payload.products[0].priceInCents).toBe(3500);
   expect(payload.orderId).toBe("pi_example");
 });
+test("reports EUR sale amount and converts settlement fees into EUR", () => {
+  const payload = buildPaidSale({ ...intent, amount: 1990, amount_received: 1990, currency: "eur",
+    metadata: { ...intent.metadata, price_key: "eur_19" },
+    latest_charge: { ...intent.latest_charge, balance_transaction: { fee: 600, currency: "brl", exchange_rate: 6 } } });
+  expect(payload.commission).toEqual({ totalPriceInCents: 1990, gatewayFeeInCents: 100, userCommissionInCents: 1890, currency: "EUR" });
+  expect(payload.products[0].id).toBe("diamantes-19");
+});
 test("never reports an unpaid or partially paid intent", () => {
   for (const status of ["requires_action", "requires_payment_method", "processing", "canceled"]) {
     expect(() => buildPaidSale({ ...intent, status })).toThrow();

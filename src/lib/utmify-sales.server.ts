@@ -25,7 +25,7 @@ export function buildPaidSale(intent: Intent) {
   }
   const metadata = intent.metadata || {};
   const billing = intent.latest_charge?.billing_details;
-  const pack = rechargePackages.find((p) => p.key === metadata.price_key);
+  const pack = rechargePackages.find((p) => p.key === metadata.price_key?.replace(/^eur_/, ""));
   const date = (seconds: number) => new Date(seconds * 1000).toISOString().replace("T", " ").slice(0, 19);
   // Keep the provider's original order ID and creation date for safe resubmission.
   const settlement = intent.latest_charge?.balance_transaction;
