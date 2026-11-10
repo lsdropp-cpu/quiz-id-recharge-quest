@@ -16,11 +16,11 @@ export type RechargePackage = {
 };
 
 export const rechargePackages: RechargePackage[] = [
-  { key: "9", diamonds: "5.600", bonus: "1.200", priceUsd: 9, cents: 900, badge: "MEJOR VALOR", badgeGradient: "from-violet-500 to-fuchsia-500", statement: "NMJ 5600" },
-  { key: "15", diamonds: "11.200", bonus: "2.240", priceUsd: 15, cents: 1500, badge: "MÁS POPULAR", badgeGradient: "from-orange-500 to-pink-500", statement: "NMJ 11200" },
-  { key: "19", diamonds: "22.400", bonus: "4.480", priceUsd: 19, cents: 1900, badge: "MEJOR OFERTA", badgeGradient: "from-violet-500 to-fuchsia-500", statement: "NMJ 22400" },
+  { key: "9", diamonds: "5.600", bonus: "1.200", priceUsd: 9.90, cents: 990, badge: "MEJOR VALOR", badgeGradient: "from-violet-500 to-fuchsia-500", statement: "NMJ 5600" },
+  { key: "15", diamonds: "11.200", bonus: "2.240", priceUsd: 15.90, cents: 1590, badge: "MÁS POPULAR", badgeGradient: "from-orange-500 to-pink-500", statement: "NMJ 11200" },
+  { key: "19", diamonds: "22.400", bonus: "4.480", priceUsd: 19.90, cents: 1990, badge: "MEJOR OFERTA", badgeGradient: "from-violet-500 to-fuchsia-500", statement: "NMJ 22400" },
   { key: "25", diamonds: "29.500", bonus: "5.900", priceUsd: 25, cents: 2500, badge: "MÁXIMO BENEFICIO", badgeGradient: "from-violet-500 to-fuchsia-500", statement: "NMJ 29500" },
-  { key: "29", diamonds: "39.200", bonus: "7.840", priceUsd: 29, cents: 2900, badge: "SUPER PACK", badgeGradient: "from-orange-500 to-pink-500", statement: "NMJ 39200" },
+  { key: "29", diamonds: "39.200", bonus: "7.840", priceUsd: 29.90, cents: 2990, badge: "SUPER PACK", badgeGradient: "from-orange-500 to-pink-500", statement: "NMJ 39200" },
   { key: "35", diamonds: "56.000", bonus: "11.200", priceUsd: 35, cents: 3500, badge: "MEGA PACK", badgeGradient: "from-violet-500 to-fuchsia-500", statement: "NMJ 56000" },
 ];
 

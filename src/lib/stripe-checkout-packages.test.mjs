@@ -1,10 +1,11 @@
 import { test, expect } from "bun:test";
 import { stripeCheckoutPackage, stripeCheckoutPrices, euroCheckoutDestinations } from "./stripe-checkout-packages";
 
-const values = [["9", 900, 990], ["15", 1500, 1590], ["19", 1900, 1990], ["25", 2500, 2500], ["29", 2900, 2990], ["35", 3500, 3500]];
+const values = [["9", 990, 990], ["15", 1590, 1590], ["19", 1990, 1990], ["25", 2500, 2500], ["29", 2990, 2990], ["35", 3500, 3500]];
 for (const [key, usd, eur] of values) {
   test(`USD ${key} retains its charge amount`, () => {
     expect(stripeCheckoutPackage(key).cents).toBe(usd);
+    expect(stripeCheckoutPackage(key).priceAmount).toBe(usd / 100);
     expect(stripeCheckoutPrices[key]).toMatchObject({ amount: usd, currency: "usd" });
   });
   test(`EUR ${key} uses the ES offer for card and wallet amounts`, () => {

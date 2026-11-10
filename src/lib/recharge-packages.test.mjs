@@ -21,7 +21,7 @@ describe("Spanish recharge prices", () => {
     }
   });
 
-  test("the other five packs keep their prices", () => {
-    expect(rechargePackages.map((p) => p.priceUsd)).toEqual([9, 15, 19, 25, 29, 35]);
+  test("all six packs use the requested USD prices", () => {
+    expect(rechargePackages.map((p) => p.priceUsd)).toEqual([9.90, 15.90, 19.90, 25.00, 29.90, 35.00]);
   });
 });
