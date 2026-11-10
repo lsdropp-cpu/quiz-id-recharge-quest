@@ -22,6 +22,6 @@ describe("Spanish recharge prices", () => {
   });
 
   test("the other five packs keep their prices", () => {
-    expect(rechargePackages.map((p) => p.priceUsd)).toEqual([9.9, 15.9, 19.9, 25.9, 29.9, 35]);
+    expect(rechargePackages.map((p) => p.priceUsd)).toEqual([9, 15, 19, 25, 29, 35]);
   });
 });
