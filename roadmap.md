@@ -1,4 +1,5 @@
 # USD and EUR Stripe checkout funnels
+- [ ] Update recharge and checkout amounts to 9.90/15.90/19.90/25.00/29.90/35.00 in USD and EUR; verify price tables and all twelve checkout destinations.
 - [x] Connect /recharge to existing USD checkouts and /es/recharge to duplicated EUR checkouts, preserving each funnel's prices, wallets, tracking and payment protections.
 - [x] Test server-approved amounts/currencies and all twelve button-to-checkout flows without a live charge; 38 focused tests passed, desktop/mobile layouts checked, latest build OK. Live payment approval and external pixel receipt remain unverified without a real transaction.
 
