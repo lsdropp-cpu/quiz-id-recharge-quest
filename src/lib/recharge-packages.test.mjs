@@ -12,7 +12,7 @@ describe("Spanish recharge prices", () => {
     expect(pack.key).toBe("35");
     expect(rechargePrice("35")).toBe(35);
     expect(rechargeCents("35")).toBe(3500);
-    expect(formatRechargePrice(rechargePrice("35"))).toBe("$35");
+    expect(formatRechargePrice(rechargePrice("35"))).toBe("$35.00");
   });
 
   test("no pack shows a price different from the amount charged", () => {
