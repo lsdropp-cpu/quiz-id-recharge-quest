@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { rechargePackages } from "@/lib/recharge-packages";
+import { stripeCheckoutPrices } from "@/lib/stripe-checkout-packages";
 
 // Ported from the gemtop process-card-payment edge function. Runs as a
 // TanStack server route and talks to Stripe's REST API directly via fetch
@@ -22,12 +22,7 @@ const TIME_WINDOW_MINUTES = 10;
 // Price mapping for each package - Método de Mejores Prácticas (amount in
 // cents). Amounts come from the shared recharge pack table so the value
 // charged always matches the value the recharge pages display.
-const PRICES: Record<string, { amount: number; description: string }> = {
-  "1": { amount: 100, description: "NMJ Test" },
-  ...Object.fromEntries(
-    rechargePackages.map((pkg) => [pkg.key, { amount: pkg.cents, description: pkg.statement }]),
-  ),
-};
+const PRICES = stripeCheckoutPrices;
 
 
 function encode(params: Record<string, unknown>, prefix?: string): string {
@@ -313,7 +308,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
           const paymentIntent = await stripeFetch("/payment_intents", "POST", stripeSecret, {
             customer: customerId,
             amount: priceData.amount,
-            currency: "usd",
+            currency: priceData.currency,
             payment_method: paymentMethodId,
             confirm: "true",
             automatic_payment_methods: {
