@@ -298,8 +298,8 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
       {/* Optional postal code only */}
       <section className="space-y-3">
         <label htmlFor="billing-country" className="block text-sm font-medium">País de facturación</label>
-        <Select value={country} onValueChange={setCountry} disabled={processing}>
-          <SelectTrigger id="billing-country" autoComplete="country" className={`${field} shadow-none`}>
+        <Select value={country} onValueChange={setCountry} disabled={processing} autoComplete="country">
+          <SelectTrigger id="billing-country" className={`${field} shadow-none`}>
             <SelectValue placeholder="Selecciona tu país" />
           </SelectTrigger>
           <SelectContent className="checkout-light max-h-72">
