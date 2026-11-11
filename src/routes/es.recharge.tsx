@@ -1,9 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { esPackages, formatEUR } from "@/lib/es-packages";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { rechargePackages } from "@/lib/recharge-packages";
-import { euroCheckoutDestinations } from "@/lib/stripe-checkout-packages";
-import { rechargeCheckoutSearch } from "@/lib/recharge-checkout";
+import { esPackages, formatEUR, buildSpainCheckoutUrl } from "@/lib/es-packages";
+import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 import GarenaHeader from "@/components/GarenaHeader";
 import LiveViewersBadge from "@/components/LiveViewersBadge";
@@ -26,7 +23,6 @@ export const Route = createFileRoute("/es/recharge")({
 });
 
 function RechargePage() {
-  const navigate = useNavigate();
   useFunnelTracking("recharge");
 
   return (
@@ -67,7 +63,7 @@ function RechargePage() {
                 <Button
                   key={i}
                   onClick={() => {
-                    navigate({ to: euroCheckoutDestinations[rechargePackages[i].key], search: rechargeCheckoutSearch(window.location.search) });
+                    window.location.href = buildSpainCheckoutUrl(pkg.variant, window.location.search);
                   }}
                   className="go-to-checkout h-auto whitespace-normal block p-0 relative rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
                 >
