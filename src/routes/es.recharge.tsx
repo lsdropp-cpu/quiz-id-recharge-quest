@@ -67,7 +67,7 @@ function RechargePage() {
                 <Button
                   key={i}
                   onClick={() => {
-                    navigate({ to: euroCheckoutDestinations[rechargePackages[i].key], search: rechargeCheckoutSearch(window.location.search) });
+                    window.location.href = buildSpainCheckoutUrl(pkg.variant, window.location.search);
                   }}
                   className="go-to-checkout h-auto whitespace-normal block p-0 relative rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
                 >
