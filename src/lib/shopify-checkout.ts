@@ -29,3 +29,19 @@ export function brShopifyCheckoutUrl(index: number, search = "") {
   url.searchParams.set("locale", "pt-BR");
   return shopifyTrackingUrl(url.toString(), resolveTracking(search));
 }
+export const rechargeShopifyVariants: Record<string, string> = {
+  "9": "53818484425040",
+  "15": "53818484457808",
+  "19": "53818484490576",
+  "25": "53818484523344",
+  "29": "53818484556112",
+  "35": "53818484588880",
+};
+
+export function rechargeShopifyCheckoutUrl(key: string, search = "", locale = "es") {
+  const variant = rechargeShopifyVariants[key];
+  if (!variant) return null;
+  const url = new URL(`https://1ievzb-tk.myshopify.com/cart/${variant}:1?channel=buy_button`);
+  url.searchParams.set("locale", locale);
+  return shopifyTrackingUrl(url.toString(), resolveTracking(search));
+}

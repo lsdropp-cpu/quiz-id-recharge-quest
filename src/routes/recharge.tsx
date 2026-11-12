@@ -6,7 +6,7 @@ import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
 import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
-import { usdShopifyCheckoutUrl } from "@/lib/shopify-checkout";
+import { rechargeShopifyCheckoutUrl } from "@/lib/shopify-checkout";
 import { Button } from "@/components/ui/button";
 
 const packages = rechargePackages.map((pkg) => ({
@@ -71,7 +71,7 @@ function RechargePage() {
                 <Button variant="ghost"
                   key={i}
                   onClick={() => {
-                    const url = usdShopifyCheckoutUrl(pkg.key, window.location.search);
+                    const url = rechargeShopifyCheckoutUrl(pkg.key, window.location.search);
                     if (url) window.location.href = url;
                   }}
                   className="go-to-checkout relative block h-auto p-0 whitespace-normal rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-[0_0_24px_rgba(255,122,20,0.25)] hover:scale-[1.02] active:scale-[0.98]"
