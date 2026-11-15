@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ShopifyStyleCheckout from "@/components/checkoutt/ShopifyStyleCheckout";
+import UploadedStripeCheckout from "@/components/checkoutt/UploadedStripeCheckout";
 import type { RechargeKey } from "@/lib/recharge-packages";
 
 const KEYS = ["9", "15", "19", "25", "29", "35"] as const;
@@ -25,5 +25,5 @@ export const Route = createFileRoute("/checkoutt")({
 
 function CheckouttPage() {
   const { p } = Route.useSearch();
-  return <ShopifyStyleCheckout priceKey={p ?? "9"} />;
+  return <UploadedStripeCheckout priceKey={p ?? "9"} />;
 }

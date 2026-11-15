@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ShopifyStyleCheckout from "@/components/checkoutt/ShopifyStyleCheckout";
+import UploadedStripeCheckout from "@/components/checkoutt/UploadedStripeCheckout";
 
 export const Route = createFileRoute("/checkoutt25")({
   head: () => ({
@@ -17,5 +17,5 @@ export const Route = createFileRoute("/checkoutt25")({
 });
 
 function CheckoutPage() {
-  return <ShopifyStyleCheckout priceKey="25" />;
+  return <UploadedStripeCheckout priceKey="25" />;
 }
