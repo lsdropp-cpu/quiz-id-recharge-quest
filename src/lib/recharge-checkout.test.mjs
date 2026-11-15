@@ -1,7 +1,7 @@
 import { describe, test, expect } from "bun:test";
 import { rechargeCheckoutDestinations, rechargeCheckoutSearch } from "./recharge-checkout";
 
-describe("Main recharge uses the Shopify-style Stripe checkout", () => {
+describe("Shared recharge and recharge2 destinations use the local-currency Stripe checkout", () => {
   for (const [key, path] of Object.entries({
     "9": "/checkoutt", "15": "/checkoutt15", "19": "/checkoutt19",
     "25": "/checkoutt25", "29": "/checkoutt29", "35": "/checkoutt35",
