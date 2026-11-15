@@ -312,7 +312,11 @@ function CheckoutForm({ pkg, country, setCountry, quote, quoteLoading, quoteErro
         <div><input aria-label="Ciudad" placeholder="Ciudad" autoComplete="billing address-level2" value={city} onChange={(e) => setCity(e.target.value)} disabled={processing} className={cls("city")} />{err("city")}</div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div><input aria-label="Estado o provincia" placeholder={`Estado o provincia${stateRequired ? "" : " (opcional)"}`} autoComplete="billing address-level1" value={state} onChange={(e) => setState(e.target.value)} disabled={processing} className={cls("state")} />{err("state")}</div>
-          <div><input aria-label="Código postal" placeholder={`Código postal${zipRequired ? "" : " (opcional)"}`} autoComplete="billing postal-code" value={zip} onChange={(e) => setZip(e.target.value)} disabled={processing} className={cls("zip")} />{err("zip")}</div>
+          <div className="space-y-1">
+            <label htmlFor="billing-postal-code" className="block text-xs text-muted-foreground">{zipRequired ? "Código postal" : "Código postal (opcional)"}</label>
+            <input id="billing-postal-code" placeholder={zipRequired ? "Código postal" : "Código postal (opcional)"} autoComplete="billing postal-code" value={zip} onChange={(e) => setZip(e.target.value)} disabled={processing} className={cls("zip")} />
+            {err("zip")}
+          </div>
         </div>
         <input type="tel" aria-label="Teléfono (opcional)" placeholder="Teléfono (opcional)" autoComplete="billing tel" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={processing} className={field} />
       </section>
