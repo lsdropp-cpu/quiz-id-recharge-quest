@@ -1,3 +1,7 @@
+# Quiz2 Stripe checkout handoff
+- [x] Connect all six /recharge2 packages to existing /checkoutt* local-currency Stripe checkouts, preserving campaign and player parameters and leaving other funnels unchanged.
+- [ ] Verify every package handoff and the quiz2 → idplayer2 → recharge2 flow without charging.
+
 # Local-currency checkout rules
 - [x] Activate Stripe account/country-spec checked currency conversion, one-hour exchange cache and signed 30-minute quotes on the six main checkouts; keep ES fixed EUR. Currency support is based on Stripe account country specifications, not guaranteed issuer approval.
 - [x] Preserve billing, wallet/3DS protections and paid-sale reporting; normalize zero-decimal currencies for Utmify, reject expired/tampered local quotes before payment and refresh totals on country changes.

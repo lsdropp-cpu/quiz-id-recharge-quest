@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 import GarenaHeader from "@/components/GarenaHeader";
 import LiveViewersBadge from "@/components/LiveViewersBadge";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { usdShopifyCheckoutUrl } from "@/lib/shopify-checkout";
+import { rechargeCheckoutDestinations, rechargeCheckoutSearch } from "@/lib/recharge-checkout";
+import { Button } from "@/components/ui/button";
 import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
 
 const packages = rechargePackages.map((pkg) => ({
@@ -17,9 +18,9 @@ const packages = rechargePackages.map((pkg) => ({
 export const Route = createFileRoute("/recharge2")({
   head: () => ({
     meta: [
-      { title: "Recarga de Diamantes — Free Fire" },
+      { title: "Recarga de Diamantes — Free Fire Quiz 2" },
       { name: "description", content: "Selecciona tu paquete de diamantes con bono especial desbloqueado." },
-      { property: "og:title", content: "Recarga de Diamantes — Free Fire" },
+      { property: "og:title", content: "Recarga de Diamantes — Free Fire Quiz 2" },
       { property: "og:description", content: "Selecciona tu paquete de diamantes con bono especial desbloqueado." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/recharge2")({
 
 function RechargeTwoPage() {
   useFunnelTracking("recharge");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen gamer-bg">
@@ -66,13 +68,12 @@ function RechargeTwoPage() {
 
             <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
               {packages.map((pkg, i) => (
-                <button
+                <Button variant="ghost"
                   key={i}
                   onClick={() => {
-                    const url = usdShopifyCheckoutUrl(pkg.key, window.location.search);
-                    if (url) window.location.href = url;
+                    void navigate({ to: rechargeCheckoutDestinations[pkg.key], search: rechargeCheckoutSearch(window.location.search) });
                   }}
-                  className="go-to-checkout relative rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-[0_0_24px_rgba(255,122,20,0.25)] hover:scale-[1.02] active:scale-[0.98]"
+                  className="go-to-checkout relative block h-auto p-0 whitespace-normal rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-[0_0_24px_rgba(255,122,20,0.25)] hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <div className={`bg-gradient-to-r ${pkg.badgeGradient} text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest py-1.5 sm:py-2`}>
                     {pkg.badge}
@@ -89,7 +90,7 @@ function RechargeTwoPage() {
                       <p className="text-primary text-[10px] sm:text-xs font-semibold">+ {pkg.bonus} Diamantes bonus</p>
                     </div>
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
 
