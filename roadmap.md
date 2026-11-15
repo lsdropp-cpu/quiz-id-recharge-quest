@@ -1,6 +1,6 @@
 # Uploaded USD checkout replacement
-- [ ] Replace the six /checkoutt dollar checkout forms with the uploaded address layout while preserving fixed prices, Stripe, tracking and EUR pages.
-- [ ] Verify all six forms on desktop/mobile and run billing and existing payment-price tests without a live charge.
+- [x] Replace the six /checkoutt dollar checkout forms with the uploaded address layout while preserving fixed USD prices, Stripe, tracking and EUR pages; uploaded local-currency conversion and replacement server/tracking files were not imported.
+- [x] Verify all six forms on desktop/mobile and run 33 billing/payment-price/Utmify tests; a complete billing form reaches Stripe's empty-card validation without charging. Latest build OK; live approvals/wallet payments and external tracking receipt remain unverified, with external fetch failures observed in preview.
 
 # USD and EUR Stripe checkout funnels
 - [x] Update recharge and checkout amounts to 9.90/15.90/19.90/25.00/29.90/35.00 in USD and EUR; 16 price tests passed and all twelve button-to-checkout totals verified without charging a card.
