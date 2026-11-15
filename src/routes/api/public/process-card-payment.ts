@@ -202,7 +202,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const clientIP = getClientIP(request);
 
-          const { paymentMethodId, priceKey, email, name, phone, trackingParams, billingAddress } =
+          const { paymentMethodId, priceKey, email, name, phone, trackingParams, billingAddress, quoteToken, checkoutMode } =
             (await request.json()) as any;
 
           if (!paymentMethodId) throw new Error("PaymentMethod ID is required");
@@ -216,8 +216,20 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
             if (!l1 || l1 === city || l1 === zip) billingAddress.line1 = undefined;
           }
 
-          const priceData = PRICES[String(priceKey)];
+          let priceData = PRICES[String(priceKey)];
           if (!priceData) throw new Error(`Invalid price key: ${priceKey}`);
+          if (checkoutMode === "local" && !quoteToken) {
+            return json({ error: "Actualiza la página y revisa el total antes de pagar." }, 400);
+          }
+          if (quoteToken) {
+            try {
+              const { verifyLocalQuote } = await import("@/lib/local-currency.server");
+              const quote = await verifyLocalQuote(String(quoteToken), String(priceKey), stripeSecret);
+              priceData = { ...priceData, amount: quote.amount, currency: quote.currency.toLowerCase() as typeof priceData.currency };
+            } catch {
+              return json({ error: "El precio expiró o cambió. Actualiza la página y revisa el total antes de pagar." }, 400);
+            }
+          }
 
           // Get card last 4 digits from PaymentMethod and existing billing details
           let cardLast4: string | undefined;
