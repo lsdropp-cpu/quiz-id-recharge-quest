@@ -12,6 +12,8 @@ const copy = {
 export default function AdvertisingConsent() {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const isCheckout = /(?:^|\/)checkout[^/]*(?:\/|$)/.test(pathname);
+  const isQuiz2Funnel = /^\/(quiz2|idplayer2|recharge2)(?:\/|$)/.test(pathname);
+  const hideBanner = isCheckout || isQuiz2Funnel;
   const t = copy[pathname.startsWith("/br") ? "br" : pathname.startsWith("/fr") ? "fr" : pathname.endsWith("-en") ? "en" : "es"];
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
@@ -39,7 +41,7 @@ export default function AdvertisingConsent() {
     if (accepted) trackTikTokPage();
   };
   return <>
-    {open && !isCheckout && <section aria-label={t.title} className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background p-5 text-foreground">
+    {open && !hideBanner && <section aria-label={t.title} className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background p-5 text-foreground">
       <div className="mx-auto max-w-3xl space-y-3">
         <h2 className="font-semibold">{t.title}</h2>
         <p className="text-sm text-muted-foreground">{t.body}</p>
