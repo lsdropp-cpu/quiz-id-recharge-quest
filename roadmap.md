@@ -1,3 +1,8 @@
+# Local-currency checkout rules
+- [ ] Activate account-checked currency conversion, one-hour exchange cache and signed 30-minute quotes on the six main checkouts; keep ES fixed EUR.
+- [ ] Preserve billing, wallet/3DS protections and paid-sale reporting; normalize zero-decimal currencies for Utmify.
+- [ ] Test conversion, tampering, expiry, fallback and all six checkout country changes without live charges.
+
 # Uploaded USD checkout replacement
 - [x] Replace the six /checkoutt dollar checkout forms with the uploaded address layout while preserving fixed USD prices, Stripe, tracking and EUR pages; uploaded local-currency conversion and replacement server/tracking files were not imported.
 - [x] Verify all six forms on desktop/mobile and run 33 billing/payment-price/Utmify tests; a complete billing form reaches Stripe's empty-card validation without charging. Latest build OK; live approvals/wallet payments and external tracking receipt remain unverified, with external fetch failures observed in preview.

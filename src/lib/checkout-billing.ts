@@ -5,7 +5,7 @@ const names = new Intl.DisplayNames(["es"], { type: "region" });
 export const billingCountries = countryCodes.map((code) => [code, names.of(code) || code] as [string, string]).sort((a, b) => a[1].localeCompare(b[1], "es"));
 const noPostalCode = new Set(["AE", "AG", "AO", "AW", "BF", "BI", "BJ", "BO", "BS", "BW", "BZ", "CD", "CF", "CG", "CI", "CK", "CM", "CW", "DJ", "DM", "ER", "FJ", "GD", "GH", "GM", "GN", "GQ", "GY", "HK", "IE", "JM", "KE", "KI", "KM", "KN", "LC", "ML", "MO", "MR", "MS", "MW", "NR", "NU", "QA", "RW", "SB", "SC", "SL", "SO", "SR", "ST", "SX", "SY", "TD", "TG", "TK", "TL", "TO", "TT", "TV", "TZ", "UG", "VU", "YE", "ZW"]);
 export const postalCodeRequired = (country: string) => !noPostalCode.has(country);
-export const regionRequired = (country: string) => ["US", "CA", "BR", "MX", "AU"].includes(country);
+export const regionRequired = (country: string) => ["US", "BR", "MX"].includes(country);
 
 export type BillingForm = { country: string; firstName: string; lastName: string; address1: string; address2: string; city: string; state: string; zip: string; phone: string };
 export function validateBilling(values: BillingForm): Record<string, string> {
