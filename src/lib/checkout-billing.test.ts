@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import { deepStrictEqual, ok } from "node:assert/strict";
-import { billingAddress, billingCountries, validateBilling } from "./checkout-billing";
+import { billingAddress, billingCountries, validateBilling, regionRequired, postalCodeRequired } from "./checkout-billing";
 const valid = { country: "US", firstName: "Ana", lastName: "Smith", address1: "10 Main Street", address2: "Apt 2", city: "Miami", state: "FL", zip: "33101", phone: "" };
 describe("checkout billing", () => {
   test("requires billing name, street and city", () => {
@@ -30,4 +30,14 @@ describe("checkout billing", () => {
 });
 test("never substitutes city for a missing street", () => {
   deepStrictEqual(billingAddress({ ...valid, address1: "", address2: "", state: "", zip: "" }), { line1: "", line2: null, city: "Miami", state: null, postal_code: null, country: "US" });
+});
+test("region required only for US Brazil and Mexico", () => {
+  deepStrictEqual(billingCountries.filter(([code]) => regionRequired(code)).map(([code]) => code).sort(), ["BR", "MX", "US"]);
+});
+test("countries without postal codes are exempt", () => {
+  for (const country of ["BO", "BZ", "IE", "AG", "BS", "JM", "LC"]) ok(!postalCodeRequired(country));
+  for (const country of ["GT", "CR", "DO", "PR", "US", "MX", "ES"]) ok(postalCodeRequired(country));
+});
+test("empty optional phone does not block billing", () => {
+  deepStrictEqual(validateBilling({ ...valid, phone: "" }), {});
 });

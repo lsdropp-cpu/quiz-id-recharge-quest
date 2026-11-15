@@ -1,3 +1,8 @@
+# Local-currency checkout rules
+- [x] Activate Stripe account/country-spec checked currency conversion, one-hour exchange cache and signed 30-minute quotes on the six main checkouts; keep ES fixed EUR. Currency support is based on Stripe account country specifications, not guaranteed issuer approval.
+- [x] Preserve billing, wallet/3DS protections and paid-sale reporting; normalize zero-decimal currencies for Utmify, reject expired/tampered local quotes before payment and refresh totals on country changes.
+- [x] Passed 44 conversion/billing/Utmify/price tests; real preview verified MXN on all six checkouts, CLP/PYG/EUR/BRL/USD switches, mobile layout, ES unchanged and tampered quote HTTP400. Latest build OK. No live charge or wallet authorization performed; external tracking fetch failures remain observed in preview.
+
 # Uploaded USD checkout replacement
 - [x] Replace the six /checkoutt dollar checkout forms with the uploaded address layout while preserving fixed USD prices, Stripe, tracking and EUR pages; uploaded local-currency conversion and replacement server/tracking files were not imported.
 - [x] Verify all six forms on desktop/mobile and run 33 billing/payment-price/Utmify tests; a complete billing form reaches Stripe's empty-card validation without charging. Latest build OK; live approvals/wallet payments and external tracking receipt remain unverified, with external fetch failures observed in preview.

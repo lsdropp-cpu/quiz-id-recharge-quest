@@ -21,6 +21,16 @@ test("reports EUR sale amount and converts settlement fees into EUR", () => {
   expect(payload.commission).toEqual({ totalPriceInCents: 1990, gatewayFeeInCents: 100, userCommissionInCents: 1890, currency: "EUR" });
   expect(payload.products[0].id).toBe("diamantes-19");
 });
+test("CLP sales use cents in Utmify rather than Stripe whole units", () => {
+  const payload = buildPaidSale({ ...intent, amount: 9405, amount_received: 9405, currency: "clp", latest_charge: { ...intent.latest_charge, balance_transaction: { fee: 300, currency: "clp" } } });
+  expect(payload.commission).toEqual({ totalPriceInCents: 940500, gatewayFeeInCents: 30000, userCommissionInCents: 910500, currency: "CLP" });
+  expect(payload.products[0].priceInCents).toBe(940500);
+});
+test("PYG sales use cents in Utmify rather than Stripe whole units", () => {
+  const payload = buildPaidSale({ ...intent, amount: 69300, amount_received: 69300, currency: "pyg", latest_charge: { ...intent.latest_charge, balance_transaction: { fee: 2000, currency: "pyg" } } });
+  expect(payload.commission.totalPriceInCents).toBe(6930000);
+  expect(payload.commission.gatewayFeeInCents).toBe(200000);
+});
 test("never reports an unpaid or partially paid intent", () => {
   for (const status of ["requires_action", "requires_payment_method", "processing", "canceled"]) {
     expect(() => buildPaidSale({ ...intent, status })).toThrow();

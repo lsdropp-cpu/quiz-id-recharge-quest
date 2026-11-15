@@ -12,6 +12,9 @@ import {
 } from "@stripe/react-stripe-js";
 import { loadStripe, type PaymentRequest } from "@stripe/stripe-js";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { getLocalQuote } from "@/lib/local-currency.functions";
+import { formatLocalPrice, type LocalQuote } from "@/lib/local-currency";
 import { declineMessage } from "@/components/gemtop/StripeCardPaymentForm";
 import { WalletPreviewStrip } from "@/components/gemtop/WalletPreviewStrip";
 import diamondBonus from "@/assets/diamond-bonus.png";
@@ -62,9 +65,9 @@ function getUtmParams() {
 }
 const sourceParam = () => new URLSearchParams(window.location.search).get("utm_source") || localStorage.getItem("utm_source") || null;
 
-type Pkg = ReturnType<typeof stripeCheckoutPackage>;
+type Pkg = Omit<ReturnType<typeof stripeCheckoutPackage>, "currency"> & { currency: string };
 
-function CheckoutForm({ pkg }: { pkg: Pkg }) {
+function CheckoutForm({ pkg, country, setCountry, quote, quoteLoading, quoteError, retryQuote }: { pkg: Pkg; country: string; setCountry: (country: string) => void; quote: LocalQuote | null; quoteLoading: boolean; quoteError: string | null; retryQuote: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -72,7 +75,6 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   const [email, setEmail] = useState("");
   const [newsletter, setNewsletter] = useState(true);
   const [holder, setHolder] = useState("");
-  const [country, setCountry] = useState(pkg.currency === "EUR" ? "ES" : "US");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address1, setAddress1] = useState("");
@@ -117,12 +119,13 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
     fetch("/api/public/process-card-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentMethodId, priceKey: pkg.paymentKey, email: payerEmail, name: payerName, phone: payerPhone || undefined, trackingParams: getUtmParams(), billingAddress: billing }),
+      body: JSON.stringify({ paymentMethodId, priceKey: pkg.key, checkoutMode: "local", quoteToken: quote?.token, email: payerEmail, name: payerName, phone: payerPhone || undefined, trackingParams: getUtmParams(), billingAddress: billing }),
     }).then(async (r) => ({ ok: r.ok, data: await r.json().catch(() => null) }));
 
   // Apple Pay / Google Pay: no address sheet, one tap with Face ID / fingerprint.
   useEffect(() => {
-    if (!stripe) return;
+    setPaymentRequest(null);
+    if (!stripe || !quote || quoteLoading || quote.expiresAt <= Date.now()) return;
     const pr = stripe.paymentRequest({
       country: "US",
       currency: pkg.currency.toLowerCase(),
@@ -131,9 +134,11 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
       requestPayerEmail: true,
       requestShipping: false,
     });
-    pr.canMakePayment().then((r) => { if (r) setPaymentRequest(pr); });
+    let active = true;
+    pr.canMakePayment().then((r) => { if (r && active) setPaymentRequest(pr); }).catch(() => {});
     pr.on("paymentmethod", async (ev) => {
       try {
+        if (quote.expiresAt <= Date.now()) { ev.complete("fail"); retryQuote(); toast.error("El precio expiró. Revisa el total actualizado antes de pagar."); return; }
         const b = ev.paymentMethod.billing_details;
         const payerEmail = ev.payerEmail || b.email || "";
         const payerName = ev.payerName || b.name || "";
@@ -158,17 +163,10 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
         toast.error("No se pudo completar el pago. Intenta de nuevo.");
       }
     });
+    return () => { active = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stripe, pkg.paymentKey]);
+  }, [stripe, quote?.token, quoteLoading]);
 
-  // Pre-select the visitor's country from the device time zone (falls back to US).
-  useEffect(() => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const c = TZ_COUNTRY[tz];
-      if (c) setCountry(c);
-    } catch { /* keep default */ }
-  }, []);
   const billingValues = { country, firstName, lastName, address1, address2, city, state, zip, phone };
   const zipRequired = postalCodeRequired(country);
   const stateRequired = regionRequired(country);
@@ -183,7 +181,8 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
 
   const [cardBrand, setCardBrand] = useState<string>("unknown");
   const pay = async () => {
-    if (!stripe || !elements || processing) return;
+    if (!stripe || !elements || processing || quoteLoading || !quote) return;
+    if (quote.expiresAt <= Date.now()) { retryQuote(); toast.error("El precio expiró. Revisa el total actualizado antes de pagar."); return; }
     if (!validate()) { toast.error("Revisa los campos marcados."); return; }
     const wait = lastAttempt + COOLDOWN_MS - Date.now();
     if (wait > 0) { toast.error(`Espera ${Math.ceil(wait / 1000)} segundos antes de intentar de nuevo.`); return; }
@@ -221,6 +220,9 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
 
   return (
     <div className="space-y-8">
+      <div aria-live="polite" className="text-sm">
+        {quoteLoading ? <p className="text-muted-foreground">Actualizando precio...</p> : quoteError ? <div className="flex items-center gap-3 text-destructive"><p>{quoteError}</p><Button variant="outline" onClick={retryQuote}>Reintentar</Button></div> : quote?.fallback && <p className="text-xs text-muted-foreground">La moneda local no está disponible. El pago se realizará en USD.</p>}
+      </div>
       {/* Express checkout */}
       {(paymentRequest || showWalletPreview) && (
         <section>
@@ -316,7 +318,7 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
       </section>
 
       <Button
-        type="button" onClick={pay} disabled={processing || !stripe}
+        type="button" onClick={pay} disabled={processing || !stripe || quoteLoading || !quote}
         className="h-14 w-full rounded-md bg-success text-base font-bold text-success-foreground transition hover:opacity-90 disabled:opacity-60"
       >
         {processing ? "Procesando..." : "Pagar ahora"}
@@ -325,10 +327,49 @@ function CheckoutForm({ pkg }: { pkg: Pkg }) {
   );
 }
 
+function timezoneCountry() {
+  try { return TZ_COUNTRY[Intl.DateTimeFormat().resolvedOptions().timeZone] || undefined; } catch { return undefined; }
+}
+
+const quoteCache = new Map<string, LocalQuote>();
+
 export default function UploadedStripeCheckout({ priceKey, currency = "USD" }: { priceKey: RechargeKey; currency?: CheckoutCurrency }) {
-  const pkg = useMemo(() => stripeCheckoutPackage(priceKey, currency), [priceKey, currency]);
+  const basePkg = useMemo(() => stripeCheckoutPackage(priceKey, currency), [priceKey, currency]);
+  const [country, setCountryState] = useState<string | null>(null);
+  const setCountry = (value: string) => { setQuote(null); setQuoteLoading(true); setCountryState(value); };
+  const [quote, setQuote] = useState<LocalQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(true);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+  const [quoteRetry, setQuoteRetry] = useState(0);
+  const requestQuote = useServerFn(getLocalQuote);
+  useEffect(() => {
+    let active = true;
+    const cacheKey = `${priceKey}:${country ?? "auto"}`;
+    const hit = quoteCache.get(cacheKey);
+    if (hit && hit.expiresAt > Date.now() + 60_000 && quoteRetry === 0) {
+      setQuote(hit); setQuoteError(null); setQuoteLoading(false);
+      if (!country) setCountryState(hit.country);
+      return;
+    }
+    setQuoteLoading(true); setQuoteError(null);
+    requestQuote({ data: { key: priceKey, country: country ?? undefined, timezoneCountry: timezoneCountry() } }).then((result) => {
+      if (!active) return;
+      if (result.quote) {
+        quoteCache.set(`${priceKey}:${result.quote.country}`, result.quote);
+        if (!country) { quoteCache.set(cacheKey, result.quote); setCountryState(result.quote.country); }
+      }
+      setQuote(result.quote); setQuoteError(result.error); setQuoteLoading(false);
+    }).catch(() => { if (active) { setQuoteError("No se pudo obtener el precio. Intenta de nuevo."); setQuoteLoading(false); } });
+    return () => { active = false; };
+  }, [priceKey, country, quoteRetry]);
+  useEffect(() => {
+    if (!quote) return;
+    const timer = setTimeout(() => { setQuote(null); setQuoteLoading(true); setQuoteRetry((value) => value + 1); }, Math.max(0, quote.expiresAt - Date.now()));
+    return () => clearTimeout(timer);
+  }, [quote]);
+  const pkg = quote ? { ...basePkg, currency: quote.currency, cents: quote.amount, priceAmount: quote.priceAmount } : basePkg;
   useEffect(() => { track("checkout", `diamantes-${pkg.key}`, sourceParam()); }, [pkg.key]);
-  const price = `${pkg.currency === "EUR" ? "€" : "$"}${pkg.priceAmount.toFixed(2)}`;
+  const price = quoteLoading ? "Actualizando..." : quote ? formatLocalPrice(quote.amount, quote.currency) : "—";
 
   return (
     <div className="checkout-light min-h-screen bg-card text-foreground">
@@ -350,7 +391,7 @@ export default function UploadedStripeCheckout({ priceKey, currency = "USD" }: {
             <Summary pkg={pkg} price={price} />
           </aside>
           <main className="w-full max-w-[560px] px-4 py-8 md:px-10">
-            <Elements stripe={stripePromise}><CheckoutForm key={pkg.paymentKey} pkg={pkg} /></Elements>
+            <Elements stripe={stripePromise}><CheckoutForm key={priceKey} pkg={pkg} country={country ?? quote?.country ?? "US"} setCountry={setCountry} quote={quote} quoteLoading={quoteLoading} quoteError={quoteError} retryQuote={() => setQuoteRetry((value) => value + 1)} /></Elements>
           </main>
         </div>
         <div className="hidden bg-muted md:block md:flex-1">

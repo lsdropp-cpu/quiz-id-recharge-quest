@@ -1,4 +1,5 @@
 import { rechargePackages } from "./recharge-packages";
+import { currencyScale } from "./local-currency";
 
 export const trackingKeys = ["src", "sck", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"] as const;
 
@@ -36,6 +37,8 @@ export function buildPaidSale(intent: Intent) {
   const convertedFee = sameCurrency ? (settlement?.fee || 0)
     : rate && rate > 0 ? Math.round((settlement?.fee || 0) / rate) : 0;
   const fee = Math.max(0, Math.min(intent.amount_received, convertedFee));
+  // Utmify expects cents even when Stripe charges in whole CLP/PYG units.
+  const toCents = (amount: number) => Math.round(amount * 100 / currencyScale(intent.currency.toUpperCase()));
   return {
     orderId: intent.id, platform: "Stripe", paymentMethod: "credit_card", status: "paid",
     createdAt: date(intent.created), approvedDate: date(intent.latest_charge?.created || intent.created), refundedAt: null,
@@ -47,10 +50,10 @@ export function buildPaidSale(intent: Intent) {
     },
     products: [{ id: pack ? `diamantes-${pack.key}` : metadata.price_key || intent.id,
       name: pack ? `${pack.diamonds} Diamantes Free Fire` : metadata.product_name || metadata.product || "Diamantes Free Fire",
-      planId: null, planName: null, quantity: 1, priceInCents: intent.amount_received }],
+      planId: null, planName: null, quantity: 1, priceInCents: toCents(intent.amount_received) }],
     trackingParameters: Object.fromEntries(trackingKeys.filter((key) => key !== "utm_id").map((key) => [key, metadata[`tracking_${key}`] || null])),
-    commission: { totalPriceInCents: intent.amount_received, gatewayFeeInCents: fee,
-      userCommissionInCents: intent.amount_received - fee, currency: intent.currency.toUpperCase() },
+    commission: { totalPriceInCents: toCents(intent.amount_received), gatewayFeeInCents: toCents(fee),
+      userCommissionInCents: toCents(intent.amount_received - fee), currency: intent.currency.toUpperCase() },
     isTest: !intent.livemode,
   };
 }
