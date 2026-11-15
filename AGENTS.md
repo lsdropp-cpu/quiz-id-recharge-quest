@@ -1,4 +1,5 @@
 # Project rules
+- Set 3DS to automatic in the shared Stripe payment handler for cards and wallets; preserve required bank/Radar authentication and the requires_action response flow without forcing authentication on every supported card.
 - Stripe-to-Utmify sale delivery uses a shared server-only verifier; use Stripe-confirmed amount, billing and status, convert settlement fees into charge currency using Stripe's exchange rate before subtracting, persist tracking and delivery state in PaymentIntent metadata, and require the client secret or a verified server caller for resends so browser input cannot fabricate sales or mix currencies.
 - Shopify campaign handoffs use the shared tracking allowlist and order attributes, including utm_id, so campaign attribution survives checkout redirects without copying customer fields.
 - Spanish recharge pack data (diamonds, bonus, price, charge amount) lives in `src/lib/recharge-packages.ts`; recharge pages, checkout pages and the Stripe charge map all read from it so a page can never display a price different from the one charged.
