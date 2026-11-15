@@ -12,6 +12,8 @@ const copy = {
 export default function AdvertisingConsent() {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const isCheckout = /(?:^|\/)checkout[^/]*(?:\/|$)/.test(pathname);
+  const isQuiz2Funnel = /^\/(quiz2|idplayer2|recharge2)(?:\/|$)/.test(pathname);
+  const hideBanner = isCheckout || isQuiz2Funnel;
   const t = copy[pathname.startsWith("/br") ? "br" : pathname.startsWith("/fr") ? "fr" : pathname.endsWith("-en") ? "en" : "es"];
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
