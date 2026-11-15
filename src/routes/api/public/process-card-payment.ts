@@ -327,9 +327,9 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
               enabled: "true",
               allow_redirects: "never",
             },
-            // Ask the issuer for 3D Secure when available so risky-looking
-            // payments get a bank confirmation instead of a straight decline.
-            payment_method_options: { card: { request_three_d_secure: "any" } },
+            // Let Stripe/Radar and issuer requirements determine when 3DS is needed,
+            // rather than requesting authentication for every supported card.
+            payment_method_options: { card: { request_three_d_secure: "automatic" } },
             ...(hasAddressData
               ? {
                   shipping: {
