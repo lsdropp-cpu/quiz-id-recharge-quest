@@ -216,7 +216,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
             if (!l1 || l1 === city || l1 === zip) billingAddress.line1 = undefined;
           }
 
-          let priceData = PRICES[String(priceKey)];
+          let priceData: { amount: number; description: string; currency: string } = PRICES[String(priceKey)];
           if (!priceData) throw new Error(`Invalid price key: ${priceKey}`);
           if (checkoutMode === "local" && !quoteToken) {
             return json({ error: "Actualiza la página y revisa el total antes de pagar." }, 400);
@@ -225,7 +225,7 @@ export const Route = createFileRoute("/api/public/process-card-payment")({
             try {
               const { verifyLocalQuote } = await import("@/lib/local-currency.server");
               const quote = await verifyLocalQuote(String(quoteToken), String(priceKey), stripeSecret);
-              priceData = { ...priceData, amount: quote.amount, currency: quote.currency.toLowerCase() as typeof priceData.currency };
+              priceData = { ...priceData, amount: quote.amount, currency: quote.currency.toLowerCase() };
             } catch {
               return json({ error: "El precio expiró o cambió. Actualiza la página y revisa el total antes de pagar." }, 400);
             }

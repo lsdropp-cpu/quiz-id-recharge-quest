@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import { deepStrictEqual, strictEqual, rejects } from "node:assert/strict";
-import { currencyForCountry, convertPackage } from "./local-currency";
+import { currencyForCountry, convertPackage, quoteLifetimeMs, rateCacheLifetimeMs, resolveCheckoutCountry } from "./local-currency";
 import { createLocalQuote, verifyLocalQuote } from "./local-currency.server";
 
 test("Spanish-speaking markets use their local currencies", () => {
@@ -14,6 +14,19 @@ test("Chile uses whole peso units for Stripe", () => {
 });
 test("Paraguay uses whole guarani units for Stripe", () => {
   strictEqual(convertPackage("9", "PYG", 7000).amount, 69300);
+});
+test("ISK Stripe amount is divisible by 100", () => {
+  strictEqual(convertPackage("9", "ISK", 137.33).amount, 136000);
+});
+test("quotes last 30 minutes and rate cache lasts one hour", () => {
+  strictEqual(quoteLifetimeMs, 1800000);
+  strictEqual(rateCacheLifetimeMs, 3600000);
+});
+test("manual country wins then access location then timezone then US", () => {
+  strictEqual(resolveCheckoutCountry("BR", "MX", "GT"), "BR");
+  strictEqual(resolveCheckoutCountry(undefined, "MX", "GT"), "MX");
+  strictEqual(resolveCheckoutCountry(undefined, "CN", "GT"), "GT");
+  strictEqual(resolveCheckoutCountry("CA", "JP", "IN"), "US");
 });
 test("all six package base values remain aligned", () => {
   deepStrictEqual(["9", "15", "19", "25", "29", "35"].map((key) => convertPackage(key as "9", "USD", 1).amount), [990, 1590, 1990, 2500, 2990, 3500]);
