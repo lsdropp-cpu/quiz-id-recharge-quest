@@ -1,11 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 import GarenaHeader from "@/components/GarenaHeader";
 import LiveViewersBadge from "@/components/LiveViewersBadge";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { rechargeCheckoutDestinations, rechargeCheckoutSearch } from "@/lib/recharge-checkout";
+import { usdShopifyCheckoutUrl } from "@/lib/shopify-checkout";
 import { Button } from "@/components/ui/button";
 import { rechargePackages, formatRechargePrice } from "@/lib/recharge-packages";
 
@@ -31,7 +31,6 @@ export const Route = createFileRoute("/recharge2")({
 
 function RechargeTwoPage() {
   useFunnelTracking("recharge");
-  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen gamer-bg">
@@ -71,7 +70,8 @@ function RechargeTwoPage() {
                 <Button variant="ghost"
                   key={i}
                   onClick={() => {
-                    void navigate({ to: rechargeCheckoutDestinations[pkg.key], search: rechargeCheckoutSearch(window.location.search) });
+                    const url = usdShopifyCheckoutUrl(pkg.key, window.location.search);
+                    if (url) window.location.href = url;
                   }}
                   className="go-to-checkout relative block h-auto p-0 whitespace-normal rounded-2xl border-2 overflow-hidden text-center transition-all bg-card border-border hover:border-primary/50 hover:shadow-[0_0_24px_rgba(255,122,20,0.25)] hover:scale-[1.02] active:scale-[0.98]"
                 >
