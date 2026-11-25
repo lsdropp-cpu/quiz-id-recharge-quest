@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, ChevronLeft, Info, Loader2, Lock, Package } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, Info, Loader2, Lock } from "lucide-react";
+import diamondBonus from "@/assets/diamond-bonus.png";
 import { Button } from "@/components/ui/button";
 import { rechargePackage, type RechargeKey } from "@/lib/recharge-packages";
 import {
@@ -335,9 +336,11 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
 
             <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground">
-                  <Package className="h-5 w-5" />
-                </div>
+                <img
+                  src={diamondBonus}
+                  alt={options?.productTitle ?? `${pack.diamonds} Diamantes`}
+                  className="h-12 w-12 shrink-0 rounded-lg border border-border bg-card object-cover"
+                />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-foreground">
                     {options?.productTitle ?? `${pack.diamonds} Diamantes`}
