@@ -226,7 +226,9 @@ export async function createXpagChargeServer(input: {
   if (quote.priceKey !== input.priceKey || quote.method !== input.method || quote.currency !== meta.currency) throw new Error('Cotação inválida.');
   const amount = quote.amount;
   const enabled = await fetchEnabledCurrencies();
-  if (!enabled?.includes(meta.currency)) throw new Error('Método indisponível nesta conta XPag.');
+  if (meta.disabled || !enabled?.includes(meta.currency)) {
+    throw new Error('Método indisponível nesta conta XPag.');
+  }
 
   if (meta.minAmount !== undefined && amount < meta.minAmount) {
     throw new Error(`O valor mínimo para ${meta.label} é ${meta.minAmount} ${meta.currency}.`);

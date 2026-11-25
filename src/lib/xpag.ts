@@ -13,6 +13,7 @@ export type LocalMethodMeta = {
   instructions: [string, string, string];
   minAmount?: number;
   maxAmount?: number;
+  disabled?: boolean;
 };
 
 export const LOCAL_METHODS: LocalMethodMeta[] = [
@@ -71,6 +72,7 @@ export const LOCAL_METHODS: LocalMethodMeta[] = [
     label: "Pix",
     currency: "BRL",
     countryLabel: "Brasil",
+    disabled: true,
     helperText: "Você verá um QR Code Pix e um código copia e cola com aprovação imediata.",
     instructions: [
       "Abra o aplicativo do seu banco e entre na área Pix.",
@@ -84,6 +86,13 @@ export function getLocalMethod(id: LocalMethodId): LocalMethodMeta {
   const found = LOCAL_METHODS.find((m) => m.id === id);
   if (!found) throw new Error(`Unknown local method: ${id}`);
   return found;
+}
+
+export function getOfferedLocalMethods(
+  enabledCurrencies: readonly LocalCurrency[] | null | undefined,
+): LocalMethodMeta[] {
+  if (!enabledCurrencies || enabledCurrencies.length === 0) return [];
+  return LOCAL_METHODS.filter((m) => !m.disabled && enabledCurrencies.includes(m.currency));
 }
 
 export const localCustomerSchema = z.object({

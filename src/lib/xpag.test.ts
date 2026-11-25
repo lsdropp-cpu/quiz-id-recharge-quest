@@ -4,6 +4,7 @@ import {
   createChargeInputSchema,
   formatLocalAmount,
   getLocalMethod,
+  getOfferedLocalMethods,
   roundForCurrency,
   xpagProductDescription,
 } from "./xpag";
@@ -49,4 +50,12 @@ test("validates customer name, email, package, and payment method", () => {
     quoteToken: "test-quote",
   });
   strictEqual(invalidEmail.success, false);
+});
+
+test("hides Pix from offered local methods even when BRL is enabled in account balances", () => {
+  const offered = getOfferedLocalMethods(["MXN", "COP", "BRL"]).map((m) => m.id);
+  strictEqual(offered.includes("PIX"), false);
+  strictEqual(offered.includes("OXXO"), true);
+  strictEqual(offered.includes("NEQUI"), true);
+  strictEqual(offered.includes("BREB"), true);
 });

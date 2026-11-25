@@ -4,9 +4,9 @@ import { ArrowRight, Check, ChevronLeft, Info, Loader2, Lock, Package } from "lu
 import { Button } from "@/components/ui/button";
 import { rechargePackage, type RechargeKey } from "@/lib/recharge-packages";
 import {
-  LOCAL_METHODS,
   formatLocalAmount,
   getLocalMethod,
+  getOfferedLocalMethods,
   localCustomerSchema,
   type LocalCheckoutOptions,
   type LocalMethodId,
@@ -48,11 +48,8 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
       if (cancelled) return;
       if (res.options) {
         setOptions(res.options);
-        if (res.options.enabledCurrencies && res.options.enabledCurrencies.length > 0) {
-          const currencies = res.options.enabledCurrencies;
-          const firstEnabled = LOCAL_METHODS.find((m) => currencies?.includes(m.currency));
-          if (firstEnabled) setSelectedMethod(firstEnabled.id);
-        }
+        const firstEnabled = getOfferedLocalMethods(res.options.enabledCurrencies)[0];
+        if (firstEnabled) setSelectedMethod(firstEnabled.id);
       }
       setOptionsError(res.error);
       setLoadingOptions(false);
@@ -62,10 +59,10 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
     };
   }, [priceKey, loadOptionsFn]);
 
-  const availableMethods = useMemo(() => {
-    const currencies = options?.enabledCurrencies;
-    return LOCAL_METHODS.filter(m => currencies?.includes(m.currency));
-  }, [options]);
+  const availableMethods = useMemo(
+    () => getOfferedLocalMethods(options?.enabledCurrencies),
+    [options],
+  );
 
   const activeMeta = getLocalMethod(selectedMethod);
   const activeQuote = options?.quotes[selectedMethod];
