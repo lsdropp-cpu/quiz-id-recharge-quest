@@ -32,6 +32,7 @@ import { Route as Checkoutt35RouteImport } from './routes/checkoutt35'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IdplayerRouteImport } from './routes/idplayer'
 import { Route as Idplayer2RouteImport } from './routes/idplayer2'
+import { Route as LocalRouteImport } from './routes/local'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PresellRouteImport } from './routes/presell'
 import { Route as QuizRouteImport } from './routes/quiz'
@@ -176,6 +177,11 @@ const IdplayerRoute = IdplayerRouteImport.update({
 const Idplayer2Route = Idplayer2RouteImport.update({
   id: '/idplayer2',
   path: '/idplayer2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocalRoute = LocalRouteImport.update({
+  id: '/local',
+  path: '/local',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObrigadoRoute = ObrigadoRouteImport.update({
@@ -355,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
+  '/local': typeof LocalRoute
   '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
   '/quiz': typeof QuizRoute
@@ -410,6 +417,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
+  '/local': typeof LocalRoute
   '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
   '/quiz': typeof QuizRoute
@@ -466,6 +474,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/idplayer': typeof IdplayerRoute
   '/idplayer2': typeof Idplayer2Route
+  '/local': typeof LocalRoute
   '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
   '/quiz': typeof QuizRoute
@@ -523,6 +532,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
+    | '/local'
     | '/obrigado'
     | '/presell'
     | '/quiz'
@@ -578,6 +588,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
+    | '/local'
     | '/obrigado'
     | '/presell'
     | '/quiz'
@@ -633,6 +644,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/idplayer'
     | '/idplayer2'
+    | '/local'
     | '/obrigado'
     | '/presell'
     | '/quiz'
@@ -689,6 +701,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   IdplayerRoute: typeof IdplayerRoute
   Idplayer2Route: typeof Idplayer2Route
+  LocalRoute: typeof LocalRoute
   ObrigadoRoute: typeof ObrigadoRoute
   PresellRoute: typeof PresellRoute
   QuizRoute: typeof QuizRoute
@@ -882,6 +895,13 @@ declare module '@tanstack/react-router' {
       path: '/idplayer2'
       fullPath: '/idplayer2'
       preLoaderRoute: typeof Idplayer2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/local': {
+      id: '/local'
+      path: '/local'
+      fullPath: '/local'
+      preLoaderRoute: typeof LocalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/obrigado': {
@@ -1121,6 +1141,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   IdplayerRoute: IdplayerRoute,
   Idplayer2Route: Idplayer2Route,
+  LocalRoute: LocalRoute,
   ObrigadoRoute: ObrigadoRoute,
   PresellRoute: PresellRoute,
   QuizRoute: QuizRoute,

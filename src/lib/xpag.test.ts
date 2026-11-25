@@ -1,0 +1,44 @@
+import { test } from "node:test";
+import { strictEqual } from "node:assert/strict";
+import {
+  createChargeInputSchema,
+  formatLocalAmount,
+  getLocalMethod,
+  roundForCurrency,
+} from "./xpag";
+
+test("rounds COP to whole pesos and MXN/BRL to 2 decimals", () => {
+  strictEqual(roundForCurrency(9.9, 4321.45, "COP"), 42782);
+  strictEqual(roundForCurrency(9.9, 20.123, "MXN"), 199.22);
+  strictEqual(roundForCurrency(9.9, 5.812, "BRL"), 57.54);
+});
+
+test("formats local currencies with the expected prefixes", () => {
+  strictEqual(formatLocalAmount(199.22, "MXN"), "MX$ 199,22");
+  strictEqual(formatLocalAmount(42782, "COP"), "CO$ 42.782,00");
+  strictEqual(formatLocalAmount(57.54, "BRL"), "R$ 57,54");
+});
+
+test("enforces OXXO min and max limits", () => {
+  const oxxo = getLocalMethod("OXXO");
+  strictEqual(oxxo.minAmount, 10);
+  strictEqual(oxxo.maxAmount, 10000);
+});
+
+test("validates customer name, email, package, and payment method", () => {
+  const valid = createChargeInputSchema.safeParse({
+    name: "Maria Silva",
+    email: "maria@exemplo.com",
+    priceKey: "15",
+    method: "NEQUI",
+  });
+  strictEqual(valid.success, true);
+
+  const invalidEmail = createChargeInputSchema.safeParse({
+    name: "Maria Silva",
+    email: "nao-e-email",
+    priceKey: "15",
+    method: "NEQUI",
+  });
+  strictEqual(invalidEmail.success, false);
+});

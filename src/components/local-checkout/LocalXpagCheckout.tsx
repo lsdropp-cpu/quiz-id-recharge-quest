@@ -1,0 +1,407 @@
+import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, Check, ChevronLeft, Info, Loader2, Lock, Package } from "lucide-react";
+import { rechargePackage, type RechargeKey } from "@/lib/recharge-packages";
+import {
+  LOCAL_METHODS,
+  formatLocalAmount,
+  formatUsdAmount,
+  getLocalMethod,
+  localCustomerSchema,
+  type LocalCheckoutOptions,
+  type LocalMethodId,
+  type XpagChargeInstruction,
+} from "@/lib/xpag";
+import { createLocalXpagCharge, getLocalCheckoutOptions } from "@/lib/xpag.functions";
+import ChargeConfirmationStep from "./ChargeConfirmationStep";
+import { MethodLogo, XpagWordmark } from "./MethodBadges";
+
+type Step = 1 | 2 | 3;
+
+const STEP_LABELS: Array<{ step: Step; label: string }> = [
+  { step: 1, label: "Seus dados" },
+  { step: 2, label: "Pagamento" },
+  { step: 3, label: "Confirmação" },
+];
+
+export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey }) {
+  const loadOptionsFn = useServerFn(getLocalCheckoutOptions);
+  const createChargeFn = useServerFn(createLocalXpagCharge);
+
+  const pack = useMemo(() => rechargePackage(priceKey), [priceKey]);
+  const [step, setStep] = useState<Step>(1);
+  const [options, setOptions] = useState<LocalCheckoutOptions | null>(null);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string }>({});
+  const [selectedMethod, setSelectedMethod] = useState<LocalMethodId>("OXXO");
+  const [submitting, setSubmitting] = useState(false);
+  const [chargeError, setChargeError] = useState<string | null>(null);
+  const [charge, setCharge] = useState<XpagChargeInstruction | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingOptions(true);
+    void loadOptionsFn({ data: { priceKey } }).then((res) => {
+      if (cancelled) return;
+      if (res.options) {
+        setOptions(res.options);
+        if (res.options.enabledCurrencies && res.options.enabledCurrencies.length > 0) {
+          const firstEnabled = LOCAL_METHODS.find((m) =>
+            res.options!.enabledCurrencies!.includes(m.currency),
+          );
+          if (firstEnabled) setSelectedMethod(firstEnabled.id);
+        }
+      }
+      setLoadingOptions(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [priceKey, loadOptionsFn]);
+
+  const availableMethods = useMemo(() => {
+    if (!options?.enabledCurrencies || options.enabledCurrencies.length === 0) {
+      return LOCAL_METHODS;
+    }
+    const filtered = LOCAL_METHODS.filter((m) => options.enabledCurrencies!.includes(m.currency));
+    return filtered.length > 0 ? filtered : LOCAL_METHODS;
+  }, [options]);
+
+  const activeMeta = getLocalMethod(selectedMethod);
+  const activeQuote = options?.quotes[selectedMethod];
+
+  const handleContinueToPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = localCustomerSchema.safeParse({ name, email });
+    if (!parsed.success) {
+      const nextErrors: { name?: string; email?: string } = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0];
+        if (key === "name" && !nextErrors.name) nextErrors.name = issue.message;
+        if (key === "email" && !nextErrors.email) nextErrors.email = issue.message;
+      }
+      setFieldErrors(nextErrors);
+      return;
+    }
+    setFieldErrors({});
+    setChargeError(null);
+    setStep(2);
+  };
+
+  const handleCreateCharge = async () => {
+    setSubmitting(true);
+    setChargeError(null);
+    const res = await createChargeFn({
+      data: {
+        priceKey,
+        method: selectedMethod,
+        name: name.trim(),
+        email: email.trim(),
+      },
+    });
+    setSubmitting(false);
+    if (res.error || !res.charge) {
+      setChargeError(res.error ?? "Não foi possível gerar o pagamento agora.");
+      return;
+    }
+    setCharge(res.charge);
+    setStep(3);
+  };
+
+  const summaryAmount = charge
+    ? formatLocalAmount(charge.amount, charge.currency)
+    : activeQuote
+      ? formatLocalAmount(activeQuote.amount, activeQuote.currency)
+      : formatUsdAmount(pack.priceUsd);
+
+  return (
+    <div className="local-checkout-surface min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+        {/* Stepper */}
+        <nav aria-label="Etapas do pagamento" className="mb-8 flex items-center justify-center gap-2 sm:gap-4">
+          {STEP_LABELS.map((item, idx) => {
+            const completed = step > item.step;
+            const current = step === item.step;
+            return (
+              <div key={item.step} className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                      completed
+                        ? "border border-success/40 bg-success/10 text-success"
+                        : current
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-border bg-card text-muted-foreground"
+                    }`}
+                  >
+                    {completed ? <Check className="h-3.5 w-3.5" /> : item.step}
+                  </span>
+                  <span
+                    className={`text-xs sm:text-sm ${
+                      current || completed ? "font-semibold text-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+                {idx < STEP_LABELS.length - 1 && (
+                  <div className="hidden h-px w-14 bg-border sm:block md:w-24" />
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Main 2-column grid */}
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.35fr_0.9fr]">
+          {/* Left card */}
+          <section className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm sm:p-8">
+            {step === 1 && (
+              <form onSubmit={handleContinueToPayment} noValidate className="space-y-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h1 className="text-xl font-bold text-foreground">Seus dados</h1>
+                  <p className="text-xs text-muted-foreground">
+                    Usamos para emitir a cobrança e mandar o comprovante.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="local-name" className="block text-sm font-semibold text-foreground">
+                    Nome completo <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    id="local-name"
+                    type="text"
+                    autoComplete="name"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                    }}
+                    placeholder="Como está no seu documento"
+                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
+                  />
+                  {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="local-email" className="block text-sm font-semibold text-foreground">
+                    E-mail <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    id="local-email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
+                    placeholder="voce@exemplo.com"
+                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
+                  />
+                  {fieldErrors.email ? (
+                    <p className="text-xs text-destructive">{fieldErrors.email}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      O comprovante da compra chega neste e-mail.
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Continuar para o pagamento
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h1 className="text-xl font-bold text-foreground">Como você quer pagar</h1>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChargeError(null);
+                      setStep(1);
+                    }}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    Voltar aos dados
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {availableMethods.map((method) => {
+                    const quote = options?.quotes[method.id];
+                    const active = selectedMethod === method.id;
+                    return (
+                      <button
+                        key={method.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedMethod(method.id);
+                          setChargeError(null);
+                        }}
+                        className={`relative flex flex-col items-center justify-center rounded-xl px-3 py-5 text-center transition-all ${
+                          active
+                            ? "border-2 border-primary bg-card shadow-xs"
+                            : "border border-border bg-muted/35 hover:border-foreground/30 hover:bg-card"
+                        }`}
+                      >
+                        {active && (
+                          <span className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                            <Check className="h-3 w-3" />
+                          </span>
+                        )}
+                        <div className="mb-2.5 flex h-10 items-center justify-center">
+                          <MethodLogo method={method.id} />
+                        </div>
+                        <span className="text-sm font-bold text-foreground">{method.label}</span>
+                        <span className="mt-1 text-xs font-medium text-muted-foreground">
+                          {loadingOptions || !quote
+                            ? "Calculando..."
+                            : formatLocalAmount(quote.amount, quote.currency)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-start gap-2.5 rounded-xl bg-muted/65 px-4 py-3 text-xs text-muted-foreground">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{activeMeta.helperText}</span>
+                </div>
+
+                {chargeError && (
+                  <div
+                    role="alert"
+                    className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive"
+                  >
+                    {chargeError}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  disabled={submitting || loadingOptions}
+                  onClick={() => void handleCreateCharge()}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Gerando pagamento...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-4 w-4" />
+                      Pagar {summaryAmount}
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {step === 3 && charge && (
+              <ChargeConfirmationStep
+                charge={charge}
+                onUpdateCharge={setCharge}
+                onBack={() => {
+                  setCharge(null);
+                  setStep(2);
+                }}
+              />
+            )}
+          </section>
+
+          {/* Right card: Resumo do pedido */}
+          <aside className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-2 pb-4">
+              <h2 className="text-base font-bold text-foreground">Resumo do pedido</h2>
+              <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-1 text-[11px] font-semibold text-success">
+                <Lock className="h-3 w-3" />
+                Conexão segura
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50 text-muted-foreground">
+                  <Package className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-foreground">
+                    {options?.productTitle ?? `${pack.diamonds} Diamantes`}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {options?.productSubtitle ?? `+ ${pack.bonus} Bônus · Free Fire`}
+                  </p>
+                </div>
+              </div>
+              <span className="shrink-0 text-sm font-bold text-foreground">
+                {formatUsdAmount(pack.priceUsd)}
+              </span>
+            </div>
+
+            <div className="space-y-2 border-b border-dashed border-border py-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-semibold text-foreground">{formatUsdAmount(pack.priceUsd)}</span>
+              </div>
+              {activeQuote && (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Câmbio do dia</span>
+                  <span className="font-semibold text-foreground">
+                    1 USD ={" "}
+                    {new Intl.NumberFormat("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 4,
+                    }).format(activeQuote.rateFromUsd)}{" "}
+                    {activeQuote.currency}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="border-b border-border py-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-sm font-bold text-foreground">Total</span>
+                <span className="text-2xl font-extrabold tracking-tight text-foreground">
+                  {summaryAmount}
+                </span>
+              </div>
+              {activeQuote && (
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Você paga em {activeQuote.currency} porque é a moeda de {activeMeta.label}.
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 pt-4">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Aceitamos
+              </span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {availableMethods.map((m) => (
+                  <MethodLogo key={m.id} method={m.id} compact />
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <footer className="mt-8 flex justify-center">
+          <XpagWordmark />
+        </footer>
+      </div>
+    </div>
+  );
+}
