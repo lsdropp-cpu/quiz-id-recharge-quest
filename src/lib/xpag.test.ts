@@ -21,9 +21,8 @@ test("formats local currencies with the expected prefixes", () => {
   strictEqual(formatLocalAmount(57.54, "BRL"), "R$ 57,54");
 });
 
-test("sends DEG Guia do Dimas as the product name to XPag", () => {
-  strictEqual(xpagProductDescription("5.600"), "DEG Guia do Dimas - 5.600 Diamantes");
-  strictEqual(xpagProductDescription("56.000"), "DEG Guia do Dimas - 56.000 Diamantes");
+test("sends only DEG Guia do Dimas as the product name to XPag without diamond amount", () => {
+  strictEqual(xpagProductDescription(), "DEG Guia do Dimas");
 });
 
 test("enforces OXXO min and max limits", () => {

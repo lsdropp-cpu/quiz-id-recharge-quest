@@ -174,8 +174,8 @@ export function formatLocalAmount(amount: number, currency: LocalCurrency): stri
 // sees on the rail, so it carries the product name.
 export const XPAG_PRODUCT_NAME = "DEG Guia do Dimas";
 
-export function xpagProductDescription(diamonds: string): string {
-  return `${XPAG_PRODUCT_NAME} - ${diamonds} Diamantes`;
+export function xpagProductDescription(): string {
+  return XPAG_PRODUCT_NAME;
 }
 
 export function formatUsdAmount(amount: number): string {

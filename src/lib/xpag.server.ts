@@ -220,7 +220,7 @@ export async function createXpagChargeServer(input: {
   email: string;
   quoteToken: string;
 }): Promise<XpagChargeInstruction> {
-  const pack = rechargePackage(input.priceKey);
+  rechargePackage(input.priceKey);
   const meta = getLocalMethod(input.method);
   const quote = verifyXpagProof(input.quoteToken, 'quote', signingSecret());
   if (quote.priceKey !== input.priceKey || quote.method !== input.method || quote.currency !== meta.currency) throw new Error('Cotação inválida.');
@@ -238,7 +238,7 @@ export async function createXpagChargeServer(input: {
   }
 
   const externalId = `loc_${crypto.randomUUID()}`;
-  const description = xpagProductDescription(pack.diamonds);
+  const description = xpagProductDescription();
 
   let body: Record<string, unknown>;
   switch (input.method) {
