@@ -68,3 +68,5 @@
 - [x] Make Naruto artwork background-only and verify centered alternate funnel content without artwork-induced spacing on mobile and desktop.
 - [x] Give /quiz2 the same page structure as /quiz (title band, side art, footer, fading scenery banner) and verify identical layout metrics on mobile and desktop.
 - [x] Apply the main funnel's Halloween theme to /quiz2, /idplayer2 and /recharge2 so the variant matches /quiz exactly; verify identical layout metrics and the full flow with UTMs.
+# Local checkout handoff
+- [x] Point the main /recharge packs at the /local XPag checkout with the selected pack and campaign parameters preserved; verify all six packs and the payment step.
