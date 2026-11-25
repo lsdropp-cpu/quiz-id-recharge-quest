@@ -175,13 +175,12 @@ function RechargePage() {
               {paymentMethods.map((method) => {
                 const isSelected = selectedMethod === method.id;
                 return (
-                  <Button
+                  <button
                     key={method.id}
-                    variant="ghost"
                     type="button"
                     aria-pressed={isSelected}
                     onClick={() => handleSelectMethod(method.id)}
-                    className={`relative flex h-auto min-h-28 flex-col items-center justify-center rounded-xl border-2 px-3 pt-6 pb-4 text-center transition-all active:scale-[0.98] ${
+                    className={`relative flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-xl border-2 px-3 pt-6 pb-4 text-center transition-all active:scale-[0.98] ${
                       isSelected
                         ? "border-primary ring-2 ring-primary/40 bg-card shadow-[0_0_20px_rgba(255,122,20,0.3)]"
                         : "border-border bg-muted/40 hover:border-primary/60 hover:bg-card hover:shadow-[0_0_20px_rgba(255,122,20,0.15)]"
@@ -200,7 +199,7 @@ function RechargePage() {
                     </div>
                     <span className="text-sm font-bold text-foreground">{method.label}</span>
                     <span className="text-[11px] text-muted-foreground">{method.countryLabel}</span>
-                  </Button>
+                  </button>
                 );
               })}
             </div>
