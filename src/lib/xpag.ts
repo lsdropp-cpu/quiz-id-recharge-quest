@@ -102,6 +102,7 @@ export const localCustomerSchema = z.object({
 export const createChargeInputSchema = localCustomerSchema.extend({
   priceKey: z.enum(["9", "15", "19", "25", "29", "35"]),
   method: z.enum(["OXXO", "SPEI", "NEQUI", "BREB", "PIX"]),
+  quoteToken: z.string().min(1).max(4096),
 });
 
 export type MethodQuote = {
@@ -109,6 +110,8 @@ export type MethodQuote = {
   currency: LocalCurrency;
   amount: number;
   rateFromUsd: number;
+  token: string;
+  expiresAt: number;
 };
 
 export type LocalCheckoutOptions = {
@@ -131,6 +134,7 @@ export type XpagChargeInstruction = {
   status: string;
   awaitingInstruction: boolean;
   transferType: string;
+  statusToken: string;
   reference?: string;
   barcodeUrl?: string;
   clabe?: string;

@@ -31,6 +31,7 @@ test("validates customer name, email, package, and payment method", () => {
     email: "maria@exemplo.com",
     priceKey: "15",
     method: "NEQUI",
+    quoteToken: "test-quote",
   });
   strictEqual(valid.success, true);
 
@@ -39,6 +40,7 @@ test("validates customer name, email, package, and payment method", () => {
     email: "nao-e-email",
     priceKey: "15",
     method: "NEQUI",
+    quoteToken: "test-quote",
   });
   strictEqual(invalidEmail.success, false);
 });

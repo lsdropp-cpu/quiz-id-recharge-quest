@@ -1,4 +1,5 @@
 import { rechargePackage, type RechargeKey } from "./recharge-packages";
+import { signXpagProof, verifyXpagProof } from './xpag-proof.server';
 import {
   LOCAL_METHODS,
   getLocalMethod,
@@ -12,11 +13,12 @@ import {
 
 const XPAG_GATEWAY_BASE = "https://connector-gateway.lovable.dev/udc_xpag";
 const RATE_CACHE_TTL_MS = 60 * 60 * 1000;
-const FALLBACK_RATES: Record<LocalCurrency, number> = {
-  MXN: 20.1,
-  COP: 4320,
-  BRL: 5.8,
-};
+const QUOTE_TTL_MS = 30 * 60_000;
+function signingSecret() {
+  const secret = process.env['LOCAL_CHECKOUT_SIGNING_SECRET'];
+  if (!secret) throw new Error('Configuração de pagamentos indisponível.');
+  return secret;
+}
 
 let cachedRates: { expiresAt: number; rates: Record<LocalCurrency, number>; live: boolean } | undefined;
 
@@ -51,8 +53,8 @@ async function callXpag(path: string, init: { method?: "GET" | "POST"; body?: Re
   }
   if (!res.ok || (json && json["ok"] === false)) {
     const errorCode = typeof json?.["error_code"] === "string" ? json["error_code"] : `http_${res.status}`;
-    const providerMsg = typeof json?.["error"] === "string" ? json["error"] : text.slice(0, 200);
-    console.error(`XPag error [${res.status}] (${errorCode}): ${providerMsg}`);
+    const providerMsg = typeof json?.["error"] === "string" ? json["error"] : 'Falha ao consultar a XPag.';
+    console.error(`XPag error [${res.status}] (${errorCode})`);
     const err = new Error(mapXpagError(errorCode, providerMsg));
     (err as Error & { code?: string }).code = errorCode;
     throw err;
@@ -93,31 +95,31 @@ export async function fetchLocalRates(): Promise<{ rates: Record<LocalCurrency, 
       signal: AbortSignal.timeout(8_000),
     });
     if (!res.ok) throw new Error("Rates HTTP error");
-    const data = (await res.json()) as { result?: string; rates?: Record<string, number> };
+    const data = (await res.json()) as { result?: string; rates?: Record<string, number>; time_last_update_unix?: number };
     const mxn = data.rates?.["MXN"];
     const cop = data.rates?.["COP"];
     const brl = data.rates?.["BRL"];
-    if (data.result === "success" && mxn && cop && brl) {
+    if (data.result === "success" && mxn && cop && brl && [mxn, cop, brl].every(r => Number.isFinite(r) && r > 0) && data.time_last_update_unix && Date.now()/1000 - data.time_last_update_unix < 172800) {
       const rates: Record<LocalCurrency, number> = { MXN: mxn, COP: cop, BRL: brl };
       cachedRates = { expiresAt: Date.now() + RATE_CACHE_TTL_MS, rates, live: true };
       return { rates, live: true };
     }
   } catch {
-    // Safe fallback rates if the external FX API is unreachable
+    // Fail closed: never charge using invented exchange rates.
   }
-  return { rates: FALLBACK_RATES, live: false };
+  throw new Error('Não foi possível atualizar o câmbio. Tente novamente.');
 }
 
 async function fetchEnabledCurrencies(): Promise<LocalCurrency[] | null> {
   try {
     const data = await callXpag("/balance", { method: "GET" });
     const balances = data["balances"] as Record<string, unknown> | undefined;
-    if (!balances || typeof balances !== "object") return null;
+    if (!balances || typeof balances !== "object") throw new Error('Moedas indisponíveis.');
     const supported: LocalCurrency[] = ["MXN", "COP", "BRL"];
     const active = supported.filter((c) => Object.prototype.hasOwnProperty.call(balances, c));
-    return active.length > 0 ? active : null;
-  } catch {
-    return null;
+    return active;
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -129,13 +131,17 @@ export async function getLocalCheckoutOptionsServer(priceKey: RechargeKey): Prom
   ]);
 
   const quotes = {} as Record<LocalMethodId, MethodQuote>;
+  const expiresAt = Date.now() + QUOTE_TTL_MS;
   for (const method of LOCAL_METHODS) {
     const rate = rates[method.currency];
+    const amount = roundForCurrency(pack.priceUsd, rate, method.currency);
     quotes[method.id] = {
       method: method.id,
       currency: method.currency,
-      amount: roundForCurrency(pack.priceUsd, rate, method.currency),
+      amount,
       rateFromUsd: rate,
+      expiresAt,
+      token: signXpagProof({ kind: 'quote', priceKey, method: method.id, currency: method.currency, amount, expiresAt }, signingSecret()),
     };
   }
 
@@ -191,6 +197,7 @@ function parseXpagInstruction(
     status,
     awaitingInstruction: Boolean(raw["awaiting_instruction"]),
     transferType,
+    statusToken: '',
   };
   if (reference) result.reference = reference;
   if (barcodeUrl) result.barcodeUrl = barcodeUrl;
@@ -210,11 +217,15 @@ export async function createXpagChargeServer(input: {
   method: LocalMethodId;
   name: string;
   email: string;
+  quoteToken: string;
 }): Promise<XpagChargeInstruction> {
   const pack = rechargePackage(input.priceKey);
   const meta = getLocalMethod(input.method);
-  const { rates } = await fetchLocalRates();
-  const amount = roundForCurrency(pack.priceUsd, rates[meta.currency], meta.currency);
+  const quote = verifyXpagProof(input.quoteToken, 'quote', signingSecret());
+  if (quote.priceKey !== input.priceKey || quote.method !== input.method || quote.currency !== meta.currency) throw new Error('Cotação inválida.');
+  const amount = quote.amount;
+  const enabled = await fetchEnabledCurrencies();
+  if (!enabled?.includes(meta.currency)) throw new Error('Método indisponível nesta conta XPag.');
 
   if (meta.minAmount !== undefined && amount < meta.minAmount) {
     throw new Error(`O valor mínimo para ${meta.label} é ${meta.minAmount} ${meta.currency}.`);
@@ -223,7 +234,7 @@ export async function createXpagChargeServer(input: {
     throw new Error(`O valor máximo para ${meta.label} é ${meta.maxAmount} ${meta.currency}.`);
   }
 
-  const externalId = `loc_${input.priceKey}_${input.method.toLowerCase()}_${Date.now()}`;
+  const externalId = `loc_${crypto.randomUUID()}`;
   const description = `${pack.statement} - ${pack.diamonds} Diamantes`;
 
   let body: Record<string, unknown>;
@@ -280,27 +291,33 @@ export async function createXpagChargeServer(input: {
   }
 
   const raw = await callXpag("/cashin", { method: "POST", body });
-  return parseXpagInstruction(raw, {
+  if (typeof raw['request_number'] !== 'string' && typeof raw['transaction_id'] !== 'string') throw new Error('A XPag não retornou a referência do pagamento.');
+  if (typeof raw['amount'] === 'number' && Math.abs(raw['amount'] - amount) > 0.001) throw new Error('Valor da cobrança diferente da cotação.');
+  const charge = parseXpagInstruction(raw, {
     method: input.method,
     currency: meta.currency,
     amount,
     externalId,
   });
+  charge.statusToken = signXpagProof({ ...quote, kind: 'charge', expiresAt: Date.now() + 13 * 24 * 60 * 60_000, requestNumber: charge.requestNumber, externalId }, signingSecret());
+  return charge;
 }
 
-export async function consultXpagChargeServer(input: {
-  requestNumber: string;
-  method: LocalMethodId;
-  currency: LocalCurrency;
-  amount: number;
-  externalId: string;
-}): Promise<XpagChargeInstruction> {
-  const query = new URLSearchParams({ request_number: input.requestNumber });
+export async function consultXpagChargeServer(input: { statusToken: string }): Promise<XpagChargeInstruction> {
+  const proof = verifyXpagProof(input.statusToken, 'charge', signingSecret());
+  if (!proof.requestNumber || !proof.externalId) throw new Error('Pagamento inválido.');
+  const query = new URLSearchParams({ request_number: proof.requestNumber });
   const raw = await callXpag(`/consult-transaction?${query.toString()}`, { method: "GET" });
-  return parseXpagInstruction(raw, {
-    method: input.method,
-    currency: input.currency,
-    amount: input.amount,
-    externalId: input.externalId,
+  if (raw['type'] && raw['type'] !== 'cashin') throw new Error('Pagamento inválido.');
+  if (raw['currency'] && raw['currency'] !== proof.currency) throw new Error('Moeda inválida.');
+  if (typeof raw['amount'] === 'number' && Math.abs(raw['amount'] - proof.amount) > 0.001) throw new Error('Valor inválido.');
+  const charge = parseXpagInstruction(raw, {
+    method: proof.method,
+    currency: proof.currency,
+    amount: proof.amount,
+    externalId: proof.externalId,
   });
+  charge.requestNumber = proof.requestNumber;
+  charge.statusToken = input.statusToken;
+  return charge;
 }

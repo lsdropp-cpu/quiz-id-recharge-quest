@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Check, ChevronLeft, Info, Loader2, Lock, Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { rechargePackage, type RechargeKey } from "@/lib/recharge-packages";
 import {
   LOCAL_METHODS,
@@ -32,6 +33,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
   const [step, setStep] = useState<Step>(1);
   const [options, setOptions] = useState<LocalCheckoutOptions | null>(null);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [optionsError, setOptionsError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string }>({});
@@ -48,25 +50,22 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
       if (res.options) {
         setOptions(res.options);
         if (res.options.enabledCurrencies && res.options.enabledCurrencies.length > 0) {
-          const firstEnabled = LOCAL_METHODS.find((m) =>
-            res.options!.enabledCurrencies!.includes(m.currency),
-          );
+          const currencies = res.options.enabledCurrencies;
+          const firstEnabled = LOCAL_METHODS.find((m) => currencies?.includes(m.currency));
           if (firstEnabled) setSelectedMethod(firstEnabled.id);
         }
       }
+      setOptionsError(res.error);
       setLoadingOptions(false);
-    });
+    }).catch(() => { if (!cancelled) { setOptionsError("Não foi possível carregar os pagamentos. Atualize a página."); setLoadingOptions(false); } });
     return () => {
       cancelled = true;
     };
   }, [priceKey, loadOptionsFn]);
 
   const availableMethods = useMemo(() => {
-    if (!options?.enabledCurrencies || options.enabledCurrencies.length === 0) {
-      return LOCAL_METHODS;
-    }
-    const filtered = LOCAL_METHODS.filter((m) => options.enabledCurrencies!.includes(m.currency));
-    return filtered.length > 0 ? filtered : LOCAL_METHODS;
+    const currencies = options?.enabledCurrencies;
+    return LOCAL_METHODS.filter(m => currencies?.includes(m.currency));
   }, [options]);
 
   const activeMeta = getLocalMethod(selectedMethod);
@@ -93,12 +92,14 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
   const handleCreateCharge = async () => {
     setSubmitting(true);
     setChargeError(null);
+    try {
     const res = await createChargeFn({
       data: {
         priceKey,
         method: selectedMethod,
         name: name.trim(),
         email: email.trim(),
+        quoteToken: activeQuote?.token ?? "",
       },
     });
     setSubmitting(false);
@@ -108,6 +109,8 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
     }
     setCharge(res.charge);
     setStep(3);
+    } catch { setChargeError("Não foi possível gerar o pagamento. Tente novamente."); }
+    finally { setSubmitting(false); }
   };
 
   const summaryAmount = charge
@@ -157,9 +160,9 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
         {/* Main 2-column grid */}
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.35fr_0.9fr]">
           {/* Left card */}
-          <section className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm sm:p-8">
+          <section className="rounded-lg border border-border/70 bg-card p-6 shadow-sm sm:p-8">
             {step === 1 && (
-              <form onSubmit={handleContinueToPayment} noValidate className="space-y-5">
+              <form action="/local" onSubmit={handleContinueToPayment} noValidate className="space-y-5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h1 className="text-xl font-bold text-foreground">Seus dados</h1>
                   <p className="text-xs text-muted-foreground">
@@ -167,6 +170,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   </p>
                 </div>
 
+                {optionsError && <p role="alert" className="text-sm text-destructive">{optionsError}</p>}
                 <div className="space-y-1.5">
                   <label htmlFor="local-name" className="block text-sm font-semibold text-foreground">
                     Nome completo <span className="text-destructive">*</span>
@@ -178,10 +182,10 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value);
-                      if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                      if (fieldErrors.name) setFieldErrors(({ name: _name, ...rest }) => rest);
                     }}
                     placeholder="Como está no seu documento"
-                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
+                    className="w-full rounded-lg border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
                   />
                   {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
                 </div>
@@ -197,10 +201,10 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
-                      if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                      if (fieldErrors.email) setFieldErrors(({ email: _email, ...rest }) => rest);
                     }}
                     placeholder="voce@exemplo.com"
-                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
+                    className="w-full rounded-lg border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
                   />
                   {fieldErrors.email ? (
                     <p className="text-xs text-destructive">{fieldErrors.email}</p>
@@ -211,13 +215,13 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   )}
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   Continuar para o pagamento
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </Button>
               </form>
             )}
 
@@ -225,7 +229,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
               <div className="space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h1 className="text-xl font-bold text-foreground">Como você quer pagar</h1>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setChargeError(null);
@@ -235,7 +239,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     Voltar aos dados
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -243,14 +247,14 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                     const quote = options?.quotes[method.id];
                     const active = selectedMethod === method.id;
                     return (
-                      <button
+                      <Button
                         key={method.id}
                         type="button"
                         onClick={() => {
                           setSelectedMethod(method.id);
                           setChargeError(null);
                         }}
-                        className={`relative flex flex-col items-center justify-center rounded-xl px-3 py-5 text-center transition-all ${
+                        className={`relative flex flex-col items-center justify-center rounded-lg px-3 py-5 text-center transition-all ${
                           active
                             ? "border-2 border-primary bg-card shadow-xs"
                             : "border border-border bg-muted/35 hover:border-foreground/30 hover:bg-card"
@@ -270,30 +274,31 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                             ? "Calculando..."
                             : formatLocalAmount(quote.amount, quote.currency)}
                         </span>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
 
-                <div className="flex items-start gap-2.5 rounded-xl bg-muted/65 px-4 py-3 text-xs text-muted-foreground">
+                <div className="flex items-start gap-2.5 rounded-lg bg-muted/65 px-4 py-3 text-xs text-muted-foreground">
                   <Info className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{activeMeta.helperText}</span>
                 </div>
 
+                {activeQuote && activeQuote.expiresAt <= Date.now() && <p role="alert" className="text-sm text-destructive">Cotação expirada. Atualize a página para continuar.</p>}
                 {chargeError && (
                   <div
                     role="alert"
-                    className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive"
+                    className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive"
                   >
                     {chargeError}
                   </div>
                 )}
 
-                <button
+                <Button
                   type="button"
-                  disabled={submitting || loadingOptions}
+                  disabled={submitting || loadingOptions || !activeQuote || activeQuote.expiresAt <= Date.now()}
                   onClick={() => void handleCreateCharge()}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {submitting ? (
                     <>
@@ -306,7 +311,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                       Pagar {summaryAmount}
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             )}
 
@@ -323,7 +328,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
           </section>
 
           {/* Right card: Resumo do pedido */}
-          <aside className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+          <aside className="rounded-lg border border-border/70 bg-card p-6 shadow-sm">
             <div className="flex items-center justify-between gap-2 pb-4">
               <h2 className="text-base font-bold text-foreground">Resumo do pedido</h2>
               <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-1 text-[11px] font-semibold text-success">
@@ -334,7 +339,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
 
             <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50 text-muted-foreground">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground">
                   <Package className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
@@ -374,7 +379,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
             <div className="border-b border-border py-4">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-sm font-bold text-foreground">Total</span>
-                <span className="text-2xl font-extrabold tracking-tight text-foreground">
+                <span className="text-2xl font-extrabold tracking-normal text-foreground">
                   {summaryAmount}
                 </span>
               </div>

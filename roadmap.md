@@ -1,3 +1,7 @@
+# XPag local checkout
+- [x] Create isolated /local customer details and local payment selection, leaving existing checkouts and funnels untouched.
+- [x] Verified account connection and real OXXO/Nequi instruction generation through /local, matching signed totals and pending status polling; eight tests pass and mobile has no horizontal overflow. No payment submitted; paid confirmation and fulfillment remain unverified. Existing advertising requests still report fetch failures.
+
 # Quiz2 Stripe checkout handoff
 - [x] Connect all six /recharge2 packages to existing /checkoutt* local-currency Stripe checkouts, preserving campaign and player parameters and leaving other funnels unchanged.
 - [x] Verified the complete quiz2 → idplayer2 → recharge2 flow and all six /checkoutt* destinations with campaign parameters and visible billing forms; seven destination tests pass, latest build OK, no charge made.

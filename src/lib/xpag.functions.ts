@@ -40,11 +40,7 @@ export const checkLocalXpagStatus = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        requestNumber: z.string().trim().min(1).max(128),
-        method: z.enum(["OXXO", "SPEI", "NEQUI", "BREB", "PIX"]),
-        currency: z.enum(["MXN", "COP", "BRL"]),
-        amount: z.number().positive(),
-        externalId: z.string().trim().min(1).max(128),
+        statusToken: z.string().min(1).max(4096),
       })
       .parse(data),
   )
