@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2 } from "lucide-react";
 import GarenaHeader from "@/components/GarenaHeader";
 import LiveViewersBadge from "@/components/LiveViewersBadge";
 import SocialProofToasts from "@/components/SocialProofToasts";
@@ -37,7 +37,9 @@ export const Route = createFileRoute("/recharge")({
 function RechargePage() {
   useFunnelTracking("recharge");
   const [selectedPack, setSelectedPack] = useState<RechargeKey | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<LocalMethodId | null>(null);
   const [packRequiredHint, setPackRequiredHint] = useState(false);
+  const [methodRequiredHint, setMethodRequiredHint] = useState(false);
   const packsRef = useRef<HTMLDivElement>(null);
   const methodsRef = useRef<HTMLDivElement>(null);
 
@@ -50,12 +52,21 @@ function RechargePage() {
   };
 
   const handleSelectMethod = (method: LocalMethodId) => {
+    setSelectedMethod(method);
+    setMethodRequiredHint(false);
+  };
+
+  const handleContinueToCheckout = () => {
     if (!selectedPack) {
       setPackRequiredHint(true);
       packsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    const url = localCheckoutUrl(selectedPack, window.location.search, method);
+    if (!selectedMethod) {
+      setMethodRequiredHint(true);
+      return;
+    }
+    const url = localCheckoutUrl(selectedPack, window.location.search);
     if (url) window.location.href = url;
   };
 
@@ -161,25 +172,53 @@ function RechargePage() {
             </p>
 
             <div className="grid grid-cols-2 gap-3">
-              {paymentMethods.map((method) => (
-                <Button
-                  key={method.id}
-                  variant="ghost"
-                  type="button"
-                  onClick={() => handleSelectMethod(method.id)}
-                  className="go-to-checkout relative flex h-auto min-h-28 flex-col items-center justify-center rounded-xl border-2 border-border bg-muted/40 px-3 pt-6 pb-4 text-center transition-all hover:border-primary hover:bg-card hover:shadow-[0_0_20px_rgba(255,122,20,0.2)] active:scale-[0.98]"
-                >
-                  <span className="absolute -top-2 right-2 rounded-md bg-destructive px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-destructive-foreground shadow-sm">
-                    PROMO
-                  </span>
-                  <div className="mb-2 flex h-12 items-center justify-center rounded-lg bg-[var(--method-white)] px-3 py-1.5 shadow-xs">
-                    <MethodLogo method={method.id} />
-                  </div>
-                  <span className="text-sm font-bold text-foreground">{method.label}</span>
-                  <span className="text-[11px] text-muted-foreground">{method.countryLabel}</span>
-                </Button>
-              ))}
+              {paymentMethods.map((method) => {
+                const isSelected = selectedMethod === method.id;
+                return (
+                  <Button
+                    key={method.id}
+                    variant="ghost"
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => handleSelectMethod(method.id)}
+                    className={`relative flex h-auto min-h-28 flex-col items-center justify-center rounded-xl border-2 px-3 pt-6 pb-4 text-center transition-all active:scale-[0.98] ${
+                      isSelected
+                        ? "border-primary ring-2 ring-primary/40 bg-card shadow-[0_0_20px_rgba(255,122,20,0.3)]"
+                        : "border-border bg-muted/40 hover:border-primary/60 hover:bg-card hover:shadow-[0_0_20px_rgba(255,122,20,0.15)]"
+                    }`}
+                  >
+                    {isSelected && (
+                      <span className="absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                    )}
+                    <span className="absolute -top-2 right-2 rounded-md bg-destructive px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-destructive-foreground shadow-sm">
+                      PROMO
+                    </span>
+                    <div className="mb-2 flex h-12 items-center justify-center rounded-lg bg-[var(--method-white)] px-3 py-1.5 shadow-xs">
+                      <MethodLogo method={method.id} />
+                    </div>
+                    <span className="text-sm font-bold text-foreground">{method.label}</span>
+                    <span className="text-[11px] text-muted-foreground">{method.countryLabel}</span>
+                  </Button>
+                );
+              })}
             </div>
+
+            {methodRequiredHint && (
+              <p role="alert" className="mt-3 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
+                Selecciona un método de pago para continuar.
+              </p>
+            )}
+
+            <Button
+              type="button"
+              onClick={handleContinueToCheckout}
+              className="go-to-checkout mt-4 inline-flex h-auto w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-[0_0_24px_rgba(255,122,20,0.35)] transition-all hover:opacity-95 active:scale-[0.99]"
+            >
+              Comprar ahora
+              <ArrowRight className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </main>
