@@ -25,7 +25,13 @@ const STEP_LABELS: Array<{ step: Step; label: string }> = [
   { step: 3, label: "Confirmación" },
 ];
 
-export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey }) {
+export default function LocalXpagCheckout({
+  priceKey,
+  initialMethod,
+}: {
+  priceKey: RechargeKey;
+  initialMethod?: LocalMethodId;
+}) {
   const loadOptionsFn = useServerFn(getLocalCheckoutOptions);
   const createChargeFn = useServerFn(createLocalXpagCharge);
 
@@ -37,7 +43,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string }>({});
-  const [selectedMethod, setSelectedMethod] = useState<LocalMethodId>("OXXO");
+  const [selectedMethod, setSelectedMethod] = useState<LocalMethodId>(initialMethod ?? "OXXO");
   const [submitting, setSubmitting] = useState(false);
   const [chargeError, setChargeError] = useState<string | null>(null);
   const [charge, setCharge] = useState<XpagChargeInstruction | null>(null);
@@ -49,7 +55,9 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
       if (cancelled) return;
       if (res.options) {
         setOptions(res.options);
-        const firstEnabled = getOfferedLocalMethods(res.options.enabledCurrencies)[0];
+        const offered = getOfferedLocalMethods(res.options.enabledCurrencies);
+        const preferred = initialMethod ? offered.find((m) => m.id === initialMethod) : undefined;
+        const firstEnabled = preferred ?? offered[0];
         if (firstEnabled) setSelectedMethod(firstEnabled.id);
       }
       setOptionsError(res.error);
@@ -58,7 +66,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
     return () => {
       cancelled = true;
     };
-  }, [priceKey, loadOptionsFn]);
+  }, [priceKey, initialMethod, loadOptionsFn]);
 
   const availableMethods = useMemo(
     () => getOfferedLocalMethods(options?.enabledCurrencies),

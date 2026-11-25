@@ -7,6 +7,14 @@ test("sends a recharge pack to the /local checkout with the chosen pack", () => 
   strictEqual(url, "/local?p=25&utm_source=tiktok&utm_campaign=deg");
 });
 
+test("includes the chosen local payment method in the /local URL and ignores disabled methods", () => {
+  strictEqual(
+    localCheckoutUrl("19", "?utm_source=tiktok", "NEQUI"),
+    "/local?p=19&m=NEQUI&utm_source=tiktok",
+  );
+  strictEqual(localCheckoutUrl("19", "", "PIX"), "/local?p=19");
+});
+
 test("keeps every pack selectable", () => {
   for (const key of ["9", "15", "19", "25", "29", "35"]) {
     const url = localCheckoutUrl(key, "");

@@ -70,6 +70,18 @@
   --border: 240 6% 18%;
   --input: 240 6% 18%;
   --ring: 22 100% 54%;
+  --method-gold: #FACC15;
+  --method-red: #DC2626;
+  --method-white: #FFFFFF;
+  --method-blue: #1E3A8A;
+  --method-pale: #F8F5F8;
+  --method-border: #ECE6EC;
+  --method-pink: #DA0081;
+  --method-ink: #200020;
+  --method-cyan: #67E8F9;
+  --method-mint: #ECFDF5;
+  --method-mint-border: #A7F3D0;
+  --method-teal: #0D9488;
 }
 
 @layer base {
@@ -300,18 +312,6 @@
 
 /* Clean light theme scoped to the /local XPag checkout */
 .local-checkout-surface {
-  --method-gold: #FACC15;
-  --method-red: #DC2626;
-  --method-white: #FFFFFF;
-  --method-blue: #1E3A8A;
-  --method-pale: #F8F5F8;
-  --method-border: #ECE6EC;
-  --method-pink: #DA0081;
-  --method-ink: #200020;
-  --method-cyan: #67E8F9;
-  --method-mint: #ECFDF5;
-  --method-mint-border: #A7F3D0;
-  --method-teal: #0D9488;
   --background: 220 14% 96%;
   --foreground: 222 22% 11%;
   --card: 0 0% 100%;
