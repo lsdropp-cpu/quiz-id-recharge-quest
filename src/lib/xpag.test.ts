@@ -5,6 +5,7 @@ import {
   formatLocalAmount,
   getLocalMethod,
   roundForCurrency,
+  xpagProductDescription,
 } from "./xpag";
 
 test("rounds COP to whole pesos and MXN/BRL to 2 decimals", () => {
@@ -17,6 +18,11 @@ test("formats local currencies with the expected prefixes", () => {
   strictEqual(formatLocalAmount(199.22, "MXN"), "MX$ 199,22");
   strictEqual(formatLocalAmount(42782, "COP"), "CO$ 42.782,00");
   strictEqual(formatLocalAmount(57.54, "BRL"), "R$ 57,54");
+});
+
+test("sends DEG as the product name to XPag", () => {
+  strictEqual(xpagProductDescription("5.600"), "DEG - 5.600 Diamantes");
+  strictEqual(xpagProductDescription("56.000"), "DEG - 56.000 Diamantes");
 });
 
 test("enforces OXXO min and max limits", () => {

@@ -161,6 +161,14 @@ export function formatLocalAmount(amount: number, currency: LocalCurrency): stri
   return `${CURRENCY_PREFIX[currency]} ${formatted}`;
 }
 
+// XPag has no separate product-name field: `description` is the text the payer
+// sees on the rail, so it carries the product name (DEG = Duo Empreendimento Digital).
+export const XPAG_PRODUCT_NAME = "DEG";
+
+export function xpagProductDescription(diamonds: string): string {
+  return `${XPAG_PRODUCT_NAME} - ${diamonds} Diamantes`;
+}
+
 export function formatUsdAmount(amount: number): string {
   return `US$ ${new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: 2,

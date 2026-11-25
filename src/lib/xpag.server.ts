@@ -4,6 +4,7 @@ import {
   LOCAL_METHODS,
   getLocalMethod,
   roundForCurrency,
+  xpagProductDescription,
   type LocalCheckoutOptions,
   type LocalCurrency,
   type LocalMethodId,
@@ -235,7 +236,7 @@ export async function createXpagChargeServer(input: {
   }
 
   const externalId = `loc_${crypto.randomUUID()}`;
-  const description = `${pack.statement} - ${pack.diamonds} Diamantes`;
+  const description = xpagProductDescription(pack.diamonds);
 
   let body: Record<string, unknown>;
   switch (input.method) {
