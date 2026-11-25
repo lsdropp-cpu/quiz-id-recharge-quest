@@ -171,8 +171,8 @@ export function formatLocalAmount(amount: number, currency: LocalCurrency): stri
 }
 
 // XPag has no separate product-name field: `description` is the text the payer
-// sees on the rail, so it carries the product name (DEG = Duo Empreendimento Digital).
-export const XPAG_PRODUCT_NAME = "DEG";
+// sees on the rail, so it carries the product name.
+export const XPAG_PRODUCT_NAME = "DEG Guia do Dimas";
 
 export function xpagProductDescription(diamonds: string): string {
   return `${XPAG_PRODUCT_NAME} - ${diamonds} Diamantes`;
