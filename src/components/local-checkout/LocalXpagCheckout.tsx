@@ -6,7 +6,6 @@ import { rechargePackage, type RechargeKey } from "@/lib/recharge-packages";
 import {
   LOCAL_METHODS,
   formatLocalAmount,
-  formatUsdAmount,
   getLocalMethod,
   localCustomerSchema,
   type LocalCheckoutOptions,
@@ -117,7 +116,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
     ? formatLocalAmount(charge.amount, charge.currency)
     : activeQuote
       ? formatLocalAmount(activeQuote.amount, activeQuote.currency)
-      : formatUsdAmount(pack.priceUsd);
+      : "Calculando...";
 
   return (
     <div className="local-checkout-surface min-h-screen bg-background text-foreground">
@@ -158,7 +157,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
         </nav>
 
         {/* Main 2-column grid */}
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.35fr_0.9fr]">
+        <div className={step === 1 ? "mx-auto max-w-xl" : "grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.35fr_0.9fr]"}>
           {/* Left card */}
           <section className="rounded-lg border border-border/70 bg-card p-6 shadow-sm sm:p-8">
             {step === 1 && (
@@ -254,7 +253,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                           setSelectedMethod(method.id);
                           setChargeError(null);
                         }}
-                        className={`relative flex flex-col items-center justify-center rounded-lg px-3 py-5 text-center transition-all ${
+                        className={`relative flex h-auto min-h-32 flex-col items-center justify-center rounded-lg px-3 py-5 text-center transition-all ${
                           active
                             ? "border-2 border-primary bg-card shadow-xs"
                             : "border border-border bg-muted/35 hover:border-foreground/30 hover:bg-card"
@@ -328,7 +327,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
           </section>
 
           {/* Right card: Resumo do pedido */}
-          <aside className="rounded-lg border border-border/70 bg-card p-6 shadow-sm">
+          {step !== 1 && <aside className="rounded-lg border border-border/70 bg-card p-6 shadow-sm">
             <div className="flex items-center justify-between gap-2 pb-4">
               <h2 className="text-base font-bold text-foreground">Resumo do pedido</h2>
               <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-1 text-[11px] font-semibold text-success">
@@ -352,28 +351,15 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                 </div>
               </div>
               <span className="shrink-0 text-sm font-bold text-foreground">
-                {formatUsdAmount(pack.priceUsd)}
+                {summaryAmount}
               </span>
             </div>
 
             <div className="space-y-2 border-b border-dashed border-border py-4 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-semibold text-foreground">{formatUsdAmount(pack.priceUsd)}</span>
+                <span className="font-semibold text-foreground">{summaryAmount}</span>
               </div>
-              {activeQuote && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Câmbio do dia</span>
-                  <span className="font-semibold text-foreground">
-                    1 USD ={" "}
-                    {new Intl.NumberFormat("pt-BR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 4,
-                    }).format(activeQuote.rateFromUsd)}{" "}
-                    {activeQuote.currency}
-                  </span>
-                </div>
-              )}
             </div>
 
             <div className="border-b border-border py-4">
@@ -383,9 +369,9 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   {summaryAmount}
                 </span>
               </div>
-              {activeQuote && (
+              {(charge || activeQuote) && (
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  Você paga em {activeQuote.currency} porque é a moeda de {activeMeta.label}.
+                  {getLocalMethod(charge?.method ?? selectedMethod).label} · {charge?.currency ?? activeQuote?.currency}
                 </p>
               )}
             </div>
@@ -400,7 +386,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                 ))}
               </div>
             </div>
-          </aside>
+          </aside>}
         </div>
 
         <footer className="mt-8 flex justify-center">
