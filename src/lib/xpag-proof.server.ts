@@ -16,14 +16,14 @@ export function signXpagProof(proof: XpagProof, secret: string) {
   return `${body}.${createHmac('sha256', secret).update(body).digest('hex')}`;
 }
 export function verifyXpagProof(token: string, kind: XpagProof['kind'], secret: string): XpagProof {
-  if (token.length > 4096) throw new Error('Pagamento inválido.');
+  if (token.length > 4096) throw new Error('Pago inválido.');
   const parts = token.split('.');
   const body = parts[0];
   const signed = parts[1];
-  if (parts.length !== 2 || !body || !signed || !/^[a-f0-9]{64}$/.test(signed)) throw new Error('Pagamento inválido.');
+  if (parts.length !== 2 || !body || !signed || !/^[a-f0-9]{64}$/.test(signed)) throw new Error('Pago inválido.');
   const expected = createHmac('sha256', secret).update(body).digest();
-  if (!timingSafeEqual(expected, Buffer.from(signed, 'hex'))) throw new Error('Pagamento inválido.');
+  if (!timingSafeEqual(expected, Buffer.from(signed, 'hex'))) throw new Error('Pago inválido.');
   const proof = proofSchema.parse(JSON.parse(Buffer.from(body, 'base64url').toString()));
-  if (proof.kind !== kind || proof.expiresAt <= Date.now()) throw new Error('Cotação expirada. Atualize o preço para continuar.');
+  if (proof.kind !== kind || proof.expiresAt <= Date.now()) throw new Error('Cotización expirada. Actualiza el precio para continuar.');
   return proof;
 }

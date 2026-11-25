@@ -63,8 +63,8 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
     charge.method === "SPEI"
       ? "CLABE INTERBANCARIA"
       : charge.method === "OXXO"
-        ? "CÓDIGO COPIA E COLA"
-        : "CÓDIGO COPIA E COLA";
+        ? "REFERENCIA DE PAGO"
+        : "CÓDIGO COPIA Y PEGA";
 
   const formattedAmount = formatLocalAmount(charge.amount, charge.currency);
 
@@ -75,13 +75,13 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
           <CheckCircle2 className="h-9 w-9" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground">Pagamento confirmado!</h2>
+          <h2 className="text-2xl font-bold text-foreground">¡Pago confirmado!</h2>
           <p className="text-sm text-muted-foreground">
-            Recebemos {formattedAmount} via {meta.label}. Pagamento recebido pela XPag.
+            Recibimos {formattedAmount} vía {meta.label}. Pago recibido por XPag.
           </p>
         </div>
         <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
-          Referência do pedido: <span className="font-mono font-medium text-foreground">{charge.requestNumber}</span>
+          Referencia del pedido: <span className="font-mono font-medium text-foreground">{charge.requestNumber}</span>
         </div>
       </div>
     );
@@ -96,12 +96,12 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
         className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
         <ChevronLeft className="h-4 w-4" />
-        Voltar
+        Volver
       </Button>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div>
-          <p className="text-xs font-medium text-muted-foreground">A pagar</p>
+          <p className="text-xs font-medium text-muted-foreground">Por pagar</p>
           <p className="text-2xl font-extrabold tracking-normal text-foreground sm:text-3xl">
             {formattedAmount}
           </p>
@@ -109,12 +109,12 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
         {isFailed ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive">
             <XCircle className="h-3.5 w-3.5" />
-            {charge.status === "expired" ? "Pagamento expirado" : "Pagamento recusado"}
+            {charge.status === "expired" ? "Pago expirado" : "Pago rechazado"}
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 text-xs font-semibold text-warning-foreground">
             <Clock className="h-3.5 w-3.5" />
-            Aguardando pagamento
+            Esperando pago
           </span>
         )}
       </div>
@@ -122,7 +122,7 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
       {charge.awaitingInstruction && !primaryCopyCode && !charge.qrImageUrl && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/40 py-10 text-center">
           <Loader2 className="h-7 w-7 animate-spin text-foreground" />
-          <p className="text-sm font-medium text-foreground">Gerando instruções de pagamento...</p>
+          <p className="text-sm font-medium text-foreground">Generando instrucciones de pago...</p>
         </div>
       )}
 
@@ -153,12 +153,12 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
           <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
             {charge.copyPaste ? <QRCodeSVG value={charge.copyPaste} size={208} /> : <img
               src={charge.qrImageUrl}
-              alt={`QR Code ${meta.label}`}
+              alt={`Código QR ${meta.label}`}
               className="h-52 w-52 object-contain"
             />}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Abra o aplicativo do seu banco e leia o código.
+            Abre la app de tu banco y escanea el código.
           </p>
         </div>
       )}
@@ -187,7 +187,7 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
       {charge.brebKey && (
         <div className="rounded-lg border border-border bg-muted/40 p-3.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            CHAVE BRE-B
+            LLAVE BRE-B
           </p>
           <div className="mt-2 flex items-center justify-between gap-3">
             <code className="font-mono text-sm font-semibold text-foreground">{charge.brebKey}</code>
@@ -213,7 +213,7 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
           )}
           {charge.beneficiary && (
             <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3 text-sm">
-              <span className="text-muted-foreground">Beneficiário</span>
+              <span className="text-muted-foreground">Beneficiario</span>
               <span className="font-semibold text-foreground">{charge.beneficiary}</span>
             </div>
           )}
@@ -223,7 +223,7 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
       {charge.method === "OXXO" && (
         <div className="flex items-center gap-2.5 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-xs font-medium text-warning-foreground">
           <Info className="h-4 w-4 shrink-0 text-warning" />
-          <span>Pague exatamente {formattedAmount}. Qualquer diferença atrasa a confirmação.</span>
+          <span>Paga exactamente {formattedAmount}. Cualquier diferencia retrasa la confirmación.</span>
         </div>
       )}
 
@@ -234,7 +234,7 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
           rel="noopener noreferrer"
           className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
         >
-          Abrir página de pagamento {meta.label}
+          Abrir página de pago {meta.label}
           <ExternalLink className="h-4 w-4" />
         </a>
       )}
@@ -252,7 +252,7 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
 
       <div className="flex items-center gap-2.5 rounded-lg bg-muted/70 px-4 py-3 text-xs text-muted-foreground">
         <Hourglass className="h-4 w-4 shrink-0" />
-        <span>Esta página consulta a confirmação de {meta.label}. Aguarde o pagamento ser recebido.</span>
+        <span>Esta página verifica la confirmación de {meta.label}. Espera a que se reciba el pago.</span>
       </div>
     </div>
   );

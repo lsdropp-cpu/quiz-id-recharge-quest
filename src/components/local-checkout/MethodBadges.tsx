@@ -49,7 +49,7 @@ export function MethodLogo({ method, compact = false }: { method: LocalMethodId;
 export function XpagWordmark() {
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-      <span>Pagamento processado por</span>
+      <span>Pago procesado por</span>
       <span className="font-extrabold italic tracking-normal text-foreground text-sm">xpag</span>
     </span>
   );

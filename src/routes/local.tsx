@@ -22,10 +22,10 @@ export const Route = createFileRoute("/local")({
   },
   head: () => ({
     meta: [
-      { title: "Pagamento local — Recarga de Diamantes" },
-      { name: "description", content: "Finalize sua recarga com pagamento local via OXXO, SPEI, Nequi ou Bre-B." },
-      { property: "og:title", content: "Pagamento local — Recarga de Diamantes" },
-      { property: "og:description", content: "Finalize sua recarga com pagamento local via OXXO, SPEI, Nequi ou Bre-B." },
+      { title: "Pago local — Recarga de Diamantes" },
+      { name: "description", content: "Completa tu recarga con pago local mediante OXXO, SPEI, Nequi o Bre-B." },
+      { property: "og:title", content: "Pago local — Recarga de Diamantes" },
+      { property: "og:description", content: "Completa tu recarga con pago local mediante OXXO, SPEI, Nequi o Bre-B." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },

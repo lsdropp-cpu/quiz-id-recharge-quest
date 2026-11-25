@@ -17,7 +17,7 @@ export const getLocalCheckoutOptions = createServerFn({ method: "POST" })
     } catch (err) {
       return {
         options: null,
-        error: err instanceof Error ? err.message : "Não foi possível carregar as cotações.",
+        error: err instanceof Error ? err.message : "No se pudieron cargar las cotizaciones.",
       };
     }
   });
@@ -31,7 +31,7 @@ export const createLocalXpagCharge = createServerFn({ method: "POST" })
     } catch (err) {
       return {
         charge: null,
-        error: err instanceof Error ? err.message : "Não foi possível gerar o pagamento.",
+        error: err instanceof Error ? err.message : "No se pudo generar el pago.",
       };
     }
   });
@@ -51,7 +51,7 @@ export const checkLocalXpagStatus = createServerFn({ method: "POST" })
     } catch (err) {
       return {
         charge: null,
-        error: err instanceof Error ? err.message : "Não foi possível consultar o status.",
+        error: err instanceof Error ? err.message : "No se pudo consultar el estado del pago.",
       };
     }
   });

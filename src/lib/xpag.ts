@@ -22,11 +22,11 @@ export const LOCAL_METHODS: LocalMethodMeta[] = [
     label: "OXXO",
     currency: "MXN",
     countryLabel: "México",
-    helperText: "Você verá um código de barras para pagar em dinheiro em qualquer loja OXXO.",
+    helperText: "Verás un código de barras para pagar en efectivo en cualquier tienda OXXO.",
     instructions: [
-      "Vá a qualquer loja OXXO.",
-      "Mostre o código de barras ou a referência no caixa.",
-      "Pague em dinheiro o valor exato e guarde o comprovante.",
+      "Ve a cualquier tienda OXXO.",
+      "Muestra el código de barras o la referencia en caja.",
+      "Paga en efectivo el monto exacto y guarda tu comprobante.",
     ],
     minAmount: 10,
     maxAmount: 10000,
@@ -36,35 +36,35 @@ export const LOCAL_METHODS: LocalMethodMeta[] = [
     label: "SPEI",
     currency: "MXN",
     countryLabel: "México",
-    helperText: "Você receberá uma CLABE exclusiva para transferir direto do seu banco mexicano.",
+    helperText: "Recibirás una CLABE exclusiva para transferir directo desde tu banco en México.",
     instructions: [
-      "Abra o aplicativo do seu banco e escolha transferir por SPEI.",
-      "Cole a CLABE informada acima e confira o banco e o beneficiário.",
-      "Transfira o valor exato para confirmação automática.",
+      "Abre la app de tu banco y elige transferir por SPEI.",
+      "Pega la CLABE indicada arriba y verifica el banco y el beneficiario.",
+      "Transfiere el monto exacto para confirmación automática.",
     ],
   },
   {
     id: "NEQUI",
     label: "Nequi",
     currency: "COP",
-    countryLabel: "Colômbia",
-    helperText: "Você verá um QR Code e um código copia e cola para pagar pelo app Nequi.",
+    countryLabel: "Colombia",
+    helperText: "Verás un código QR y un código para copiar y pegar desde la app Nequi.",
     instructions: [
-      "Abra o aplicativo Nequi.",
-      "Escolha pagar com QR e leia o código acima, ou cole o código copiado.",
-      "Confira o valor e conclua o pagamento.",
+      "Abre la aplicación Nequi.",
+      "Elige pagar con QR y escanea el código de arriba, o pega el código copiado.",
+      "Verifica el monto y completa el pago.",
     ],
   },
   {
     id: "BREB",
     label: "Bre-B",
     currency: "COP",
-    countryLabel: "Colômbia",
-    helperText: "Você verá um QR Code e a chave curta Bre-B para pagar pelo seu banco na Colômbia.",
+    countryLabel: "Colombia",
+    helperText: "Verás un código QR y la llave Bre-B para pagar desde tu banco en Colombia.",
     instructions: [
-      "Abra o aplicativo do seu banco na Colômbia e entre em Bre-B.",
-      "Leia o QR Code acima ou cole a chave Bre-B.",
-      "Confira o valor e conclua o pagamento.",
+      "Abre la app de tu banco en Colombia y entra a Bre-B.",
+      "Escanea el código QR de arriba o pega la llave Bre-B.",
+      "Verifica el monto y completa el pago.",
     ],
   },
   {
@@ -73,11 +73,11 @@ export const LOCAL_METHODS: LocalMethodMeta[] = [
     currency: "BRL",
     countryLabel: "Brasil",
     disabled: true,
-    helperText: "Você verá um QR Code Pix e um código copia e cola com aprovação imediata.",
+    helperText: "Verás un código QR Pix y un código para copiar y pegar con aprobación inmediata.",
     instructions: [
-      "Abra o aplicativo do seu banco e entre na área Pix.",
-      "Leia o QR Code acima ou use o Pix Copia e Cola.",
-      "Confira o valor e confirme o pagamento.",
+      "Abre la app de tu banco y entra al área Pix.",
+      "Escanea el código QR de arriba o usa el código copia y pega.",
+      "Verifica el monto y confirma el pago.",
     ],
   },
 ];
@@ -99,13 +99,13 @@ export const localCustomerSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(3, "Informe seu nome completo.")
-    .max(120, "Nome muito longo."),
+    .min(3, "Ingresa tu nombre completo.")
+    .max(120, "Nombre demasiado largo."),
   email: z
     .string()
     .trim()
-    .email("Informe um e-mail válido.")
-    .max(255, "E-mail muito longo."),
+    .email("Ingresa un correo electrónico válido.")
+    .max(255, "Correo electrónico demasiado largo."),
 });
 
 export const createChargeInputSchema = localCustomerSchema.extend({

@@ -20,9 +20,9 @@ import { MethodLogo, XpagWordmark } from "./MethodBadges";
 type Step = 1 | 2 | 3;
 
 const STEP_LABELS: Array<{ step: Step; label: string }> = [
-  { step: 1, label: "Seus dados" },
-  { step: 2, label: "Pagamento" },
-  { step: 3, label: "Confirmação" },
+  { step: 1, label: "Tus datos" },
+  { step: 2, label: "Pago" },
+  { step: 3, label: "Confirmación" },
 ];
 
 export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey }) {
@@ -54,7 +54,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
       }
       setOptionsError(res.error);
       setLoadingOptions(false);
-    }).catch(() => { if (!cancelled) { setOptionsError("Não foi possível carregar os pagamentos. Atualize a página."); setLoadingOptions(false); } });
+    }).catch(() => { if (!cancelled) { setOptionsError("No se pudieron cargar los métodos de pago. Actualiza la página."); setLoadingOptions(false); } });
     return () => {
       cancelled = true;
     };
@@ -101,12 +101,12 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
     });
     setSubmitting(false);
     if (res.error || !res.charge) {
-      setChargeError(res.error ?? "Não foi possível gerar o pagamento agora.");
+      setChargeError(res.error ?? "No se pudo generar el pago en este momento.");
       return;
     }
     setCharge(res.charge);
     setStep(3);
-    } catch { setChargeError("Não foi possível gerar o pagamento. Tente novamente."); }
+    } catch { setChargeError("No se pudo generar el pago. Inténtalo de nuevo."); }
     finally { setSubmitting(false); }
   };
 
@@ -120,7 +120,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
     <div className="local-checkout-surface min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10">
         {/* Stepper */}
-        <nav aria-label="Etapas do pagamento" className="mb-8 flex items-center justify-center gap-2 sm:gap-4">
+        <nav aria-label="Pasos del pago" className="mb-8 flex items-center justify-center gap-2 sm:gap-4">
           {STEP_LABELS.map((item, idx) => {
             const completed = step > item.step;
             const current = step === item.step;
@@ -161,16 +161,16 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
             {step === 1 && (
               <form action="/local" onSubmit={handleContinueToPayment} noValidate className="space-y-5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h1 className="text-xl font-bold text-foreground">Seus dados</h1>
+                  <h1 className="text-xl font-bold text-foreground">Tus datos</h1>
                   <p className="text-xs text-muted-foreground">
-                    Usamos para emitir a cobrança e mandar o comprovante.
+                    Los usamos para generar el cobro y enviar el comprobante.
                   </p>
                 </div>
 
                 {optionsError && <p role="alert" className="text-sm text-destructive">{optionsError}</p>}
                 <div className="space-y-1.5">
                   <label htmlFor="local-name" className="block text-sm font-semibold text-foreground">
-                    Nome completo <span className="text-destructive">*</span>
+                    Nombre completo <span className="text-destructive">*</span>
                   </label>
                   <input
                     id="local-name"
@@ -181,7 +181,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                       setName(e.target.value);
                       if (fieldErrors.name) setFieldErrors(({ name: _name, ...rest }) => rest);
                     }}
-                    placeholder="Como está no seu documento"
+                    placeholder="Como aparece en tu documento"
                     className="w-full rounded-lg border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
                   />
                   {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
@@ -189,7 +189,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
 
                 <div className="space-y-1.5">
                   <label htmlFor="local-email" className="block text-sm font-semibold text-foreground">
-                    E-mail <span className="text-destructive">*</span>
+                    Correo electrónico <span className="text-destructive">*</span>
                   </label>
                   <input
                     id="local-email"
@@ -200,14 +200,14 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                       setEmail(e.target.value);
                       if (fieldErrors.email) setFieldErrors(({ email: _email, ...rest }) => rest);
                     }}
-                    placeholder="voce@exemplo.com"
+                    placeholder="tu@ejemplo.com"
                     className="w-full rounded-lg border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
                   />
                   {fieldErrors.email ? (
                     <p className="text-xs text-destructive">{fieldErrors.email}</p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      O comprovante da compra chega neste e-mail.
+                      El comprobante de la compra llega a este correo.
                     </p>
                   )}
                 </div>
@@ -216,7 +216,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   type="submit"
                   className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
-                  Continuar para o pagamento
+                  Continuar al pago
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </form>
@@ -225,7 +225,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
             {step === 2 && (
               <div className="space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h1 className="text-xl font-bold text-foreground">Como você quer pagar</h1>
+                  <h1 className="text-xl font-bold text-foreground">Cómo quieres pagar</h1>
                   <Button
                     type="button"
                     onClick={() => {
@@ -235,7 +235,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                     className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
-                    Voltar aos dados
+                    Volver a tus datos
                   </Button>
                 </div>
 
@@ -281,7 +281,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   <span>{activeMeta.helperText}</span>
                 </div>
 
-                {activeQuote && activeQuote.expiresAt <= Date.now() && <p role="alert" className="text-sm text-destructive">Cotação expirada. Atualize a página para continuar.</p>}
+                {activeQuote && activeQuote.expiresAt <= Date.now() && <p role="alert" className="text-sm text-destructive">Cotización expirada. Actualiza la página para continuar.</p>}
                 {chargeError && (
                   <div
                     role="alert"
@@ -300,7 +300,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                   {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Gerando pagamento...
+                      Generando pago...
                     </>
                   ) : (
                     <>
@@ -327,10 +327,10 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
           {/* Right card: Resumo do pedido */}
           {step !== 1 && <aside className="rounded-lg border border-border/70 bg-card p-6 shadow-sm">
             <div className="flex items-center justify-between gap-2 pb-4">
-              <h2 className="text-base font-bold text-foreground">Resumo do pedido</h2>
+              <h2 className="text-base font-bold text-foreground">Resumen del pedido</h2>
               <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2.5 py-1 text-[11px] font-semibold text-success">
                 <Lock className="h-3 w-3" />
-                Conexão segura
+                Conexión segura
               </span>
             </div>
 
@@ -346,7 +346,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
                     {options?.productTitle ?? `${pack.diamonds} Diamantes`}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {options?.productSubtitle ?? `+ ${pack.bonus} Bônus · Free Fire`}
+                    {options?.productSubtitle ?? `+ ${pack.bonus} Bono · Free Fire`}
                   </p>
                 </div>
               </div>
@@ -378,7 +378,7 @@ export default function LocalXpagCheckout({ priceKey }: { priceKey: RechargeKey 
 
             <div className="flex flex-wrap items-center gap-2 pt-4">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Aceitamos
+                Aceptamos
               </span>
               <div className="flex flex-wrap items-center gap-1.5">
                 {availableMethods.map((m) => (

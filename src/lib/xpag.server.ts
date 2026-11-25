@@ -17,7 +17,7 @@ const RATE_CACHE_TTL_MS = 60 * 60 * 1000;
 const QUOTE_TTL_MS = 30 * 60_000;
 function signingSecret() {
   const secret = process.env['LOCAL_CHECKOUT_SIGNING_SECRET'];
-  if (!secret) throw new Error('Configuração de pagamentos indisponível.');
+  if (!secret) throw new Error('Configuración de pagos no disponible.');
   return secret;
 }
 
@@ -27,7 +27,7 @@ function getGatewayHeaders(): Record<string, string> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
   const xpagKey = process.env["UDC_XPAG_API_KEY"];
   if (!lovableKey || !xpagKey) {
-    throw new Error("A conexão com a XPag não está configurada neste ambiente.");
+    throw new Error("La conexión con XPag no está configurada en este entorno.");
   }
   return {
     Authorization: `Bearer ${lovableKey}`,
@@ -54,7 +54,7 @@ async function callXpag(path: string, init: { method?: "GET" | "POST"; body?: Re
   }
   if (!res.ok || (json && json["ok"] === false)) {
     const errorCode = typeof json?.["error_code"] === "string" ? json["error_code"] : `http_${res.status}`;
-    const providerMsg = typeof json?.["error"] === "string" ? json["error"] : 'Falha ao consultar a XPag.';
+    const providerMsg = typeof json?.["error"] === "string" ? json["error"] : 'Error al consultar XPag.';
     console.error(`XPag error [${res.status}] (${errorCode})`);
     const err = new Error(mapXpagError(errorCode, providerMsg));
     (err as Error & { code?: string }).code = errorCode;
@@ -67,23 +67,23 @@ function mapXpagError(code: string, fallback: string): string {
   switch (code) {
     case "invalid_credentials":
     case "missing_credentials":
-      return "Credenciais da XPag inválidas. Reconecte sua conta XPag com o Client ID e Client Secret corretos.";
+      return "Credenciales de XPag inválidas. Reconecta tu cuenta de XPag con el Client ID y Client Secret correctos.";
     case "key_inactive":
     case "permission_denied":
-      return "Sua chave da XPag não tem permissão ativa para criar cobranças.";
+      return "Tu clave de XPag no tiene permiso activo para crear cobros.";
     case "currency_not_enabled":
-      return "Esta moeda não está habilitada na sua conta XPag. Escolha outro método de pagamento.";
+      return "Esta moneda no está habilitada en la cuenta de XPag. Elige otro método de pago.";
     case "amount_below_min":
-      return "O valor deste pacote está abaixo do mínimo aceito para este método.";
+      return "El monto de este paquete está por debajo del mínimo aceptado para este método.";
     case "amount_above_limit":
-      return "O valor deste pacote ultrapassa o limite aceito para este método.";
+      return "El monto de este paquete supera el límite aceptado para este método.";
     case "provider_unavailable":
     case "maintenance":
-      return "O provedor deste método está temporariamente indisponível. Tente novamente em instantes.";
+      return "El proveedor de este método no está disponible temporalmente. Inténtalo de nuevo en unos momentos.";
     case "rate_limited":
-      return "Muitas tentativas em sequência. Aguarde alguns segundos e tente novamente.";
+      return "Demasiados intentos seguidos. Espera unos segundos e inténtalo de nuevo.";
     default:
-      return fallback || "Não foi possível gerar a cobrança agora. Tente novamente.";
+      return fallback || "No se pudo generar el cobro en este momento. Inténtalo de nuevo.";
   }
 }
 
@@ -108,14 +108,14 @@ export async function fetchLocalRates(): Promise<{ rates: Record<LocalCurrency, 
   } catch {
     // Fail closed: never charge using invented exchange rates.
   }
-  throw new Error('Não foi possível atualizar o câmbio. Tente novamente.');
+  throw new Error('No se pudo actualizar el tipo de cambio. Inténtalo de nuevo.');
 }
 
 async function fetchEnabledCurrencies(): Promise<LocalCurrency[] | null> {
   try {
     const data = await callXpag("/balance", { method: "GET" });
     const balances = data["balances"] as Record<string, unknown> | undefined;
-    if (!balances || typeof balances !== "object") throw new Error('Moedas indisponíveis.');
+    if (!balances || typeof balances !== "object") throw new Error('Monedas no disponibles.');
     const supported: LocalCurrency[] = ["MXN", "COP", "BRL"];
     const active = supported.filter((c) => Object.prototype.hasOwnProperty.call(balances, c));
     return active;
@@ -150,7 +150,7 @@ export async function getLocalCheckoutOptionsServer(priceKey: RechargeKey): Prom
     priceKey,
     priceUsd: pack.priceUsd,
     productTitle: `${pack.diamonds} Diamantes`,
-    productSubtitle: `+ ${pack.bonus} Bônus · Free Fire`,
+    productSubtitle: `+ ${pack.bonus} Bono · Free Fire`,
     quotes,
     enabledCurrencies,
     ratesLive: live,
@@ -223,18 +223,18 @@ export async function createXpagChargeServer(input: {
   rechargePackage(input.priceKey);
   const meta = getLocalMethod(input.method);
   const quote = verifyXpagProof(input.quoteToken, 'quote', signingSecret());
-  if (quote.priceKey !== input.priceKey || quote.method !== input.method || quote.currency !== meta.currency) throw new Error('Cotação inválida.');
+  if (quote.priceKey !== input.priceKey || quote.method !== input.method || quote.currency !== meta.currency) throw new Error('Cotización inválida.');
   const amount = quote.amount;
   const enabled = await fetchEnabledCurrencies();
   if (meta.disabled || !enabled?.includes(meta.currency)) {
-    throw new Error('Método indisponível nesta conta XPag.');
+    throw new Error('Método no disponible en esta cuenta de XPag.');
   }
 
   if (meta.minAmount !== undefined && amount < meta.minAmount) {
-    throw new Error(`O valor mínimo para ${meta.label} é ${meta.minAmount} ${meta.currency}.`);
+    throw new Error(`El monto mínimo para ${meta.label} es ${meta.minAmount} ${meta.currency}.`);
   }
   if (meta.maxAmount !== undefined && amount > meta.maxAmount) {
-    throw new Error(`O valor máximo para ${meta.label} é ${meta.maxAmount} ${meta.currency}.`);
+    throw new Error(`El monto máximo para ${meta.label} es ${meta.maxAmount} ${meta.currency}.`);
   }
 
   const externalId = `loc_${crypto.randomUUID()}`;
@@ -294,8 +294,8 @@ export async function createXpagChargeServer(input: {
   }
 
   const raw = await callXpag("/cashin", { method: "POST", body });
-  if (typeof raw['request_number'] !== 'string' && typeof raw['transaction_id'] !== 'string') throw new Error('A XPag não retornou a referência do pagamento.');
-  if (typeof raw['amount'] === 'number' && Math.abs(raw['amount'] - amount) > 0.001) throw new Error('Valor da cobrança diferente da cotação.');
+  if (typeof raw['request_number'] !== 'string' && typeof raw['transaction_id'] !== 'string') throw new Error('XPag no devolvió la referencia del pago.');
+  if (typeof raw['amount'] === 'number' && Math.abs(raw['amount'] - amount) > 0.001) throw new Error('El monto del cobro no coincide con la cotización.');
   const charge = parseXpagInstruction(raw, {
     method: input.method,
     currency: meta.currency,
@@ -308,12 +308,12 @@ export async function createXpagChargeServer(input: {
 
 export async function consultXpagChargeServer(input: { statusToken: string }): Promise<XpagChargeInstruction> {
   const proof = verifyXpagProof(input.statusToken, 'charge', signingSecret());
-  if (!proof.requestNumber || !proof.externalId) throw new Error('Pagamento inválido.');
+  if (!proof.requestNumber || !proof.externalId) throw new Error('Pago inválido.');
   const query = new URLSearchParams({ request_number: proof.requestNumber });
   const raw = await callXpag(`/consult-transaction?${query.toString()}`, { method: "GET" });
-  if (raw['type'] && raw['type'] !== 'cashin') throw new Error('Pagamento inválido.');
-  if (raw['currency'] && raw['currency'] !== proof.currency) throw new Error('Moeda inválida.');
-  if (typeof raw['amount'] === 'number' && Math.abs(raw['amount'] - proof.amount) > 0.001) throw new Error('Valor inválido.');
+  if (raw['type'] && raw['type'] !== 'cashin') throw new Error('Pago inválido.');
+  if (raw['currency'] && raw['currency'] !== proof.currency) throw new Error('Moneda inválida.');
+  if (typeof raw['amount'] === 'number' && Math.abs(raw['amount'] - proof.amount) > 0.001) throw new Error('Monto inválido.');
   const charge = parseXpagInstruction(raw, {
     method: proof.method,
     currency: proof.currency,
