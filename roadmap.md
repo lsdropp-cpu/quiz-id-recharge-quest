@@ -70,3 +70,8 @@
 - [x] Apply the main funnel's Halloween theme to /quiz2, /idplayer2 and /recharge2 so the variant matches /quiz exactly; verify identical layout metrics and the full flow with UTMs.
 # Local checkout handoff
 - [x] Point the main /recharge packs at the /local XPag checkout with the selected pack and campaign parameters preserved; verify all six packs and the payment step.
+
+# Meta browser-only measurement
+- [x] Install the requested Pixel on the main funnel with shared consent, disclosure and XPag paid-only purchase events; do not install CAPI or customer matching.
+- [x] Ten focused tests and browser checks confirm consent blocking, SDK load after acceptance, withdrawal and synthetic paid-only/duplicate/replay gates; no synthetic purchases sent to Meta and no charge made.
+- [ ] Verify a real paid XPag purchase and Meta receipt after publishing; blocked by the absence of a safe paid test and Events Manager access. The SDK request was observed, not a Facebook conversion receipt.

@@ -9,6 +9,7 @@ import {
 } from "@/lib/xpag";
 import { Button } from "@/components/ui/button";
 import PaymentBarcode from './PaymentBarcode';
+import { trackMetaPurchase } from '@/lib/meta-pixel';
 import { QRCodeSVG } from 'qrcode.react';
 
 type Props = {
@@ -25,6 +26,10 @@ export default function ChargeConfirmationStep({ charge, onUpdateCharge, onBack 
 
   const isPaid = charge.status === "confirmed" || charge.status === "completed";
   const isFailed = charge.status === "failed" || charge.status === "expired";
+
+  useEffect(() => {
+    if (isPaid) trackMetaPurchase(charge);
+  }, [isPaid, charge.requestNumber, charge.status, charge.amount, charge.currency]);
 
   useEffect(() => {
     if (isPaid || isFailed) return;

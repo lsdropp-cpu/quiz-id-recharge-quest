@@ -2,8 +2,8 @@ export const TIKTOK_PIXEL_ID = "DBD5O1BC77U29DFSUJ7G";
 export const UTMIFY_TIKTOK_PIXEL_IDS = ["6a6bd4f5b9b8fc887e72d81a", "6ac00ee5dffe50be16245e3c"];
 const UTMIFY_PIXEL_SRC = "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js";
 export const CONSENT_KEY = "advertising_consent_v1";
-export const NOTICE_VERSION = "tiktok-advertising-2026-10-22";
-export const NOTICE = "TikTok receives page visits, approved purchase amount and currency, browser/device information, IP address and advertising cookie identifiers to measure and optimize ads. Advertising attribution partners may read name, email or phone typed into site forms for campaign attribution; card data is never shared by this integration. Accept or reject advertising measurement; change your choice in Privacy settings.";
+export const NOTICE_VERSION = "advertising-meta-tiktok-2026-11-26";
+export const NOTICE = "Meta (Facebook/Instagram) and TikTok receive page visits, confirmed purchase amount and currency, browser/device information, IP address and advertising cookie identifiers to measure and optimize ads. Meta receives browser-only events without customer matching or server uploads. Existing advertising attribution partners may read name, email or phone typed into site forms; card data is never shared by this integration. Accept or reject advertising measurement; change or withdraw your choice at /privacy.";
 
 export type ConsentRecord = {
   visitorId: string; advertising: boolean; region: string | null;
@@ -33,7 +33,7 @@ declare global { interface Window { ttq?: Queue; TiktokAnalyticsObject?: string;
 export function readConsent(): ConsentRecord | null {
   try {
     const value = JSON.parse(localStorage.getItem(CONSENT_KEY) || "null");
-    return value && typeof value.advertising === "boolean" && typeof value.visitorId === "string" && value.noticeVersion === NOTICE_VERSION ? value : null;
+    return value && typeof value.advertising === "boolean" && typeof value.visitorId === "string" && (value.advertising === false || value.noticeVersion === NOTICE_VERSION) ? value : null;
   } catch { return null; }
 }
 export function hasAdvertisingOptOut() {
@@ -44,8 +44,10 @@ export async function resolveAdvertisingRegion() {
   try {
     const response = await fetch("/cdn-cgi/trace", { signal: AbortSignal.timeout(2000), credentials: "omit" });
     if (response.ok) {
-      const code = (await response.text()).match(/^loc=([A-Z]{2})$/m)?.[1];
-      region = code && COUNTRIES.has(code) ? code : null;
+      const trace = await response.text();
+      const code = trace.match(/^loc=([A-Z]{2})$/m)?.[1];
+      const host = trace.match(/^h=(.+)$/m)?.[1];
+      region = host === window.location.hostname && code && COUNTRIES.has(code) ? code : null;
     }
   } catch { region = null; }
   return region;

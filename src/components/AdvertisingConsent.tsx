@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { syncMetaConsent, trackMetaPage } from '@/lib/meta-pixel';
 import { hasAdvertisingOptOut, readConsent, requiresConsent, resolveAdvertisingRegion, syncTikTokConsent, trackTikTokPage, updateAdvertisingChoice } from "@/lib/tiktok-tracking";
 
 const copy = {
@@ -27,25 +28,27 @@ export default function AdvertisingConsent() {
       setHasChoice(Boolean(readConsent()));
       setReady(true);
       syncTikTokConsent();
+      syncMetaConsent();
     });
-    const changed = () => syncTikTokConsent();
+    const changed = () => { syncTikTokConsent(); syncMetaConsent(); };
     const storage = (event: StorageEvent) => { if (event.key === "advertising_consent_v1" || event.key === null) changed(); };
     window.addEventListener("storage", storage);
     window.addEventListener("advertising-consent-change", changed);
     return () => { cancelled = true; window.removeEventListener("storage", storage); window.removeEventListener("advertising-consent-change", changed); };
   }, []);
-  useEffect(() => { if (ready) trackTikTokPage(); }, [ready, pathname]);
+  useEffect(() => { if (ready) { trackTikTokPage(); trackMetaPage(); } }, [ready, pathname]);
   const choose = (accepted: boolean) => {
     if (!updateAdvertisingChoice(accepted)) return;
     setHasChoice(true);
     setOpen(false);
-    if (accepted) trackTikTokPage();
+    if (accepted) { trackTikTokPage(); trackMetaPage(); }
   };
   return <>
     {open && !hideBanner && <section aria-label={t.title} className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background p-5 text-foreground">
       <div className="mx-auto max-w-3xl space-y-3">
         <h2 className="font-semibold">{t.title}</h2>
-        <p className="text-sm text-muted-foreground">{t.body}</p>
+        <p className="text-sm text-muted-foreground">{t.body.replace('TikTok', 'Meta (Facebook/Instagram) + TikTok')}</p>
+        <a href="/privacy" className="text-sm underline">{t.policy}</a>
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" className="min-w-28" onClick={() => choose(false)}>{t.reject}</Button>
           <Button variant="outline" className="min-w-28" onClick={() => choose(true)}>{t.accept}</Button>

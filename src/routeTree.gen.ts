@@ -35,6 +35,7 @@ import { Route as Idplayer2RouteImport } from './routes/idplayer2'
 import { Route as LocalRouteImport } from './routes/local'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PresellRouteImport } from './routes/presell'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as Quiz2RouteImport } from './routes/quiz2'
 import { Route as RechargeRouteImport } from './routes/recharge'
@@ -192,6 +193,11 @@ const ObrigadoRoute = ObrigadoRouteImport.update({
 const PresellRoute = PresellRouteImport.update({
   id: '/presell',
   path: '/presell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuizRoute = QuizRouteImport.update({
@@ -364,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/local': typeof LocalRoute
   '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
+  '/privacy': typeof PrivacyRoute
   '/quiz': typeof QuizRoute
   '/quiz2': typeof Quiz2Route
   '/recharge': typeof RechargeRoute
@@ -420,6 +427,7 @@ export interface FileRoutesByTo {
   '/local': typeof LocalRoute
   '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
+  '/privacy': typeof PrivacyRoute
   '/quiz': typeof QuizRoute
   '/quiz2': typeof Quiz2Route
   '/recharge': typeof RechargeRoute
@@ -477,6 +485,7 @@ export interface FileRoutesById {
   '/local': typeof LocalRoute
   '/obrigado': typeof ObrigadoRoute
   '/presell': typeof PresellRoute
+  '/privacy': typeof PrivacyRoute
   '/quiz': typeof QuizRoute
   '/quiz2': typeof Quiz2Route
   '/recharge': typeof RechargeRoute
@@ -535,6 +544,7 @@ export interface FileRouteTypes {
     | '/local'
     | '/obrigado'
     | '/presell'
+    | '/privacy'
     | '/quiz'
     | '/quiz2'
     | '/recharge'
@@ -591,6 +601,7 @@ export interface FileRouteTypes {
     | '/local'
     | '/obrigado'
     | '/presell'
+    | '/privacy'
     | '/quiz'
     | '/quiz2'
     | '/recharge'
@@ -647,6 +658,7 @@ export interface FileRouteTypes {
     | '/local'
     | '/obrigado'
     | '/presell'
+    | '/privacy'
     | '/quiz'
     | '/quiz2'
     | '/recharge'
@@ -704,6 +716,7 @@ export interface RootRouteChildren {
   LocalRoute: typeof LocalRoute
   ObrigadoRoute: typeof ObrigadoRoute
   PresellRoute: typeof PresellRoute
+  PrivacyRoute: typeof PrivacyRoute
   QuizRoute: typeof QuizRoute
   Quiz2Route: typeof Quiz2Route
   RechargeRoute: typeof RechargeRoute
@@ -916,6 +929,13 @@ declare module '@tanstack/react-router' {
       path: '/presell'
       fullPath: '/presell'
       preLoaderRoute: typeof PresellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quiz': {
@@ -1144,6 +1164,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocalRoute: LocalRoute,
   ObrigadoRoute: ObrigadoRoute,
   PresellRoute: PresellRoute,
+  PrivacyRoute: PrivacyRoute,
   QuizRoute: QuizRoute,
   Quiz2Route: Quiz2Route,
   RechargeRoute: RechargeRoute,
