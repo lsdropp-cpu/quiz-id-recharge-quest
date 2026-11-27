@@ -3,6 +3,7 @@ import { signXpagProof, verifyXpagProof } from './xpag-proof.server';
 import {
   LOCAL_METHODS,
   getLocalMethod,
+  mapXpagTransportError,
   roundForCurrency,
   xpagProductDescription,
   type LocalCheckoutOptions,
@@ -14,7 +15,10 @@ import {
 
 const XPAG_GATEWAY_BASE = "https://connector-gateway.lovable.dev/udc_xpag";
 const RATE_CACHE_TTL_MS = 60 * 60 * 1000;
+const CURRENCY_CACHE_TTL_MS = 5 * 60 * 1000;
 const QUOTE_TTL_MS = 30 * 60_000;
+const XPAG_GET_TIMEOUT_MS = 12_000;
+const XPAG_POST_TIMEOUT_MS = 25_000;
 function signingSecret() {
   const secret = process.env['LOCAL_CHECKOUT_SIGNING_SECRET'];
   if (!secret) throw new Error('Configuración de pagos no disponible.');
@@ -22,6 +26,7 @@ function signingSecret() {
 }
 
 let cachedRates: { expiresAt: number; rates: Record<LocalCurrency, number>; live: boolean } | undefined;
+let cachedCurrencies: { expiresAt: number; currencies: LocalCurrency[] } | undefined;
 
 function getGatewayHeaders(): Record<string, string> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -39,28 +44,45 @@ function getGatewayHeaders(): Record<string, string> {
 
 async function callXpag(path: string, init: { method?: "GET" | "POST"; body?: Record<string, unknown> } = {}) {
   const headers = getGatewayHeaders();
-  const res = await fetch(`${XPAG_GATEWAY_BASE}${path}`, {
-    method: init.method ?? "GET",
-    headers,
-    body: init.body ? JSON.stringify(init.body) : undefined,
-    signal: AbortSignal.timeout(15_000),
-  });
-  const text = await res.text();
-  let json: Record<string, unknown> | null = null;
-  try {
-    json = text ? (JSON.parse(text) as Record<string, unknown>) : null;
-  } catch {
-    json = null;
+  const method = init.method ?? "GET";
+  const timeoutMs = method === "POST" ? XPAG_POST_TIMEOUT_MS : XPAG_GET_TIMEOUT_MS;
+  const maxAttempts = method === "GET" ? 2 : 1;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(`${XPAG_GATEWAY_BASE}${path}`, {
+        method,
+        headers,
+        body: init.body ? JSON.stringify(init.body) : undefined,
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (error) {
+      if (attempt < maxAttempts) continue;
+      console.error(`XPag transport error on ${method} ${path}:`, error instanceof Error ? error.message : error);
+      throw new Error(mapXpagTransportError(error));
+    }
+
+    const text = await res.text();
+    let json: Record<string, unknown> | null = null;
+    try {
+      json = text ? (JSON.parse(text) as Record<string, unknown>) : null;
+    } catch {
+      json = null;
+    }
+    if (!res.ok || (json && json["ok"] === false)) {
+      if (attempt < maxAttempts && res.status >= 500) continue;
+      const errorCode = typeof json?.["error_code"] === "string" ? json["error_code"] : `http_${res.status}`;
+      const providerMsg = typeof json?.["error"] === "string" ? json["error"] : 'Error al consultar XPag.';
+      console.error(`XPag error [${res.status}] (${errorCode})`);
+      const err = new Error(mapXpagError(errorCode, providerMsg));
+      (err as Error & { code?: string }).code = errorCode;
+      throw err;
+    }
+    return json ?? {};
   }
-  if (!res.ok || (json && json["ok"] === false)) {
-    const errorCode = typeof json?.["error_code"] === "string" ? json["error_code"] : `http_${res.status}`;
-    const providerMsg = typeof json?.["error"] === "string" ? json["error"] : 'Error al consultar XPag.';
-    console.error(`XPag error [${res.status}] (${errorCode})`);
-    const err = new Error(mapXpagError(errorCode, providerMsg));
-    (err as Error & { code?: string }).code = errorCode;
-    throw err;
-  }
-  return json ?? {};
+
+  throw new Error(mapXpagTransportError(null));
 }
 
 function mapXpagError(code: string, fallback: string): string {
@@ -111,17 +133,17 @@ export async function fetchLocalRates(): Promise<{ rates: Record<LocalCurrency, 
   throw new Error('No se pudo actualizar el tipo de cambio. Inténtalo de nuevo.');
 }
 
-async function fetchEnabledCurrencies(): Promise<LocalCurrency[] | null> {
-  try {
-    const data = await callXpag("/balance", { method: "GET" });
-    const balances = data["balances"] as Record<string, unknown> | undefined;
-    if (!balances || typeof balances !== "object") throw new Error('Monedas no disponibles.');
-    const supported: LocalCurrency[] = ["MXN", "COP", "BRL"];
-    const active = supported.filter((c) => Object.prototype.hasOwnProperty.call(balances, c));
-    return active;
-  } catch (error) {
-    throw error;
+async function fetchEnabledCurrencies(): Promise<LocalCurrency[]> {
+  if (cachedCurrencies && cachedCurrencies.expiresAt > Date.now()) {
+    return cachedCurrencies.currencies;
   }
+  const data = await callXpag("/balance", { method: "GET" });
+  const balances = data["balances"] as Record<string, unknown> | undefined;
+  if (!balances || typeof balances !== "object") throw new Error('Monedas no disponibles.');
+  const supported: LocalCurrency[] = ["MXN", "COP", "BRL"];
+  const active = supported.filter((c) => Object.prototype.hasOwnProperty.call(balances, c));
+  cachedCurrencies = { expiresAt: Date.now() + CURRENCY_CACHE_TTL_MS, currencies: active };
+  return active;
 }
 
 export async function getLocalCheckoutOptionsServer(priceKey: RechargeKey): Promise<LocalCheckoutOptions> {
@@ -131,9 +153,10 @@ export async function getLocalCheckoutOptionsServer(priceKey: RechargeKey): Prom
     fetchEnabledCurrencies(),
   ]);
 
-  const quotes = {} as Record<LocalMethodId, MethodQuote>;
+  const quotes: Partial<Record<LocalMethodId, MethodQuote>> = {};
   const expiresAt = Date.now() + QUOTE_TTL_MS;
   for (const method of LOCAL_METHODS) {
+    if (method.disabled || !enabledCurrencies.includes(method.currency)) continue;
     const rate = rates[method.currency];
     const amount = roundForCurrency(pack.priceUsd, rate, method.currency);
     quotes[method.id] = {
@@ -225,8 +248,7 @@ export async function createXpagChargeServer(input: {
   const quote = verifyXpagProof(input.quoteToken, 'quote', signingSecret());
   if (quote.priceKey !== input.priceKey || quote.method !== input.method || quote.currency !== meta.currency) throw new Error('Cotización inválida.');
   const amount = quote.amount;
-  const enabled = await fetchEnabledCurrencies();
-  if (meta.disabled || !enabled?.includes(meta.currency)) {
+  if (meta.disabled) {
     throw new Error('Método no disponible en esta cuenta de XPag.');
   }
 

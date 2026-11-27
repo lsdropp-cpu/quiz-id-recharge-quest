@@ -130,7 +130,7 @@ export type LocalCheckoutOptions = {
   priceUsd: number;
   productTitle: string;
   productSubtitle: string;
-  quotes: Record<LocalMethodId, MethodQuote>;
+  quotes: Partial<Record<LocalMethodId, MethodQuote>>;
   enabledCurrencies: LocalCurrency[] | null;
   ratesLive: boolean;
 };
@@ -201,4 +201,15 @@ export function roundForCurrency(usdAmount: number, rate: number, currency: Loca
     return Math.round(raw);
   }
   return Math.round(raw * 100) / 100;
+}
+
+export function mapXpagTransportError(error: unknown): string {
+  if (error instanceof Error) {
+    const name = error.name.toLowerCase();
+    const msg = error.message.toLowerCase();
+    if (name === "timeouterror" || name === "aborterror" || msg.includes("timeout") || msg.includes("aborted")) {
+      return "La conexión con el procesador de pagos tardó demasiado. Inténtalo de nuevo en unos segundos.";
+    }
+  }
+  return "No se pudo conectar con el procesador de pagos. Inténtalo de nuevo en unos segundos.";
 }

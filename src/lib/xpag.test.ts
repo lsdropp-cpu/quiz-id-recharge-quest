@@ -6,6 +6,7 @@ import {
   formatLocalAmount,
   getLocalMethod,
   getOfferedLocalMethods,
+  mapXpagTransportError,
   roundForCurrency,
   xpagProductDescription,
 } from "./xpag";
@@ -61,4 +62,16 @@ test("offers only Colombia local methods (Nequi and Bre-B) and hides Mexico and 
   strictEqual(offered.includes("NEQUI"), true);
   strictEqual(offered.includes("BREB"), true);
   strictEqual(offered.length, 2);
+});
+
+test("maps timeout and network errors to friendly Spanish messages", () => {
+  const timeoutErr = new DOMException("The operation was aborted due to timeout", "TimeoutError");
+  strictEqual(
+    mapXpagTransportError(timeoutErr),
+    "La conexión con el procesador de pagos tardó demasiado. Inténtalo de nuevo en unos segundos.",
+  );
+  strictEqual(
+    mapXpagTransportError(new Error("fetch failed")),
+    "No se pudo conectar con el procesador de pagos. Inténtalo de nuevo en unos segundos.",
+  );
 });
