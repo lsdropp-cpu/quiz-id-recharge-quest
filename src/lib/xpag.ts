@@ -172,6 +172,14 @@ export function formatLocalAmount(amount: number, currency: LocalCurrency): stri
   return `${CURRENCY_PREFIX[currency]} ${formatted}`;
 }
 
+export function formatCopAmount(amount: number): string {
+  const formatted = new Intl.NumberFormat("es-CO", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Math.round(amount));
+  return `CO$ ${formatted}`;
+}
+
 // XPag has no separate product-name field: `description` is the text the payer
 // sees on the rail, so it carries the product name.
 export const XPAG_PRODUCT_NAME = "DEG Guia do Dimas";

@@ -1,10 +1,32 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { RechargeKey } from "./recharge-packages";
 import {
   createChargeInputSchema,
   type LocalCheckoutOptions,
   type XpagChargeInstruction,
 } from "./xpag";
+
+export const getColombiaRechargePrices = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ prices: Record<RechargeKey, number> | null; error: string | null }> => {
+    try {
+      const { fetchLocalRates } = await import("./xpag.server");
+      const { rechargePackages } = await import("./recharge-packages");
+      const { roundForCurrency } = await import("./xpag");
+      const { rates } = await fetchLocalRates();
+      const prices = {} as Record<RechargeKey, number>;
+      for (const pack of rechargePackages) {
+        prices[pack.key] = roundForCurrency(pack.priceUsd, rates.COP, "COP");
+      }
+      return { prices, error: null };
+    } catch (err) {
+      return {
+        prices: null,
+        error: err instanceof Error ? err.message : "No se pudieron cargar los precios en pesos colombianos.",
+      };
+    }
+  },
+);
 
 export const getLocalCheckoutOptions = createServerFn({ method: "POST" })
   .inputValidator((data) =>

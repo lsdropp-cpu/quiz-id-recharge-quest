@@ -2,6 +2,7 @@ import { test } from "node:test";
 import { strictEqual } from "node:assert/strict";
 import {
   createChargeInputSchema,
+  formatCopAmount,
   formatLocalAmount,
   getLocalMethod,
   getOfferedLocalMethods,
@@ -19,6 +20,7 @@ test("formats local currencies with the expected prefixes", () => {
   strictEqual(formatLocalAmount(199.22, "MXN"), "MX$ 199,22");
   strictEqual(formatLocalAmount(42782, "COP"), "CO$ 42.782,00");
   strictEqual(formatLocalAmount(57.54, "BRL"), "R$ 57,54");
+  strictEqual(formatCopAmount(42782), "CO$ 42.782");
 });
 
 test("sends only DEG Guia do Dimas as the product name to XPag without diamond amount", () => {

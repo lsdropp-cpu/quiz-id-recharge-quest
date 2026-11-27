@@ -7,20 +7,16 @@ import SocialProofToasts from "@/components/SocialProofToasts";
 import { MethodLogo } from "@/components/local-checkout/MethodBadges";
 import diamondIcon from "@/assets/diamond-icon.png";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
-import { rechargePackages, formatRechargePrice, type RechargeKey } from "@/lib/recharge-packages";
+import { rechargePackages, type RechargeKey } from "@/lib/recharge-packages";
 import { localCheckoutUrl } from "@/lib/local-checkout-url";
-import { LOCAL_METHODS, type LocalMethodId } from "@/lib/xpag";
+import { formatCopAmount, LOCAL_METHODS, type LocalMethodId } from "@/lib/xpag";
+import { getColombiaRechargePrices } from "@/lib/xpag.functions";
 import { Button } from "@/components/ui/button";
-
-const packages = rechargePackages.map((pkg) => ({
-  ...pkg,
-  price: formatRechargePrice(pkg.priceUsd),
-}));
-
 
 const paymentMethods = LOCAL_METHODS.filter((m) => !m.disabled);
 
 export const Route = createFileRoute("/recharge")({
+  loader: () => getColombiaRechargePrices(),
   head: () => ({
     meta: [
       { title: "Recarga de Diamantes — Free Fire" },
@@ -36,12 +32,18 @@ export const Route = createFileRoute("/recharge")({
 
 function RechargePage() {
   useFunnelTracking("recharge");
+  const { prices: copPrices, error: ratesError } = Route.useLoaderData();
   const [selectedPack, setSelectedPack] = useState<RechargeKey | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<LocalMethodId | null>(null);
   const [packRequiredHint, setPackRequiredHint] = useState(false);
   const [methodRequiredHint, setMethodRequiredHint] = useState(false);
   const packsRef = useRef<HTMLDivElement>(null);
   const methodsRef = useRef<HTMLDivElement>(null);
+
+  const packages = rechargePackages.map((pkg) => ({
+    ...pkg,
+    price: copPrices ? formatCopAmount(copPrices[pkg.key]) : "—",
+  }));
 
   const chosenPackage = selectedPack ? packages.find((p) => p.key === selectedPack) : null;
 
@@ -109,6 +111,12 @@ function RechargePage() {
               </p>
             )}
 
+            {ratesError && (
+              <p role="alert" className="mb-3 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+                {ratesError}
+              </p>
+            )}
+
             <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
               {packages.map((pkg) => {
                 const isSelected = selectedPack === pkg.key;
@@ -140,7 +148,7 @@ function RechargePage() {
                       </div>
                       <p className="text-violet-400 font-medium text-[10px] sm:text-xs">Diamantes</p>
                       <div className="w-12 h-px bg-border mx-auto my-2 sm:my-2.5" />
-                      <p className="font-display text-primary font-extrabold text-2xl sm:text-3xl tracking-tight drop-shadow-[0_0_8px_rgba(255,122,20,0.4)]">{pkg.price}</p>
+                      <p className="font-display text-primary font-extrabold text-xl sm:text-2xl tracking-tight whitespace-nowrap drop-shadow-[0_0_8px_rgba(255,122,20,0.4)]">{pkg.price}</p>
                       <div className="mt-2 sm:mt-3 bg-primary/10 border border-primary/30 rounded-lg py-1.5 px-2">
                         <p className="text-primary text-[10px] sm:text-xs font-semibold">+ {pkg.bonus} Diamantes bonus</p>
                       </div>
@@ -154,7 +162,7 @@ function RechargePage() {
               Tus créditos se acreditarán a tu cuenta de juego tan pronto como recibamos la confirmación del pago. Además de los diamantes de bonificación, también recibirás una bonificación del 20% en los artículos del juego.
             </p>
             <p className="text-xs text-primary text-center font-medium">
-              ¡El importe de la recarga se convertirá automáticamente a tu moneda local!
+              ¡Precios mostrados en pesos colombianos (COP)!
             </p>
           </div>
 
