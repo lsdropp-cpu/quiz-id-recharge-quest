@@ -22,6 +22,7 @@ export const LOCAL_METHODS: LocalMethodMeta[] = [
     label: "OXXO",
     currency: "MXN",
     countryLabel: "México",
+    disabled: true,
     helperText: "Verás un código de barras para pagar en efectivo en cualquier tienda OXXO.",
     instructions: [
       "Ve a cualquier tienda OXXO.",
@@ -36,6 +37,7 @@ export const LOCAL_METHODS: LocalMethodMeta[] = [
     label: "SPEI",
     currency: "MXN",
     countryLabel: "México",
+    disabled: true,
     helperText: "Recibirás una CLABE exclusiva para transferir directo desde tu banco en México.",
     instructions: [
       "Abre la app de tu banco y elige transferir por SPEI.",

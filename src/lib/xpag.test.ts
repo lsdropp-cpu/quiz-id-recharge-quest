@@ -51,10 +51,12 @@ test("validates customer name, email, package, and payment method", () => {
   strictEqual(invalidEmail.success, false);
 });
 
-test("hides Pix from offered local methods even when BRL is enabled in account balances", () => {
+test("offers only Colombia local methods (Nequi and Bre-B) and hides Mexico and Brazil", () => {
   const offered = getOfferedLocalMethods(["MXN", "COP", "BRL"]).map((m) => m.id);
   strictEqual(offered.includes("PIX"), false);
-  strictEqual(offered.includes("OXXO"), true);
+  strictEqual(offered.includes("OXXO"), false);
+  strictEqual(offered.includes("SPEI"), false);
   strictEqual(offered.includes("NEQUI"), true);
   strictEqual(offered.includes("BREB"), true);
+  strictEqual(offered.length, 2);
 });

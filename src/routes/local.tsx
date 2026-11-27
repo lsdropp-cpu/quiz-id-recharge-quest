@@ -5,7 +5,7 @@ import type { RechargeKey } from "@/lib/recharge-packages";
 import type { LocalMethodId } from "@/lib/xpag";
 
 const KEYS = [9, 15, 19, 25, 29, 35] as const;
-const METHODS: readonly LocalMethodId[] = ["OXXO", "SPEI", "NEQUI", "BREB"];
+const METHODS: readonly LocalMethodId[] = ["NEQUI", "BREB"];
 
 export const Route = createFileRoute("/local")({
   // `p` stays a number so the address bar reads /local?p=19 instead of /local?p=%2219%22.
@@ -27,9 +27,9 @@ export const Route = createFileRoute("/local")({
   head: () => ({
     meta: [
       { title: "Pago local — Recarga de Diamantes" },
-      { name: "description", content: "Completa tu recarga con pago local mediante OXXO, SPEI, Nequi o Bre-B." },
+      { name: "description", content: "Completa tu recarga con pago local en Colombia mediante Nequi o Bre-B." },
       { property: "og:title", content: "Pago local — Recarga de Diamantes" },
-      { property: "og:description", content: "Completa tu recarga con pago local mediante OXXO, SPEI, Nequi o Bre-B." },
+      { property: "og:description", content: "Completa tu recarga con pago local en Colombia mediante Nequi o Bre-B." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },

@@ -43,7 +43,7 @@ export default function LocalXpagCheckout({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string }>({});
-  const [selectedMethod, setSelectedMethod] = useState<LocalMethodId>(initialMethod ?? "OXXO");
+  const [selectedMethod, setSelectedMethod] = useState<LocalMethodId>(initialMethod ?? "NEQUI");
   const [submitting, setSubmitting] = useState(false);
   const [chargeError, setChargeError] = useState<string | null>(null);
   const [charge, setCharge] = useState<XpagChargeInstruction | null>(null);
