@@ -63,6 +63,7 @@ import { Route as FrRechargeRouteImport } from './routes/fr.recharge'
 import { Route as ApiPublicFreepayWebhookRouteImport } from './routes/api/public/freepay-webhook'
 import { Route as ApiPublicProcessCardPaymentRouteImport } from './routes/api/public/process-card-payment'
 import { Route as ApiPublicRegisterUtmifySaleRouteImport } from './routes/api/public/register-utmify-sale'
+import { Route as ApiPublicXpagWebhookRouteImport } from './routes/api/public/xpag-webhook'
 import { Route as BrCheckoutPlanRouteImport } from './routes/br.checkout.$plan'
 
 const IndexRoute = IndexRouteImport.update({
@@ -337,6 +338,11 @@ const ApiPublicRegisterUtmifySaleRoute =
     path: '/api/public/register-utmify-sale',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicXpagWebhookRoute = ApiPublicXpagWebhookRouteImport.update({
+  id: '/api/public/xpag-webhook',
+  path: '/api/public/xpag-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BrCheckoutPlanRoute = BrCheckoutPlanRouteImport.update({
   id: '/br/checkout/$plan',
   path: '/br/checkout/$plan',
@@ -398,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
   '/api/public/process-card-payment': typeof ApiPublicProcessCardPaymentRoute
   '/api/public/register-utmify-sale': typeof ApiPublicRegisterUtmifySaleRoute
+  '/api/public/xpag-webhook': typeof ApiPublicXpagWebhookRoute
   '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRoutesByTo {
@@ -455,6 +462,7 @@ export interface FileRoutesByTo {
   '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
   '/api/public/process-card-payment': typeof ApiPublicProcessCardPaymentRoute
   '/api/public/register-utmify-sale': typeof ApiPublicRegisterUtmifySaleRoute
+  '/api/public/xpag-webhook': typeof ApiPublicXpagWebhookRoute
   '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRoutesById {
@@ -513,6 +521,7 @@ export interface FileRoutesById {
   '/api/public/freepay-webhook': typeof ApiPublicFreepayWebhookRoute
   '/api/public/process-card-payment': typeof ApiPublicProcessCardPaymentRoute
   '/api/public/register-utmify-sale': typeof ApiPublicRegisterUtmifySaleRoute
+  '/api/public/xpag-webhook': typeof ApiPublicXpagWebhookRoute
   '/br/checkout/$plan': typeof BrCheckoutPlanRoute
 }
 export interface FileRouteTypes {
@@ -572,6 +581,7 @@ export interface FileRouteTypes {
     | '/api/public/freepay-webhook'
     | '/api/public/process-card-payment'
     | '/api/public/register-utmify-sale'
+    | '/api/public/xpag-webhook'
     | '/br/checkout/$plan'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -629,6 +639,7 @@ export interface FileRouteTypes {
     | '/api/public/freepay-webhook'
     | '/api/public/process-card-payment'
     | '/api/public/register-utmify-sale'
+    | '/api/public/xpag-webhook'
     | '/br/checkout/$plan'
   id:
     | '__root__'
@@ -686,6 +697,7 @@ export interface FileRouteTypes {
     | '/api/public/freepay-webhook'
     | '/api/public/process-card-payment'
     | '/api/public/register-utmify-sale'
+    | '/api/public/xpag-webhook'
     | '/br/checkout/$plan'
   fileRoutesById: FileRoutesById
 }
@@ -744,6 +756,7 @@ export interface RootRouteChildren {
   ApiPublicFreepayWebhookRoute: typeof ApiPublicFreepayWebhookRoute
   ApiPublicProcessCardPaymentRoute: typeof ApiPublicProcessCardPaymentRoute
   ApiPublicRegisterUtmifySaleRoute: typeof ApiPublicRegisterUtmifySaleRoute
+  ApiPublicXpagWebhookRoute: typeof ApiPublicXpagWebhookRoute
   BrCheckoutPlanRoute: typeof BrCheckoutPlanRoute
 }
 
@@ -1127,6 +1140,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRegisterUtmifySaleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/xpag-webhook': {
+      id: '/api/public/xpag-webhook'
+      path: '/api/public/xpag-webhook'
+      fullPath: '/api/public/xpag-webhook'
+      preLoaderRoute: typeof ApiPublicXpagWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/br/checkout/$plan': {
       id: '/br/checkout/$plan'
       path: '/br/checkout/$plan'
@@ -1192,6 +1212,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicFreepayWebhookRoute: ApiPublicFreepayWebhookRoute,
   ApiPublicProcessCardPaymentRoute: ApiPublicProcessCardPaymentRoute,
   ApiPublicRegisterUtmifySaleRoute: ApiPublicRegisterUtmifySaleRoute,
+  ApiPublicXpagWebhookRoute: ApiPublicXpagWebhookRoute,
   BrCheckoutPlanRoute: BrCheckoutPlanRoute,
 }
 export const routeTree = rootRouteImport

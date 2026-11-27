@@ -1,7 +1,17 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
+const trackingProofSchema = z.object({
+  src: z.string().max(150).optional(),
+  sck: z.string().max(150).optional(),
+  utm_source: z.string().max(150).optional(),
+  utm_medium: z.string().max(150).optional(),
+  utm_campaign: z.string().max(150).optional(),
+  utm_content: z.string().max(150).optional(),
+  utm_term: z.string().max(150).optional(),
+  utm_id: z.string().max(150).optional(),
+});
 const proofSchema = z.object({
-  kind: z.enum(['quote', 'charge']),
+  kind: z.enum(['quote', 'charge', 'webhook']),
   priceKey: z.enum(['9', '15', '19', '25', '29', '35']),
   method: z.enum(['OXXO', 'SPEI', 'NEQUI', 'BREB', 'PIX']),
   currency: z.enum(['MXN', 'COP', 'BRL']),
@@ -9,6 +19,10 @@ const proofSchema = z.object({
   expiresAt: z.number().int().positive(),
   requestNumber: z.string().max(128).optional(),
   externalId: z.string().max(128).optional(),
+  createdAt: z.string().max(40).optional(),
+  customerName: z.string().max(120).optional(),
+  customerEmail: z.string().max(255).optional(),
+  tracking: trackingProofSchema.optional(),
 });
 export type XpagProof = z.infer<typeof proofSchema>;
 export function signXpagProof(proof: XpagProof, secret: string) {

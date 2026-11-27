@@ -4,6 +4,7 @@ import { ArrowRight, Check, ChevronLeft, Info, Loader2, Lock } from "lucide-reac
 import diamondBonus from "@/assets/diamond-bonus.png";
 import { Button } from "@/components/ui/button";
 import { rechargePackage, type RechargeKey } from "@/lib/recharge-packages";
+import { resolveTracking } from "@/lib/tracking";
 import {
   formatLocalAmount,
   getLocalMethod,
@@ -98,6 +99,7 @@ export default function LocalXpagCheckout({
     setSubmitting(true);
     setChargeError(null);
     try {
+    const tracking = resolveTracking(window.location.search);
     const res = await createChargeFn({
       data: {
         priceKey,
@@ -105,6 +107,7 @@ export default function LocalXpagCheckout({
         name: name.trim(),
         email: email.trim(),
         quoteToken: activeQuote?.token ?? "",
+        tracking,
       },
     });
     setSubmitting(false);

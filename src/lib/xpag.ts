@@ -110,10 +110,22 @@ export const localCustomerSchema = z.object({
     .max(255, "Correo electrónico demasiado largo."),
 });
 
+export const localTrackingSchema = z.object({
+  src: z.string().max(200).nullish(),
+  sck: z.string().max(200).nullish(),
+  utm_source: z.string().max(200).nullish(),
+  utm_medium: z.string().max(200).nullish(),
+  utm_campaign: z.string().max(200).nullish(),
+  utm_content: z.string().max(200).nullish(),
+  utm_term: z.string().max(200).nullish(),
+  utm_id: z.string().max(200).nullish(),
+});
+
 export const createChargeInputSchema = localCustomerSchema.extend({
   priceKey: z.enum(["9", "15", "19", "25", "29", "35"]),
   method: z.enum(["OXXO", "SPEI", "NEQUI", "BREB", "PIX"]),
   quoteToken: z.string().min(1).max(4096),
+  tracking: localTrackingSchema.optional(),
 });
 
 export type MethodQuote = {

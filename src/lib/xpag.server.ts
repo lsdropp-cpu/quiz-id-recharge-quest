@@ -1,5 +1,6 @@
 import { rechargePackage, type RechargeKey } from "./recharge-packages";
 import { signXpagProof, verifyXpagProof } from './xpag-proof.server';
+import { sanitizeXpagTracking, sendXpagSaleToUtmify } from "./xpag-utmify.server";
 import {
   LOCAL_METHODS,
   getLocalMethod,
@@ -14,6 +15,7 @@ import {
 } from "./xpag";
 
 const XPAG_GATEWAY_BASE = "https://connector-gateway.lovable.dev/udc_xpag";
+const XPAG_WEBHOOK_BASE = "https://project--1c83f521-baf1-47ed-95c2-7b07e3b6cabd.lovable.app/api/public/xpag-webhook";
 const RATE_CACHE_TTL_MS = 60 * 60 * 1000;
 const CURRENCY_CACHE_TTL_MS = 5 * 60 * 1000;
 const QUOTE_TTL_MS = 30 * 60_000;
@@ -27,6 +29,7 @@ function signingSecret() {
 
 let cachedRates: { expiresAt: number; rates: Record<LocalCurrency, number>; live: boolean } | undefined;
 let cachedCurrencies: { expiresAt: number; currencies: LocalCurrency[] } | undefined;
+const utmifyPaidSent = new Set<string>();
 
 function getGatewayHeaders(): Record<string, string> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -242,6 +245,7 @@ export async function createXpagChargeServer(input: {
   name: string;
   email: string;
   quoteToken: string;
+  tracking?: Record<string, string | null | undefined>;
 }): Promise<XpagChargeInstruction> {
   rechargePackage(input.priceKey);
   const meta = getLocalMethod(input.method);
@@ -261,6 +265,23 @@ export async function createXpagChargeServer(input: {
 
   const externalId = `loc_${crypto.randomUUID()}`;
   const description = xpagProductDescription();
+  const createdAt = new Date().toISOString();
+  const tracking = sanitizeXpagTracking(input.tracking);
+  const webhookToken = signXpagProof(
+    {
+      ...quote,
+      kind: "webhook",
+      expiresAt: Date.now() + 13 * 24 * 60 * 60_000,
+      externalId,
+      createdAt,
+      customerName: input.name,
+      customerEmail: input.email,
+      ...(Object.keys(tracking).length > 0 ? { tracking } : {}),
+    },
+    signingSecret(),
+  );
+  const webhookUrl = `${XPAG_WEBHOOK_BASE}?t=${encodeURIComponent(webhookToken)}`;
+  const maybeWebhook = webhookUrl.length <= 2000 ? { webhook_url: webhookUrl } : {};
 
   let body: Record<string, unknown>;
   switch (input.method) {
@@ -273,6 +294,7 @@ export async function createXpagChargeServer(input: {
         generateCheckout: false,
         description,
         external_id: externalId,
+        ...maybeWebhook,
       };
       break;
     case "SPEI":
@@ -282,6 +304,7 @@ export async function createXpagChargeServer(input: {
         name: input.name,
         description,
         external_id: externalId,
+        ...maybeWebhook,
       };
       break;
     case "NEQUI":
@@ -292,6 +315,7 @@ export async function createXpagChargeServer(input: {
         generateCheckout: false,
         description,
         external_id: externalId,
+        ...maybeWebhook,
       };
       break;
     case "BREB":
@@ -302,6 +326,7 @@ export async function createXpagChargeServer(input: {
         generateCheckout: false,
         description,
         external_id: externalId,
+        ...maybeWebhook,
       };
       break;
     case "PIX":
@@ -311,6 +336,7 @@ export async function createXpagChargeServer(input: {
         name: input.name,
         description,
         external_id: externalId,
+        ...maybeWebhook,
       };
       break;
   }
@@ -324,7 +350,36 @@ export async function createXpagChargeServer(input: {
     amount,
     externalId,
   });
-  charge.statusToken = signXpagProof({ ...quote, kind: 'charge', expiresAt: Date.now() + 13 * 24 * 60 * 60_000, requestNumber: charge.requestNumber, externalId }, signingSecret());
+  charge.statusToken = signXpagProof(
+    {
+      ...quote,
+      kind: 'charge',
+      expiresAt: Date.now() + 13 * 24 * 60 * 60_000,
+      requestNumber: charge.requestNumber,
+      externalId,
+      createdAt,
+      customerName: input.name,
+      customerEmail: input.email,
+      ...(Object.keys(tracking).length > 0 ? { tracking } : {}),
+    },
+    signingSecret(),
+  );
+
+  const fee = typeof raw["fee"] === "number" ? raw["fee"] : undefined;
+  await sendXpagSaleToUtmify({
+    requestNumber: charge.requestNumber,
+    priceKey: input.priceKey,
+    method: input.method,
+    currency: meta.currency,
+    amount: charge.amount,
+    ...(fee !== undefined ? { fee } : {}),
+    status: "waiting_payment",
+    createdAt,
+    customerName: input.name,
+    customerEmail: input.email,
+    ...(Object.keys(tracking).length > 0 ? { tracking } : {}),
+  });
+
   return charge;
 }
 
@@ -344,5 +399,86 @@ export async function consultXpagChargeServer(input: { statusToken: string }): P
   });
   charge.requestNumber = proof.requestNumber;
   charge.statusToken = input.statusToken;
+
+  const isPaid = charge.status === "confirmed" || charge.status === "completed";
+  if (isPaid && !utmifyPaidSent.has(proof.requestNumber)) {
+    const fee = typeof raw["fee"] === "number" ? raw["fee"] : undefined;
+    const delivered = await sendXpagSaleToUtmify({
+      requestNumber: proof.requestNumber,
+      priceKey: proof.priceKey,
+      method: proof.method,
+      currency: proof.currency,
+      amount: charge.amount,
+      ...(fee !== undefined ? { fee } : {}),
+      status: "paid",
+      createdAt: proof.createdAt ?? new Date().toISOString(),
+      approvedAt: new Date().toISOString(),
+      customerName: proof.customerName ?? "Cliente",
+      customerEmail: proof.customerEmail ?? "",
+      ...(proof.tracking ? { tracking: proof.tracking } : {}),
+    });
+    if (delivered) utmifyPaidSent.add(proof.requestNumber);
+  }
+
   return charge;
+}
+
+export async function handleXpagWebhookServer(token: string, body: Record<string, unknown>): Promise<{ ok: boolean; status: number }> {
+  let proof;
+  try {
+    proof = verifyXpagProof(token, "webhook", signingSecret());
+  } catch {
+    return { ok: false, status: 401 };
+  }
+  if (!proof.externalId) return { ok: false, status: 401 };
+
+  const externalId = typeof body["external_id"] === "string" ? body["external_id"].trim() : "";
+  if (!externalId || externalId !== proof.externalId) return { ok: false, status: 401 };
+
+  const type = typeof body["type"] === "string" ? body["type"] : "";
+  const webhookStatus = typeof body["status"] === "string" ? body["status"] : "";
+  if (type !== "cashin" || (webhookStatus !== "confirmed" && webhookStatus !== "completed")) {
+    return { ok: true, status: 200 };
+  }
+
+  const requestNumber =
+    (typeof body["request_number"] === "string" && body["request_number"].trim()) ||
+    (typeof body["transaction_id"] === "string" && body["transaction_id"].trim()) ||
+    "";
+  if (!requestNumber) return { ok: false, status: 400 };
+
+  // Re-verify directly with XPag before reporting a paid sale to Utmify.
+  const query = new URLSearchParams({ request_number: requestNumber });
+  const verified = await callXpag(`/consult-transaction?${query.toString()}`, { method: "GET" });
+  const verifiedStatus = typeof verified["status"] === "string" ? verified["status"] : "";
+  if (verified["type"] && verified["type"] !== "cashin") return { ok: false, status: 400 };
+  if (verified["currency"] && verified["currency"] !== proof.currency) return { ok: false, status: 400 };
+  if (typeof verified["amount"] === "number" && Math.abs(verified["amount"] - proof.amount) > 0.001) {
+    return { ok: false, status: 400 };
+  }
+  if (verifiedStatus !== "confirmed" && verifiedStatus !== "completed") {
+    return { ok: true, status: 200 };
+  }
+
+  if (!utmifyPaidSent.has(requestNumber)) {
+    const amount = typeof verified["amount"] === "number" && verified["amount"] > 0 ? verified["amount"] : proof.amount;
+    const fee = typeof verified["fee"] === "number" ? verified["fee"] : undefined;
+    const delivered = await sendXpagSaleToUtmify({
+      requestNumber,
+      priceKey: proof.priceKey,
+      method: proof.method,
+      currency: proof.currency,
+      amount,
+      ...(fee !== undefined ? { fee } : {}),
+      status: "paid",
+      createdAt: proof.createdAt ?? new Date().toISOString(),
+      approvedAt: new Date().toISOString(),
+      customerName: proof.customerName ?? "Cliente",
+      customerEmail: proof.customerEmail ?? "",
+      ...(proof.tracking ? { tracking: proof.tracking } : {}),
+    });
+    if (delivered) utmifyPaidSent.add(requestNumber);
+  }
+
+  return { ok: true, status: 200 };
 }
