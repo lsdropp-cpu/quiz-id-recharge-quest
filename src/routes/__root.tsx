@@ -80,7 +80,7 @@ function ErrorComponent({ error, reset }: import("@tanstack/react-router").Error
   );
 }
 
-const BR_SCRIPTS = [
+const UTMIFY_SCRIPTS = [
   {
     src: "https://cdn.utmify.com.br/scripts/utms/latest.js",
     async: true,
@@ -90,13 +90,10 @@ const BR_SCRIPTS = [
   },
   { children: 'window.pixelId = "6ac3c40c0b8aa0336e8b2ded";' },
   { src: "https://cdn.utmify.com.br/scripts/pixel/pixel.js", async: true, defer: true },
-
 ];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: ({ matches }) => {
-    const isBr = matches.some((m) => m.pathname === "/br" || m.pathname.startsWith("/br/"));
-    return {
+  head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -120,27 +117,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "/favicon.png",
       },
     ],
-    // Brazilian funnel has its own Utmify account; Spanish pages keep theirs.
-    scripts: isBr ? BR_SCRIPTS : [
-      {
-        src: "https://cdn.utmify.com.br/scripts/utms/latest.js",
-        async: true,
-        defer: true,
-        "data-utmify-prevent-xcod-sck": "",
-        "data-utmify-prevent-subids": "",
-      },
-      {
-        children: 'window.pixelId = "68966bec0ad50b6867bbee95";',
-      },
-      {
-        src: "https://cdn.utmify.com.br/scripts/pixel/pixel.js",
-        async: true,
-        defer: true,
-      },
-
-    ],
-    };
-  },
+    scripts: UTMIFY_SCRIPTS,
+  }),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
